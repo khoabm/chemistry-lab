@@ -95,6 +95,55 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-Project bootstrap.
+M0 project foundation: a static, empty laboratory shell. Equipment and chemical
+palettes are placeholders; reset is disabled. Laboratory interactions and
+chemistry are reserved for later milestones.
 
 See the active milestone in `docs/MILESTONES.md`.
+
+## Local development
+
+Use Node.js 24+ and npm. Install the locked
+dependencies and start the Vite development server:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the local URL printed by Vite (normally `http://localhost:5173`).
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server with React refresh |
+| `npm run build` | Type-check and generate the production application in `dist/` |
+| `npm run preview` | Serve the existing production build locally |
+| `npm run typecheck` | Check application, test, and tooling TypeScript |
+| `npm run lint` | Run ESLint with zero warnings allowed |
+| `npm test` | Run the Vitest test suite once |
+| `npm run test:watch` | Run Vitest in watch mode |
+
+## Source and styling conventions
+
+- `src/main.tsx`: browser entry and global styles.
+- `src/app/`: application composition and application smoke tests.
+- `src/features/lab/components/`: focused laboratory presentation components.
+- `src/styles/tokens.css`: shared colors, spacing, radii, and typography defaults.
+- `src/styles/global.css`: base styles and responsive laboratory layout.
+- `tests/setup.ts`: jsdom assertions and cleanup for React Testing Library.
+- `src/simulation/AGENTS.md`: existing instructions for future simulation work.
+
+Use functional React components, strict TypeScript, and plain CSS with shared
+tokens. No store or simulation implementation exists in M0. Preserve the
+dependency direction: Presentation → Application state → Simulation → Domain data.
+Create additional folders only when their code is needed.
+
+The desktop layout prioritizes the laboratory workspace. Side panels stack at
+narrow widths. The shell includes semantic landmarks, a keyboard skip link,
+visible focus styles, and readable empty states; no interactive experiment is
+available yet.
+
+The M0 ExecPlan and validation record live in `plans/m0-project-foundation.md`.
+Tool configuration references: [Vite](https://vite.dev/guide/),
+[Vitest](https://vitest.dev/guide/), and
+[typescript-eslint](https://typescript-eslint.io/getting-started/).
