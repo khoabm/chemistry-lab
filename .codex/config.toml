@@ -18,6 +18,4 @@ web_search = "cached"
 [sandbox_workspace_write]
 
 # Required for tasks such as installing npm packages.
-network_access = 
-
-model = "gpt-6.1-sol"
+network_access = true

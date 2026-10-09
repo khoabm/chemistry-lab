@@ -34,6 +34,48 @@ For complex work, follow `.agent/PLANS.md`.
 
 ---
 
+## Communication language
+
+Always communicate with the user in Vietnamese.
+
+This includes:
+
+- explanations
+- progress updates
+- implementation summaries
+- review findings
+- questions
+- warnings
+- error explanations
+- milestone reports
+
+Use clear and concise Vietnamese.
+
+Do not switch to English unless the user explicitly requests English.
+
+Code should continue to follow normal programming-language conventions.
+
+Keep the following in English unless the repository explicitly defines
+otherwise:
+
+- source-code identifiers
+- variable names
+- function names
+- type names
+- file names
+- technical API names
+- library names
+- framework names
+- Git branch names
+- code comments when existing project conventions use English
+- documentation files when the existing project documentation uses English
+
+Commit messages should follow the repository's existing convention.
+If no convention exists, prefer concise English Conventional Commit messages.
+
+When quoting exact compiler errors, command output, library documentation, or
+API names, preserve the original text and explain it in Vietnamese.
+
 ## Current development scope
 
 The active milestone is defined in:
