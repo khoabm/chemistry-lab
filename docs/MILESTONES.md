@@ -4,6 +4,25 @@
 
 `M0 — Project Foundation`
 
+## Active milestone branch
+
+`M0`
+
+Each milestone must be developed on the Git branch matching its milestone ID.
+
+Examples:
+
+- M0 → branch `M0`
+- M1 → branch `M1`
+- M2 → branch `M2`
+- M3 → branch `M3`
+
+The next milestone branch must be based on the completed state of the previous
+milestone.
+
+Codex must not automatically advance the active milestone or milestone branch.
+The user explicitly approves milestone transitions.
+
 IMPORTANT:
 
 Codex must not change the active milestone automatically.

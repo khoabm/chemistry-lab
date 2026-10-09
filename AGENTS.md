@@ -347,3 +347,454 @@ derived from the project specification.
 
 When the specification is intentionally simplified, preserve that
 simplification.
+
+## Git and GitHub workflow
+
+GitHub is the source-control platform for this project.
+
+All development must be performed through Git branches.
+
+### Milestone branch rule
+
+Each milestone must be implemented on its own dedicated branch.
+
+Branch names must match the milestone identifier:
+
+- `M0`
+- `M1`
+- `M2`
+- `M3`
+- `M4`
+- `M5`
+- `M6`
+- and later milestone identifiers when explicitly introduced
+
+Do not implement two milestones on the same development branch.
+
+Before implementing a milestone, verify the current Git branch.
+
+If the current branch does not match the active milestone, do not begin implementation until the correct branch exists and is checked out.
+
+Example:
+
+Active milestone:
+
+`M0 — Project Foundation`
+
+Required branch:
+
+`M0`
+
+---
+
+### Milestone branch lifecycle
+
+The expected development flow is sequential.
+
+Example:
+
+    main
+      ↓
+     M0
+      ↓
+     M1
+      ↓
+     M2
+      ↓
+     M3
+
+When starting the first milestone:
+
+1. start from the appropriate base branch
+2. create branch `M0`
+3. implement only M0
+4. validate M0 completely
+5. commit M0 work
+6. push branch `M0` to GitHub
+
+When M0 is approved and development moves to M1:
+
+1. ensure M0 work is committed
+2. ensure branch `M0` is pushed to GitHub
+3. create or update branch `M1` from the completed M0 state
+4. switch to branch `M1`
+5. change the active milestone only when explicitly instructed by the user
+6. implement M1 only on branch `M1`
+
+Apply the same pattern for later milestones.
+
+Do not automatically advance to another milestone branch.
+
+The user decides when a milestone is approved and when the next milestone
+begins.
+
+---
+
+### GitHub usage
+
+GitHub is the canonical remote source repository.
+
+Before significant Git operations, inspect:
+
+    git status
+    git branch --show-current
+    git remote -v
+
+Before pushing:
+
+- make sure the working tree contains only intended changes
+- make sure tests and validation required by the milestone pass
+- make sure no unrelated files are included
+- make sure the branch name matches the active milestone
+
+Do not force-push unless the user explicitly requests it.
+
+Do not rewrite published Git history unless the user explicitly requests it.
+
+Do not delete remote branches unless explicitly requested.
+
+Do not merge branches without explicit user instruction.
+
+Codex may prepare commits and branches as part of an explicitly requested
+workflow, but milestone approval remains a user decision.
+
+---
+
+### Commit discipline
+
+Keep commits coherent and scoped to the active milestone.
+
+Do not mix:
+
+- unrelated refactors
+- future milestone functionality
+- experimental code
+- unrelated formatting changes
+
+into the same milestone work.
+
+Prefer descriptive conventional commit messages where appropriate.
+
+Examples:
+
+    chore: initialize project foundation
+    feat: add laboratory workspace shell
+    feat: add equipment interaction
+    feat: add reaction matching engine
+    test: cover mix reaction matching
+
+Before completing a milestone, the repository should have a clean and
+understandable Git history.
+
+---
+
+### Branch safety rule
+
+Never implement milestone work directly on `main` unless the user explicitly
+requests it.
+
+Never implement M1 work on branch `M0`.
+
+Never implement M2 work on branch `M1`.
+
+The Git branch must correspond to the active milestone.
+
+## Technology stack lock
+
+The project must use a coherent and intentionally selected technology stack.
+
+Do not mix unrelated frameworks, competing architectural approaches, or
+libraries designed for a different platform.
+
+The existing repository is the source of truth for the active technology
+stack.
+
+Before introducing code or a dependency, inspect at minimum:
+
+- `package.json`
+- existing source structure
+- existing build configuration
+- existing TypeScript configuration
+- existing styling approach
+- existing state-management approach
+- existing test setup
+
+Always extend the existing stack instead of introducing a competing one.
+
+---
+
+### Core frontend stack
+
+The intended MVP frontend stack is:
+
+- React
+- TypeScript
+- Vite
+
+This means the application must remain a React web application.
+
+Do not introduce another application framework unless the user explicitly
+changes the project architecture.
+
+Do not introduce:
+
+- Vue
+- Angular
+- Svelte
+- Solid
+- Ember
+- jQuery as an application framework
+- React Native
+- Expo
+- Next.js
+- Nuxt
+- Remix
+- Astro as the application framework
+
+unless explicitly requested by the user.
+
+Do not copy implementation patterns that require a different framework.
+
+Examples of invalid implementation:
+
+- Vue composables inside a React project
+- Angular services/modules inside a React project
+- Next.js server components inside a Vite React application
+- React Native components in a browser React application
+- framework-specific routing APIs from another framework
+
+Use React-compatible implementations only.
+
+---
+
+### React implementation rules
+
+Use idiomatic React and TypeScript.
+
+Prefer:
+
+- functional React components
+- React hooks
+- typed props
+- explicit component responsibilities
+- composition
+- reusable hooks where genuinely useful
+
+Do not introduce another UI paradigm that conflicts with React.
+
+Do not use DOM mutation as the primary application architecture when React
+state should control the UI.
+
+Direct DOM access is acceptable only when required for a specific browser API
+or interaction and should be isolated.
+
+---
+
+### State-management consistency
+
+The preferred application-state library is Zustand when centralized
+application state becomes necessary.
+
+If Zustand is already present:
+
+do not introduce another competing global state manager such as:
+
+- Redux
+- Redux Toolkit
+- MobX
+- Recoil
+- Jotai
+- XState used as a replacement global store
+
+unless the user explicitly approves the architectural change.
+
+React local state remains acceptable for component-local state.
+
+Do not move all local state into Zustand without a concrete reason.
+
+---
+
+### Drag-and-drop consistency
+
+The preferred drag-and-drop solution is `dnd-kit` when the project requires
+a dedicated drag-and-drop library.
+
+If `dnd-kit` is already used, do not introduce another drag-and-drop system
+such as:
+
+- react-dnd
+- react-beautiful-dnd
+- interact.js as a competing drag/drop architecture
+
+unless the existing solution demonstrably cannot support the requirement and
+the user approves the change.
+
+---
+
+### Animation consistency
+
+The preferred general React animation library is Motion when a dedicated
+animation library is required.
+
+If Motion is already used, do not add another general-purpose animation
+framework merely for convenience.
+
+Do not mix multiple animation libraries for equivalent responsibilities.
+
+CSS transitions and animations remain appropriate for simple effects.
+
+Use the smallest suitable solution.
+
+---
+
+### Styling consistency
+
+Before adding styles, inspect the styling system already used by the project.
+
+Continue using the established approach.
+
+Do not mix multiple competing styling systems without a strong documented
+reason.
+
+For example, if the project uses normal CSS/CSS Modules, do not suddenly
+introduce:
+
+- Tailwind CSS
+- styled-components
+- Emotion
+- another utility CSS framework
+
+for isolated components.
+
+If the project later intentionally adopts one styling system, use it
+consistently.
+
+---
+
+### Testing consistency
+
+The intended testing stack is:
+
+- Vitest
+- React Testing Library
+- Playwright when end-to-end testing is required
+
+Do not introduce competing test runners such as Jest merely because an
+example found elsewhere uses Jest.
+
+Translate examples to the project's existing testing stack.
+
+Do not install a second testing framework for the same testing level unless
+explicitly approved.
+
+---
+
+### Package-management consistency
+
+Use the package manager already established by the repository.
+
+The lockfile is the source of truth.
+
+Examples:
+
+- `package-lock.json` → use npm
+- `pnpm-lock.yaml` → use pnpm
+- `yarn.lock` → use Yarn
+
+Do not create multiple lockfiles.
+
+Do not switch package managers automatically.
+
+For this project's initial setup, use npm unless the user explicitly selects
+another package manager.
+
+---
+
+### Dependency rule
+
+Before adding any package, answer internally:
+
+1. Can the current stack already solve this?
+2. Is the package compatible with React + TypeScript + Vite?
+3. Does the project already contain another package serving the same role?
+4. Is the package necessary for the active milestone?
+5. Is the package actively used after installation?
+
+Do not install speculative dependencies for future milestones.
+
+Do not install a package simply because a tutorial uses it.
+
+Do not add dependencies that are unused.
+
+---
+
+### Architecture consistency
+
+Follow the architecture defined in:
+
+`docs/ARCHITECTURE.md`
+
+Do not replace existing architecture with a new pattern merely because an
+alternative is popular.
+
+Do not introduce unnecessary patterns such as:
+
+- micro-frontends
+- server-side rendering
+- backend-for-frontend
+- event sourcing
+- dependency-injection frameworks
+- microservices
+- GraphQL
+
+unless a future requirement genuinely needs them and the user explicitly
+approves the architectural change.
+
+---
+
+### Technology conflict rule
+
+If a requested implementation appears to conflict with the current technology
+stack:
+
+do not silently introduce another framework or incompatible library.
+
+Instead:
+
+1. inspect the existing stack
+2. determine whether the requirement can be implemented within it
+3. prefer the compatible implementation
+4. explain the conflict if no compatible implementation exists
+
+The default decision is always to preserve stack consistency.
+
+---
+
+### External examples rule
+
+When using documentation, tutorials, generated examples, or external code:
+
+adapt the solution to this project's technology stack.
+
+Never copy framework-specific code blindly.
+
+For example, if documentation shows a Next.js implementation but the project
+uses React + Vite, translate the relevant concept to React + Vite rather than
+introducing Next.js.
+
+## Existing source is authoritative
+
+Documentation defines the intended architecture.
+
+The actual repository defines the currently installed and implemented
+technology stack.
+
+If project documentation and the actual repository appear inconsistent:
+
+1. do not silently choose one
+2. inspect Git history and the active milestone
+3. preserve working source code
+4. report the inconsistency before making a large architectural change
+
+Never replace a working technology solely to make the repository match an
+outdated example in documentation.

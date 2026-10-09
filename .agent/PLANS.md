@@ -130,6 +130,46 @@ Describe implementation in an ordered sequence.
 
 Each step should produce a coherent improvement.
 
+## Git and technology validation
+
+Before implementation begins, the ExecPlan must record:
+
+### Git state
+
+- active milestone
+- required milestone branch
+- current branch
+- base branch or previous milestone branch
+- whether the working tree is clean enough to begin work
+
+Implementation must not proceed on the wrong milestone branch.
+
+### Existing technology stack
+
+Record the relevant existing technologies discovered from the repository,
+including:
+
+- frontend framework
+- language
+- build tool
+- package manager
+- state-management solution
+- styling approach
+- animation solution
+- drag-and-drop solution
+- unit/component testing stack
+- end-to-end testing stack
+
+State explicitly whether the feature requires any new dependency.
+
+If a new dependency is required, explain:
+
+- why the existing stack cannot reasonably solve the requirement
+- why the selected dependency is compatible with the project
+- whether another existing dependency already serves the same purpose
+
+The implementation plan must preserve the established technology stack.
+
 ## Testing and validation
 
 Explain:
