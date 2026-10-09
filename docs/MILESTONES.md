@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M0 — Project Foundation`
+`M1 — Interactive Laboratory Workspace`
 
 ## Active milestone branch
 
-`M0`
+`M1`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
