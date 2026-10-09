@@ -1,0 +1,23 @@
+# Repository-local Codex configuration.
+
+# Ask before actions that require additional privileges.
+approval_policy = "on-request"
+
+# Allow Codex to edit files inside the project workspace.
+sandbox_mode = "workspace-write"
+
+# Use stronger reasoning for architecture and implementation tasks.
+model_reasoning_effort = "high"
+
+# Keep visible reasoning summaries compact.
+model_reasoning_summary = "concise"
+
+# Use cached/indexed search behavior by default when Codex needs web search.
+web_search = "cached"
+
+[sandbox_workspace_write]
+
+# Required for tasks such as installing npm packages.
+network_access = 
+
+model = "gpt-6.1-sol"
