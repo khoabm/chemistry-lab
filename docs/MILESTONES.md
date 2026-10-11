@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M2 — Container and Chemical System`
+`M3 — Mixing Reaction Engine`
 
 ## Active milestone branch
 
-`M2`
+`M3`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
