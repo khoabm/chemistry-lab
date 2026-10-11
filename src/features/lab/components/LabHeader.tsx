@@ -1,4 +1,9 @@
-export function LabHeader() {
+interface LabHeaderProps {
+  canReset: boolean
+  onReset: () => void
+}
+
+export function LabHeader({ canReset, onReset }: LabHeaderProps) {
   return (
     <header className="lab-header">
       <div className="lab-brand">
@@ -14,12 +19,13 @@ export function LabHeader() {
         </div>
       </div>
       <div className="header-actions">
-        <span className="preview-label">Laboratory preview</span>
+        <span className="preview-label">Interactive laboratory</span>
         <button
           className="reset-button"
           type="button"
-          disabled
-          title="Reset is unavailable in this preview."
+          disabled={!canReset}
+          onClick={onReset}
+          title="Clear all equipment from the bench."
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M4 8a6 6 0 1 1 0 5M4 3v5h5" />

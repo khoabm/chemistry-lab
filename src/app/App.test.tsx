@@ -19,9 +19,9 @@ describe('laboratory foundation', () => {
     render(<App />)
 
     const materials = screen.getByRole('complementary', { name: 'Lab materials' })
-    expect(within(materials).getByText('No equipment available yet.')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Equipment' })).getAllByRole('button')).toHaveLength(4)
+    expect(within(materials).getByRole('button', { name: 'Add Beaker' })).toBeEnabled()
     expect(within(materials).getByText('No chemicals available yet.')).toBeInTheDocument()
-    expect(within(materials).queryByRole('button')).not.toBeInTheDocument()
     expect(screen.getByText('Empty workspace')).toBeInTheDocument()
     expect(within(screen.getByRole('complementary', { name: 'Observations' })).getByText(/No observations yet/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset lab' })).toBeDisabled()
