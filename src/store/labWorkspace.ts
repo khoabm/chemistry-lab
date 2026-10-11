@@ -1,9 +1,14 @@
 import type { EquipmentInstance, EquipmentType, Point } from '../types/equipment'
+import type { ChemicalId } from '../simulation/chemicals/catalog'
+import { addChemicalPortion } from '../simulation/chemicals/portions'
+import { isContainerEquipment } from '../types/container'
+import type { ContainerState } from '../types/container'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
   selectedEquipmentId: string | null
   nextSerial: number
+  containers: readonly ContainerState[]
 }
 
 export type LabWorkspaceAction =
@@ -11,9 +16,11 @@ export type LabWorkspaceAction =
   | { type: 'move'; id: string; position: Point }
   | { type: 'select'; id: string }
   | { type: 'reset' }
+  | { type: 'add-chemical'; equipmentId: string; chemicalId: ChemicalId; quantity: number }
+  | { type: 'clear-container'; equipmentId: string }
 
 export function createLabWorkspaceState(): LabWorkspaceState {
-  return { equipment: [], selectedEquipmentId: null, nextSerial: 1 }
+  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [] }
 }
 
 function boundedPosition(position: Point): Point {
@@ -41,6 +48,19 @@ export function labWorkspaceReducer(
       : state
   }
 
+  if (action.type === 'add-chemical' || action.type === 'clear-container') {
+    const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
+    if (!container) return state
+    const contents = action.type === 'clear-container'
+      ? container.contents.length ? [] : container.contents
+      : addChemicalPortion(container.contents, action.chemicalId, action.quantity)
+    if (contents === container.contents) return state
+    return {
+      ...state,
+      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents } : item),
+    }
+  }
+
   if (!Number.isFinite(action.position.x) || !Number.isFinite(action.position.y)) {
     return state
   }
@@ -52,7 +72,11 @@ export function labWorkspaceReducer(
       position: boundedPosition(action.position),
     }
     return {
+      ...state,
       equipment: [...state.equipment, instance],
+      containers: isContainerEquipment(instance.equipmentType)
+        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [] }]
+        : state.containers,
       selectedEquipmentId: instance.id,
       nextSerial: state.nextSerial + 1,
     }

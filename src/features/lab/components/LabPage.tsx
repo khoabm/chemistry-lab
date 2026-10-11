@@ -6,10 +6,15 @@ import { LabHeader } from './LabHeader'
 import { LabObservations } from './LabObservations'
 import { LabPalette } from './LabPalette'
 import { LabWorkspace } from './LabWorkspace'
+import { ContainerDetails } from './ContainerDetails'
 
 export function LabPage() {
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
+  const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
+  const dragSource = interaction.preview?.source
+  const draggingContainer = dragSource?.kind === 'workspace'
+    ? state.containers.find((container) => container.equipmentInstanceId === dragSource.id) : undefined
   return (
     <div
       className="lab-page"
@@ -23,11 +28,18 @@ export function LabPage() {
       <a className="skip-link" href="#laboratory">Skip to laboratory</a>
       <LabHeader canReset={state.equipment.length > 0} onReset={interaction.resetWorkspace} />
       <main id="laboratory" className="lab-layout" tabIndex={-1}>
-        <LabPalette interaction={interaction} />
+        <LabPalette interaction={interaction} canAddChemical={!!selectedContainer && !interaction.preview}
+          onAddChemical={(chemicalId) => {
+            if (selectedContainer && !interaction.preview) dispatch({ type: 'add-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId, quantity: 1 })
+          }} />
         <LabWorkspace state={state} interaction={interaction} />
-        <LabObservations />
+        <LabObservations>
+          {selectedContainer && <ContainerDetails container={selectedContainer} disabled={!!interaction.preview}
+            onClear={() => dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId })} />}
+        </LabObservations>
       </main>
-      {interaction.preview && <EquipmentDragPreview preview={interaction.preview} />}
+      {interaction.preview && <EquipmentDragPreview preview={interaction.preview}
+        contents={draggingContainer?.contents ?? []} />}
       <footer className="lab-footer">
         <p>Explore chemistry, one observation at a time.</p>
         <p>Virtual demonstrations <span aria-hidden="true">·</span> Introductory chemistry</p>

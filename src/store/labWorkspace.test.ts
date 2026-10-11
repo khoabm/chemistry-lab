@@ -68,3 +68,68 @@ describe('equipment state transitions', () => {
     expect(fresh.equipment[0]?.id).not.toBe(state.equipment[0]?.id)
   })
 })
+
+describe('container state transitions', () => {
+  function placeContainers() {
+    const beaker = labWorkspaceReducer(createLabWorkspaceState(), { type: 'add', equipmentType: 'beaker', position: { x: 0.2, y: 0.3 } })
+    return labWorkspaceReducer(beaker, { type: 'add', equipmentType: 'test-tube', position: { x: 0.6, y: 0.7 } })
+  }
+
+  it('creates separate empty containers only for supported equipment', () => {
+    let state = placeContainers()
+    state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'dropper', position: { x: 0, y: 0 } })
+    state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 1, y: 1 } })
+    expect(state.containers).toEqual([
+      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [] },
+      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [] },
+    ])
+    expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-3', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
+    expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-4', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
+  })
+
+  it('keeps contents independent and preserves identity/content while moving or selecting', () => {
+    const empty = placeContainers()
+    const action = { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'copper-sulfate', quantity: 1 } as const
+    const filled = labWorkspaceReducer(empty, action)
+    const repeated = labWorkspaceReducer(filled, action)
+    const moved = labWorkspaceReducer(repeated, { type: 'move', id: 'equipment-1', position: { x: 0.8, y: 0.8 } })
+    const selected = labWorkspaceReducer(moved, { type: 'select', id: 'equipment-2' })
+    expect(selected.containers).toBe(repeated.containers)
+    expect(selected.containers[0]?.contents).toEqual([{ chemicalId: 'copper-sulfate', quantity: 2 }])
+    expect(selected.containers[1]).toBe(empty.containers[1])
+    expect(empty.containers[0]?.contents).toEqual([])
+    expect(labWorkspaceReducer(empty, action)).toEqual(filled)
+  })
+
+  it('does not evaluate a registered reactive combination when chemicals are added', () => {
+    const acid = labWorkspaceReducer(placeContainers(), { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid', quantity: 1 })
+    const added = labWorkspaceReducer(acid, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'sodium-bicarbonate', quantity: 1 })
+    expect(added.containers[0]?.contents).toEqual([
+      { chemicalId: 'hydrochloric-acid', quantity: 1 }, { chemicalId: 'sodium-bicarbonate', quantity: 1 },
+    ])
+  })
+
+  it('clears only the target container and reset removes all container state', () => {
+    const first = labWorkspaceReducer(placeContainers(), { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'silver-nitrate', quantity: 1 })
+    const both = labWorkspaceReducer(first, { type: 'add-chemical', equipmentId: 'equipment-2', chemicalId: 'copper-carbonate', quantity: 1 })
+    const clear = labWorkspaceReducer(both, { type: 'clear-container', equipmentId: 'equipment-1' })
+    expect(clear.equipment).toBe(both.equipment)
+    expect(clear.selectedEquipmentId).toBe(both.selectedEquipmentId)
+    expect(clear.containers[0]?.contents).toEqual([])
+    expect(clear.containers[1]).toBe(both.containers[1])
+    expect(both.containers[0]?.contents).toHaveLength(1)
+    expect(labWorkspaceReducer(clear, { type: 'clear-container', equipmentId: 'equipment-1' })).toBe(clear)
+    const reset = labWorkspaceReducer(both, { type: 'reset' })
+    expect(reset.containers).toEqual([])
+    const fresh = labWorkspaceReducer(reset, { type: 'add', equipmentType: 'beaker', position: { x: 0, y: 0 } })
+    expect(fresh.containers[0]?.contents).toEqual([])
+    expect(fresh.containers[0]?.id).not.toBe(both.containers[0]?.id)
+  })
+
+  it('ignores missing container IDs and invalid chemical amounts', () => {
+    const state = placeContainers()
+    expect(labWorkspaceReducer(state, { type: 'clear-container', equipmentId: 'missing' })).toBe(state)
+    expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'missing', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
+    expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'silver-nitrate', quantity: NaN })).toBe(state)
+  })
+})

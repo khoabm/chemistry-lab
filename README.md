@@ -95,14 +95,19 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M1 interactive workspace: place and move beakers, test tubes, droppers and unlit
+M2 container and chemical system, extending the M1 workspace: place and move beakers, test tubes, droppers and unlit
 alcohol lamps. Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
 clears the bench without reloading the page.
 
-Chemical contents, reactions, mixing and heating remain reserved for later
-milestones. Chemicals and observations still show empty states.
+Select a beaker or test tube, then click/tap a chemical in the palette to add one
+simplified unit. All eleven specified chemicals are available, with name,
+formula and solution/solid labels. Containers display basic starting liquid/solid
+appearance and keep independent contents while moving. The right panel lists the
+selected container's contents; Empty container clears only that container. Reset
+lab removes equipment and contents. Reactions, mixing and heating remain reserved
+for later milestones; adding substances does not evaluate chemistry.
 
 See the active milestone in `docs/MILESTONES.md`.
 
@@ -135,34 +140,40 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/features/lab/components/`: focused laboratory presentation components.
 - `src/features/lab/hooks/useEquipmentInteraction.ts`: shared pointer/keyboard interaction.
 - `src/features/lab/interactions/`: bench coordinate conversion and geometry tests.
-- `src/store/labWorkspace.ts`: pure equipment state transitions and unit tests.
+- `src/store/labWorkspace.ts`: pure equipment/container state transitions and unit tests.
 - `src/types/equipment.ts`: stable equipment IDs/types and normalized positions.
+- `src/types/container.ts`: container associations and chemical portions.
+- `src/simulation/chemicals/`: the specified catalog and pure portion additions.
 - `src/styles/tokens.css`: shared colors, spacing, radii, and typography defaults.
 - `src/styles/global.css`: base styles and responsive laboratory layout.
 - `tests/setup.ts`: jsdom assertions and cleanup for React Testing Library.
-- `src/simulation/AGENTS.md`: existing instructions for future simulation work.
+- `src/simulation/AGENTS.md`: chemistry/domain boundary instructions.
 
 Use functional React components, strict TypeScript, and plain CSS with shared
-tokens. M1 uses a page-local React reducer with no new dependencies. Preserve the
+tokens. M2 extends the page-local React reducer with no new dependencies. Preserve the
 dependency direction: Presentation → Application state → Simulation → Domain data.
 Create additional folders only when their code is needed.
 
 The desktop layout prioritizes the laboratory workspace. At widths up to 900px,
 the Equipment & Chemicals palette becomes a collapsible sticky bar above the
 bench. Its content has a bounded height and scrolls internally for longer lists;
-Chemicals still contains only the M1 empty state. Tap/click or Enter adds
+The chemical catalog shares this scrollable panel. Tap/click or Enter adds
 equipment; on narrow touch screens vertical swipes scroll tools, and dragging
 on the bench moves placed equipment. Escape closes the tools and restores toggle
 focus when no drag is active. The bench is a single flat surface with a subtle
 square grid. The shell includes semantic landmarks, a keyboard skip link,
 visible focus styles, and readable empty states. Equipment positions adapt to
 the bench size and stay within its bounds. Overlapping equipment is allowed;
-the selected instance appears above other equipment. No interactive chemistry
-experiment is available yet.
+the selected instance appears above other equipment. Liquid portions use separate
+representative bands, and solids use basic sample shapes. These do not represent
+reaction products or physically accurate layering. Visual levels are capped;
+the details panel retains the simplified quantity counts. No reaction is evaluated yet.
 
 The M0 ExecPlan and validation record live in `plans/m0-project-foundation.md`.
 The M1 implementation and validation record live in
 `plans/m1-interactive-laboratory-workspace.md`.
+The M2 implementation and validation record live in
+`plans/m2-container-and-chemical-system.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

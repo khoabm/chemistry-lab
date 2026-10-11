@@ -68,7 +68,8 @@ export function LabWorkspace({
             aria-describedby="equipment-movement-hint"
             {...getEquipmentHandlers({ kind: 'workspace', equipmentType: instance.equipmentType, id: instance.id })}
           >
-            <EquipmentVisual equipmentType={instance.equipmentType} />
+            <EquipmentVisual equipmentType={instance.equipmentType}
+              contents={state.containers.find((container) => container.equipmentInstanceId === instance.id)?.contents ?? []} />
             <span>{label}</span>
           </button>
         ))}

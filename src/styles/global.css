@@ -96,20 +96,12 @@ h3 { font-size: 14px; font-weight: 600; }
 .lab-palette { grid-area: palette; }
 .palette-toggle { display: none; }
 .palette-mobile-hint { display: none; }
-.palette-content { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.palette-content { display: flex; flex: 1; flex-direction: column; min-height: 0; max-height: max(360px, 70svh); overflow-y: auto; scrollbar-gutter: stable; }
 .lab-observations { grid-area: observations; }
 .panel-heading { padding-bottom: var(--space-5); border-bottom: 1px solid var(--color-line); }
 .panel-heading h2 { margin-top: var(--space-2); }
 .palette-section { padding: var(--space-5) 0; }
 .palette-section + .palette-section { border-top: 1px solid var(--color-line); }
-.palette-placeholder { display: flex; gap: var(--space-2); margin-top: var(--space-4); }
-.palette-placeholder span {
-  flex: 1;
-  height: 54px;
-  border: 1px dashed #d7dfd4;
-  border-radius: var(--radius-small);
-  background: #f8f9f5;
-}
 .empty-caption { margin-top: var(--space-3); color: var(--color-muted); font-size: 12px; line-height: 1.6; }
 .palette-note { margin-top: auto; padding-top: var(--space-6); max-width: 150px; color: var(--color-muted); font-size: 12px; line-height: 1.7; }
 
@@ -223,6 +215,27 @@ h3 { font-size: 14px; font-weight: 600; }
 .equipment-drag-feedback { position: absolute; top: calc(100% + 6px); white-space: nowrap; padding: 4px 7px; border-radius: 4px; background: var(--color-panel); color: var(--color-muted); }
 .workspace-message { min-height: 32px; padding-top: var(--space-2); font-size: 12px; line-height: 1.6; color: var(--color-accent); text-align: center; }
 
+.chemical-palette { display: grid; gap: var(--space-2); margin-top: var(--space-3); }
+.chemical-palette-item {
+  display: flex; align-items: center; gap: var(--space-2); width: 100%; min-width: 0;
+  padding: var(--space-2); border: 1px solid var(--color-line); border-radius: var(--radius-small);
+  background: #f8f9f5; color: var(--color-text); text-align: left; cursor: pointer; touch-action: pan-y;
+}
+.chemical-palette-item:hover:not(:disabled) { background: var(--color-accent-soft); border-color: #99ad94; }
+.chemical-palette-item:disabled { opacity: 0.6; cursor: not-allowed; }
+.chemical-palette-item > span:last-child { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.chemical-palette-item strong { font-size: 12px; }
+.chemical-palette-item span span { font-size: 11px; line-height: 1.5; }
+.chemical-palette-item small { color: var(--color-muted); font-size: 10px; }
+.chemical-swatch { width: 16px; height: 24px; flex-shrink: 0; border: 1px solid #849a84; border-radius: 3px 3px 7px 7px; }
+.chemical-swatch.is-solid { height: 16px; border-radius: 3px; transform: rotate(-12deg); }
+.container-details { padding-top: var(--space-5); }
+.contents-list { list-style: none; padding: 0; margin: var(--space-4) 0; display: grid; gap: var(--space-3); }
+.contents-list li { display: grid; gap: 5px; padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
+.contents-list strong { font-size: 12px; line-height: 1.6; font-weight: 500; }
+.contents-list span { font-size: 11px; color: var(--color-muted); }
+.container-details .reset-button { margin-top: var(--space-4); }
+
 .observation-empty { padding: 42px 0 var(--space-5); }
 .observation-empty svg { width: 42px; margin-bottom: var(--space-5); color: #849a84; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .observation-empty h3 { font-size: 16px; font-weight: 500; line-height: 1.6; letter-spacing: -0.3px; }
@@ -278,7 +291,7 @@ h3 { font-size: 14px; font-weight: 600; }
   }
   .lab-palette:not(.is-expanded) .palette-content { display: none; }
   .palette-content .palette-section { padding: var(--space-3) 0; }
-  .lab-palette .palette-placeholder, .lab-palette .palette-note { display: none; }
+  .lab-palette .palette-note { display: none; }
   .lab-palette .empty-caption { margin-top: var(--space-2); }
   .palette-desktop-hint { display: none; }
   .palette-mobile-hint { display: inline; }

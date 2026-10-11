@@ -2,8 +2,14 @@ import { useRef, useState } from 'react'
 import { equipmentLabels, equipmentTypes } from '../equipment'
 import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { EquipmentVisual } from './EquipmentVisual'
+import type { ChemicalId } from '../../../simulation/chemicals/catalog'
+import { ChemicalPalette } from './ChemicalPalette'
 
-export function LabPalette({ interaction }: { interaction: EquipmentInteraction }) {
+export function LabPalette({ interaction, canAddChemical, onAddChemical }: {
+  interaction: EquipmentInteraction
+  canAddChemical: boolean
+  onAddChemical: (chemicalId: ChemicalId) => void
+}) {
   const [isExpanded, setExpanded] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
 
@@ -62,15 +68,7 @@ export function LabPalette({ interaction }: { interaction: EquipmentInteraction 
             <span className="palette-mobile-hint">Tap to add; drag on the bench to move.</span>
           </p>
         </section>
-        <section className="palette-section" aria-labelledby="chemicals-title">
-          <h3 id="chemicals-title">Chemicals</h3>
-          <div className="palette-placeholder" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <p className="empty-caption">No chemicals available yet.</p>
-        </section>
+        <ChemicalPalette canAdd={canAddChemical} onAdd={onAddChemical} />
         <p className="palette-note">A small collection. A world of possibilities.</p>
       </div>
     </aside>

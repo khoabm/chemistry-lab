@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
+import { chemicals } from '../../../simulation/chemicals/catalog'
 
 // jsdom does not provide native pointer capture/layout. Keep real React event
 // handlers and mock only the browser measurements and pointer event fields.
@@ -33,6 +34,99 @@ afterEach(() => {
   vi.unstubAllGlobals()
   if (originalHitTest) Object.defineProperty(document, 'elementFromPoint', originalHitTest)
   else Reflect.deleteProperty(document, 'elementFromPoint')
+})
+
+describe('M2 chemical and container interactions', () => {
+  it('shows the full catalog and accepts only a selected supported container', () => {
+    const palette = screen.getByRole('region', { name: 'Chemicals' })
+    expect(within(palette).getAllByRole('button')).toHaveLength(11)
+    for (const chemical of chemicals) {
+      expect(within(palette).getByText(chemical.formula)).toBeInTheDocument()
+      expect(within(palette).getByRole('button', { name: `Add ${chemical.name}` })).toBeDisabled()
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
+    expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
+    expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeEnabled()
+    expect(screen.getByText('This container is empty.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Empty container' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: /^(mix|heat|ignite)/i })).not.toBeInTheDocument()
+  })
+
+  it('adds liquids and solids directly inside equipment, and aggregates repeated additions', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    const container = screen.getByRole('button', { name: 'Beaker 1' })
+    const liquid = screen.getByRole('button', { name: 'Add Copper(II) sulfate' })
+    liquid.focus()
+    // A keyboard-generated native button click has detail 0.
+    fireEvent.click(liquid, { detail: 0 })
+    fireEvent.click(liquid)
+    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    const contents = screen.getByRole('list', { name: 'Container contents' })
+    expect(within(contents).getByText('2 units · Solution')).toBeInTheDocument()
+    expect(within(contents).getByText('1 unit · Solid')).toBeInTheDocument()
+    expect(container.querySelector('[data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
+    expect(container.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', '#609d73')
+    const id = container.getAttribute('data-equipment-id')
+    fireEvent.keyDown(container, { key: 'ArrowRight' })
+    expect(container).toHaveAttribute('data-equipment-id', id)
+    expect(container.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
+    expect(within(contents).getByText('2 units · Solution')).toBeInTheDocument()
+  })
+
+  it('switches between independent beaker/test tube contents and clears only the selected container', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Silver nitrate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    expect(screen.getByText('This container is empty.')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    const tube = screen.getByRole('button', { name: 'Test tube 1' })
+    expect(tube.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
+    const tubeClip = tube.querySelector('clipPath')?.id
+    const beaker = screen.getByRole('button', { name: 'Beaker 1' })
+    expect(beaker.querySelector('clipPath')?.id).not.toBe(tubeClip)
+    fireEvent.click(beaker)
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText(/Silver nitrate/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Empty container' }))
+    expect(beaker.querySelector('[data-content-state]')).not.toBeInTheDocument()
+    expect(tube.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
+    fireEvent.click(tube)
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText(/Copper\(II\) carbonate/)).toBeInTheDocument()
+  })
+
+  it('retains separate starting substances without gas or reaction output, and resets all contents', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Hydrochloric acid' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium bicarbonate' }))
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getAllByRole('listitem')).toHaveLength(2)
+    expect(screen.getByText(/no reactions are evaluated yet/)).toBeInTheDocument()
+    const previous = screen.getByRole('button', { name: 'Test tube 1' }).getAttribute('data-equipment-id')
+    fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
+    expect(screen.queryByRole('list', { name: 'Container contents' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add Hydrochloric acid' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    expect(screen.getByRole('button', { name: 'Test tube 1' })).not.toHaveAttribute('data-equipment-id', previous)
+    expect(screen.getByText('This container is empty.')).toBeInTheDocument()
+  })
+
+  it('keeps a filled drag preview, disables contents actions while dragging and preserves contents after a drop', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) sulfate' }))
+    const source = screen.getByRole('button', { name: 'Beaker 1' })
+    vi.spyOn(source, 'getBoundingClientRect').mockReturnValue(new DOMRect(356, 137, 88, 126))
+    pointer(source, 'down', 400, 200)
+    pointer(source, 'move', 600, 300)
+    expect(screen.getByRole('button', { name: 'Add Copper(II) sulfate' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Empty container' })).toBeDisabled()
+    expect(document.querySelector('.equipment-drag-preview [data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
+    pointer(source, 'up', 600, 300)
+    fireEvent.click(source, { detail: 1 })
+    expect(source.querySelector('[data-content-state="liquid"]')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Empty container' })).toBeEnabled()
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText('1 unit · Solution')).toBeInTheDocument()
+  })
 })
 
 describe('laboratory equipment interactions', () => {
