@@ -52,7 +52,8 @@ describe('M2 chemical and container interactions', () => {
     expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeEnabled()
     expect(screen.getByText('This container is empty.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Empty container' })).toBeDisabled()
-    expect(screen.queryByRole('button', { name: /^(mix|heat|ignite)/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: /^(heat|ignite)/i })).not.toBeInTheDocument()
   })
 
   it('adds liquids and solids directly inside equipment, and aggregates repeated additions', () => {
@@ -101,7 +102,7 @@ describe('M2 chemical and container interactions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Hydrochloric acid' }))
     fireEvent.click(screen.getByRole('button', { name: 'Add Sodium bicarbonate' }))
     expect(within(screen.getByRole('list', { name: 'Container contents' })).getAllByRole('listitem')).toHaveLength(2)
-    expect(screen.getByText(/no reactions are evaluated yet/)).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
     const previous = screen.getByRole('button', { name: 'Test tube 1' }).getAttribute('data-equipment-id')
     fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
     expect(screen.queryByRole('list', { name: 'Container contents' })).not.toBeInTheDocument()
@@ -121,11 +122,65 @@ describe('M2 chemical and container interactions', () => {
     expect(screen.getByRole('button', { name: 'Add Copper(II) sulfate' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Empty container' })).toBeDisabled()
     expect(document.querySelector('.equipment-drag-preview [data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
+    expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
     pointer(source, 'up', 600, 300)
     fireEvent.click(source, { detail: 1 })
     expect(source.querySelector('[data-content-state="liquid"]')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Empty container' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Mix' })).toBeEnabled()
     expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText('1 unit · Solution')).toBeInTheDocument()
+  })
+})
+
+describe('M3 explicit mixing', () => {
+  it('identifies a supported combination only after Mix, including reverse addition order and native keyboard click', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium chloride' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Silver nitrate' }))
+    const result = screen.getByRole('status', { name: 'Mix result' })
+    expect(result).toBeEmptyDOMElement()
+    const mix = screen.getByRole('button', { name: 'Mix' })
+    mix.focus()
+    fireEvent.click(mix, { detail: 0 })
+    expect(mix).toHaveFocus()
+    expect(result).toHaveTextContent('Reaction identified: Silver chloride precipitation.')
+    fireEvent.click(mix)
+    expect(result).toHaveTextContent('Reaction identified: Silver chloride precipitation.')
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getAllByRole('listitem')).toHaveLength(2)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Beaker 1' }), { key: 'ArrowRight' })
+    expect(result).toHaveTextContent('Silver chloride precipitation')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) sulfate' }))
+    expect(result).toBeEmptyDOMElement()
+    fireEvent.click(mix)
+    expect(result).toHaveTextContent('No observable reaction.')
+  })
+
+  it('keeps container results independent and clears results on empty/reset', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Hydrochloric acid' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium bicarbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('Acid and bicarbonate gas formation')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium chloride' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('No observable reaction.')
+    fireEvent.click(screen.getByRole('button', { name: 'Beaker 1' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('Acid and bicarbonate gas formation')
+    fireEvent.click(screen.getByRole('button', { name: 'Empty container' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
+    expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Test tube 1' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('No observable reaction.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
+    expect(screen.queryByRole('button', { name: 'Mix' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
+    expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
   })
 })
 
@@ -238,7 +293,7 @@ describe('laboratory equipment interactions', () => {
     expect(items()).toHaveLength(1)
     expect(items()[0]).toHaveStyle({ left: 'calc(50% + 0px)', top: 'calc(50% + 0px)' })
     expect(screen.queryByText('Release to place equipment')).not.toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent('Beaker placed on the bench.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Beaker placed on the bench.')
   })
 
   it('rejects invalid palette drops without accidentally adding equipment', () => {
@@ -250,7 +305,7 @@ describe('laboratory equipment interactions', () => {
     pointer(source, 'up', 200, 300)
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(0)
-    expect(screen.getByRole('status')).toHaveTextContent('Equipment is unchanged.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Equipment is unchanged.')
   })
 
   it('moves an existing instance with its identity and pointer grab offset preserved', () => {
@@ -290,7 +345,7 @@ describe('laboratory equipment interactions', () => {
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(0)
     expect(bench()).not.toHaveClass('is-drop-valid')
-    expect(screen.getByRole('status')).toHaveTextContent('Placement cancelled.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Placement cancelled.')
   })
 
   it.each(['Escape', 'pointercancel', 'lostpointercapture', 'reset'])('cancels a pending pointer press on %s before it becomes a drag', (reason) => {
@@ -331,7 +386,7 @@ describe('laboratory equipment interactions', () => {
     pointer(source, 'up', 600, 300)
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(1)
-    expect(screen.getByRole('status')).toHaveTextContent('Placement cancelled.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Placement cancelled.')
   })
 
   it('supports selection and keyboard movement bounded at the edges', () => {
@@ -361,7 +416,7 @@ describe('laboratory equipment interactions', () => {
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(0)
     expect(bench()).not.toHaveClass('is-drop-valid')
-    expect(screen.getByRole('status')).toHaveTextContent('Bench cleared.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Bench cleared.')
   })
 
   it('keeps short clicks distinct from drags and ignores unrelated pointers', () => {
@@ -375,6 +430,6 @@ describe('laboratory equipment interactions', () => {
     pointer(source, 'up', 102, 201)
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(1)
-    expect(screen.getByRole('status')).toHaveTextContent('Dropper added to the bench.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Dropper added to the bench.')
   })
 })

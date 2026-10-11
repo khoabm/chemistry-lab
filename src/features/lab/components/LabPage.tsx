@@ -35,6 +35,7 @@ export function LabPage() {
         <LabWorkspace state={state} interaction={interaction} />
         <LabObservations>
           {selectedContainer && <ContainerDetails container={selectedContainer} disabled={!!interaction.preview}
+            onMix={() => dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId })}
             onClear={() => dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId })} />}
         </LabObservations>
       </main>

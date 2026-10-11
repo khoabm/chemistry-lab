@@ -13,7 +13,7 @@ export function LabObservations({ children }: { children?: ReactNode }) {
           <path d="M18 8V5h12v3M18 19h12M18 25h12M18 31h7" />
         </svg>
         <h3>Every discovery starts<br />with an observation.</h3>
-        <p>No observations yet. Results and explanations will appear here once experiments are available.</p>
+        <p>No observations yet. Select a beaker or test tube, add chemicals, then press Mix to check for a supported reaction.</p>
       </div>}
       <div className="observation-note">
         <span className="note-rule" aria-hidden="true" />

@@ -115,6 +115,10 @@ Equipment should have clear visual icons or illustrations.
 A first-time user should recognize that equipment can be placed into the
 workspace.
 
+The intended experimental roles and milestone boundaries for the alcohol lamp
+and dropper are recorded in `docs/PRODUCT.md`, section 6. Their eventual controls
+should make those roles clear; placement-only behavior remains valid through M3.
+
 ---
 
 ## 7. Laboratory workspace

@@ -1,6 +1,7 @@
 import type { EquipmentInstance, EquipmentType, Point } from '../types/equipment'
 import type { ChemicalId } from '../simulation/chemicals/catalog'
 import { addChemicalPortion } from '../simulation/chemicals/portions'
+import { evaluateReaction } from '../simulation/engine/evaluateReaction'
 import { isContainerEquipment } from '../types/container'
 import type { ContainerState } from '../types/container'
 
@@ -18,6 +19,7 @@ export type LabWorkspaceAction =
   | { type: 'reset' }
   | { type: 'add-chemical'; equipmentId: string; chemicalId: ChemicalId; quantity: number }
   | { type: 'clear-container'; equipmentId: string }
+  | { type: 'mix'; equipmentId: string }
 
 export function createLabWorkspaceState(): LabWorkspaceState {
   return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [] }
@@ -48,6 +50,16 @@ export function labWorkspaceReducer(
       : state
   }
 
+  if (action.type === 'mix') {
+    const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
+    if (!container || container.contents.length === 0) return state
+    const reactionResult = evaluateReaction({ contents: container.contents, trigger: 'mix' })
+    return {
+      ...state,
+      containers: state.containers.map((item) => item.id === container.id ? { ...item, reactionResult } : item),
+    }
+  }
+
   if (action.type === 'add-chemical' || action.type === 'clear-container') {
     const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
     if (!container) return state
@@ -57,7 +69,7 @@ export function labWorkspaceReducer(
     if (contents === container.contents) return state
     return {
       ...state,
-      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents } : item),
+      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents, reactionResult: null } : item),
     }
   }
 
@@ -75,7 +87,7 @@ export function labWorkspaceReducer(
       ...state,
       equipment: [...state.equipment, instance],
       containers: isContainerEquipment(instance.equipmentType)
-        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [] }]
+        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [], reactionResult: null }]
         : state.containers,
       selectedEquipmentId: instance.id,
       nextSerial: state.nextSerial + 1,

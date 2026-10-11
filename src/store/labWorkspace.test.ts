@@ -80,8 +80,8 @@ describe('container state transitions', () => {
     state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'dropper', position: { x: 0, y: 0 } })
     state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 1, y: 1 } })
     expect(state.containers).toEqual([
-      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [] },
-      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [] },
+      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [], reactionResult: null },
+      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [], reactionResult: null },
     ])
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-3', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-4', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
@@ -107,6 +107,7 @@ describe('container state transitions', () => {
     expect(added.containers[0]?.contents).toEqual([
       { chemicalId: 'hydrochloric-acid', quantity: 1 }, { chemicalId: 'sodium-bicarbonate', quantity: 1 },
     ])
+    expect(added.containers[0]?.reactionResult).toBeNull()
   })
 
   it('clears only the target container and reset removes all container state', () => {
@@ -131,5 +132,53 @@ describe('container state transitions', () => {
     expect(labWorkspaceReducer(state, { type: 'clear-container', equipmentId: 'missing' })).toBe(state)
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'missing', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'silver-nitrate', quantity: NaN })).toBe(state)
+  })
+
+  function preparedMixture() {
+    const acid = labWorkspaceReducer(placeContainers(), { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid', quantity: 1 })
+    return labWorkspaceReducer(acid, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'sodium-bicarbonate', quantity: 1 })
+  }
+
+  it('stores semantic products only on explicit Mix, independently of other containers', () => {
+    const state = preparedMixture()
+    const action = { type: 'mix', equipmentId: 'equipment-1' } as const
+    const mixed = labWorkspaceReducer(state, action)
+    expect(mixed.containers[0]?.reactionResult).toMatchObject({ status: 'reaction', reactionId: 'R5', products: expect.arrayContaining([expect.objectContaining({ id: 'carbon-dioxide' })]) })
+    expect(mixed.containers[1]).toBe(state.containers[1])
+    expect(mixed.containers[0]?.contents).toBe(state.containers[0]?.contents)
+    expect(mixed.equipment).toBe(state.equipment)
+    expect(state.containers[0]?.reactionResult).toBeNull()
+    expect(labWorkspaceReducer(state, action)).toEqual(mixed)
+    expect(labWorkspaceReducer(mixed, action)).toEqual(mixed)
+    const moved = labWorkspaceReducer(mixed, { type: 'move', id: 'equipment-1', position: { x: 0.8, y: 0.8 } })
+    const selected = labWorkspaceReducer(moved, { type: 'select', id: 'equipment-2' })
+    expect(selected.containers).toBe(mixed.containers)
+  })
+
+  it('invalidates the result on additions and clearing, but preserves it on invalid additions', () => {
+    const mixed = labWorkspaceReducer(preparedMixture(), { type: 'mix', equipmentId: 'equipment-1' })
+    const invalid = labWorkspaceReducer(mixed, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid', quantity: NaN })
+    expect(invalid).toBe(mixed)
+    const added = labWorkspaceReducer(mixed, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'sodium-hydroxide', quantity: 1 })
+    expect(added.containers[0]?.reactionResult).toBeNull()
+    expect(added.containers[1]).toBe(mixed.containers[1])
+    const repeatedAddition = labWorkspaceReducer(mixed, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid', quantity: 1 })
+    expect(repeatedAddition.containers[0]?.reactionResult).toBeNull()
+    const unsupported = labWorkspaceReducer(added, { type: 'mix', equipmentId: 'equipment-1' })
+    expect(unsupported.containers[0]?.reactionResult).toEqual({ status: 'no-reaction', observation: 'No observable reaction.' })
+    const clear = labWorkspaceReducer(mixed, { type: 'clear-container', equipmentId: 'equipment-1' })
+    expect(clear.containers[0]).toMatchObject({ contents: [], reactionResult: null })
+    expect(clear.containers[1]).toBe(mixed.containers[1])
+    const reset = labWorkspaceReducer(mixed, { type: 'reset' })
+    expect(reset.containers).toEqual([])
+    const fresh = labWorkspaceReducer(reset, { type: 'add', equipmentType: 'beaker', position: { x: 0, y: 0 } })
+    expect(fresh.containers[0]?.reactionResult).toBeNull()
+  })
+
+  it('ignores Mix on missing, unsupported or empty equipment', () => {
+    const state = labWorkspaceReducer(placeContainers(), { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0, y: 0 } })
+    for (const equipmentId of ['missing', 'equipment-1', 'equipment-2', 'equipment-3']) {
+      expect(labWorkspaceReducer(state, { type: 'mix', equipmentId })).toBe(state)
+    }
   })
 })

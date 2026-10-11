@@ -4,10 +4,11 @@ import type { ContainerState } from '../../../types/container'
 interface ContainerDetailsProps {
   container: ContainerState
   onClear: () => void
+  onMix: () => void
   disabled: boolean
 }
 
-export function ContainerDetails({ container, onClear, disabled }: ContainerDetailsProps) {
+export function ContainerDetails({ container, onClear, onMix, disabled }: ContainerDetailsProps) {
   return (
     <section className="container-details" aria-labelledby="contents-title">
       <h3 id="contents-title">Selected container contents</h3>
@@ -22,8 +23,16 @@ export function ContainerDetails({ container, onClear, disabled }: ContainerDeta
           })}
         </ul>
       )}
-      <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0} onClick={onClear}>Empty container</button>
-      <p className="empty-caption">Amounts use simplified units. Substances are shown separately; no reactions are evaluated yet.</p>
+      <div className="container-actions">
+        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0} onClick={onMix}>Mix</button>
+        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0} onClick={onClear}>Empty container</button>
+      </div>
+      <p className="mix-result" role="status" aria-label="Mix result" aria-atomic="true">
+        {container.reactionResult?.status === 'reaction'
+          ? `Reaction identified: ${container.reactionResult.name}.`
+          : container.reactionResult?.observation}
+      </p>
+      <p className="empty-caption">Press Mix to check for a supported reaction. Amounts use simplified units; the list and drawing show starting substances, not reaction products.</p>
     </section>
   )
 }

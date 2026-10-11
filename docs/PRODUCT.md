@@ -98,6 +98,25 @@ Equipment may be expanded in later versions.
 
 The MVP should not attempt to reproduce a complete laboratory inventory.
 
+### Intended functional roles
+
+The alcohol lamp and dropper should become usable tools in experiments, beyond
+placement and movement. Neither tool is a chemical reactant, and neither should
+be required for every reaction.
+
+- Alcohol lamp: provide the supported heating interaction in M5, then enable
+  the registered `heat` reactions R7 and R8 in M6. It must not cause mix-only
+  reactions to match a heat trigger.
+- Dropper: add or transfer supported liquid reagents into a beaker or test tube
+  using simplified quantities. Chemical delivery changes container contents;
+  evaluation still requires the explicit `mix` action. The dropper does not
+  introduce a new reaction trigger or new chemistry rules.
+
+As of M3, both tools support placement and movement only. This note records the
+requested future behavior; it does not expand M3 completion criteria. Dropper
+interaction has no assigned implementation milestone yet. Its milestone placement
+and interaction design require explicit user approval before implementation.
+
 ---
 
 ## 7. MVP chemicals
