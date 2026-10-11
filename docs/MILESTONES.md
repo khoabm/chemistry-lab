@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M1 — Interactive Laboratory Workspace`
+`M2 — Container and Chemical System`
 
 ## Active milestone branch
 
-`M1`
+`M2`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
