@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M6 — Heat Reactions`
+`M7 — Teaching UX`
 
 ## Active milestone branch
 
-`M6`
+`M7`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
