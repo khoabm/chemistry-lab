@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M5 — Alcohol Lamp and Heating Interaction`
+`M6 — Heat Reactions`
 
 ## Active milestone branch
 
-`M5`
+`M6`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
@@ -321,7 +321,7 @@ Heat-triggered chemistry belongs to M6.
 
 ---
 
-# M6 — Heat Reactions
+# M6 — Heat ReactionsM6 — Heat Reactions
 
 ## Goal
 
