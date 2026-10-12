@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M4 — Reaction Visualization`
+`M5 — Alcohol Lamp and Heating Interaction`
 
 ## Active milestone branch
 
-`M4`
+`M5`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
