@@ -321,7 +321,7 @@ Heat-triggered chemistry belongs to M6.
 
 ---
 
-# M6 — Heat ReactionsM6 — Heat Reactions
+# M6 — Heat Reactions
 
 ## Goal
 

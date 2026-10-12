@@ -39,7 +39,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
             heating={container.heatingState.status === 'heating'} />
         </div>
         <div>
-          <HeatingStatus state={container.heatingState} />
+          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
             : <p className="empty-caption">Starting sample. No mixing result yet.</p>}
         </div>

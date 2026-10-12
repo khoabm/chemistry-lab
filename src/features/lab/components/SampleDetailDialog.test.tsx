@@ -1,7 +1,8 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
 import { StrictMode } from 'react'
+import { heatReactionDelayMs } from '../hooks/useHeatReactions'
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal')
 const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close')
@@ -21,6 +22,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   for (const [name, descriptor] of [['showModal', originalShowModal], ['close', originalClose]] as const) {
     if (descriptor) Object.defineProperty(HTMLDialogElement.prototype, name, descriptor)
     else Reflect.deleteProperty(HTMLDialogElement.prototype, name)
@@ -41,6 +43,25 @@ function openDetail() {
 }
 
 describe('selected sample detail', () => {
+  it('updates an already-open dialog when delayed heating finishes', () => {
+    vi.useFakeTimers()
+    addSample('Copper(II) carbonate')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
+    const sample = screen.getByRole('button', { name: 'Beaker 1' })
+    fireEvent.click(sample)
+    for (let step = 0; step < 3; step++) fireEvent.keyDown(sample, { key: 'ArrowRight', shiftKey: true })
+    for (let step = 0; step < 5; step++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    const { dialog } = openDetail()
+    expect(within(dialog).getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting')
+    act(() => vi.advanceTimersByTime(heatReactionDelayMs))
+    expect(within(dialog).getByRole('status', { name: 'Heat result' })).toHaveTextContent('Thermal decomposition')
+    expect(dialog.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', '#303330')
+    expect(dialog.querySelectorAll('.reaction-bubble')).toHaveLength(3)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
+    expect(screen.getByRole('status', { name: 'Heat result' })).toHaveTextContent('Thermal decomposition')
+  })
+
   it('shares physical heating in the close-up/dialog without inventing a reaction', () => {
     addSample('Copper(II) carbonate')
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))

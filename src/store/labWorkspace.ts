@@ -6,6 +6,8 @@ import { isContainerEquipment } from '../types/container'
 import type { ContainerState } from '../types/container'
 import type { AlcoholLampState } from '../types/heating'
 import { findHeatingLamp } from '../simulation/heating/heatingZone'
+import { isCompletedHeatReaction } from '../simulation/reactions/types'
+import type { HeatEvaluationState } from '../types/heating'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
@@ -13,6 +15,7 @@ export interface LabWorkspaceState {
   nextSerial: number
   containers: readonly ContainerState[]
   lamps: readonly AlcoholLampState[]
+  nextHeatRequestId: number
 }
 
 export type LabWorkspaceAction =
@@ -24,22 +27,33 @@ export type LabWorkspaceAction =
   | { type: 'clear-container'; equipmentId: string }
   | { type: 'mix'; equipmentId: string }
   | { type: 'toggle-lamp'; equipmentId: string }
+  | { type: 'evaluate-heat'; equipmentId: string; requestId: number }
 
 export function createLabWorkspaceState(): LabWorkspaceState {
-  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [] }
+  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [], nextHeatRequestId: 1 }
 }
 
 function synchronizeHeating(state: LabWorkspaceState): LabWorkspaceState {
   const litLampIds = state.lamps.filter((lamp) => lamp.status === 'lit').map((lamp) => lamp.equipmentInstanceId)
+  let nextHeatRequestId = state.nextHeatRequestId
   const containers: readonly ContainerState[] = state.containers.map((container) => {
     const instance = state.equipment.find((item) => item.id === container.equipmentInstanceId)
     const lampId = instance ? findHeatingLamp(instance, state.equipment, litLampIds) : null
-    if (container.heatingState.status === 'heating' && container.heatingState.lampId === lampId
-      || container.heatingState.status === 'not-heating' && lampId === null) return container
-    return { ...container, heatingState: lampId ? { status: 'heating', lampId } : { status: 'not-heating' } }
+    const sameSource = container.heatingState.status === 'heating' && container.heatingState.lampId === lampId
+      || container.heatingState.status === 'not-heating' && lampId === null
+    let heatEvaluation: HeatEvaluationState = container.heatEvaluation
+    if (!lampId || container.contents.length === 0) {
+      if (heatEvaluation.status !== 'idle') heatEvaluation = { status: 'idle' }
+    } else if (isCompletedHeatReaction(container.reactionResult)) {
+      if (heatEvaluation.status !== 'evaluated') heatEvaluation = { status: 'evaluated' }
+    } else if (!sameSource || heatEvaluation.status === 'idle') {
+      heatEvaluation = { status: 'pending', requestId: nextHeatRequestId++ }
+    }
+    if (sameSource && heatEvaluation === container.heatEvaluation) return container
+    return { ...container, heatEvaluation, heatingState: lampId ? { status: 'heating', lampId } : { status: 'not-heating' } }
   })
   return containers.every((container, index) => container === state.containers[index])
-    ? state : { ...state, containers }
+    ? state : { ...state, containers, nextHeatRequestId }
 }
 
 function boundedPosition(position: Point): Point {
@@ -58,7 +72,7 @@ export function labWorkspaceReducer(
   action: LabWorkspaceAction,
 ): LabWorkspaceState {
   if (action.type === 'reset') {
-    return { ...createLabWorkspaceState(), nextSerial: state.nextSerial }
+    return { ...createLabWorkspaceState(), nextSerial: state.nextSerial, nextHeatRequestId: state.nextHeatRequestId }
   }
 
   if (action.type === 'select') {
@@ -73,13 +87,25 @@ export function labWorkspaceReducer(
       ? { ...lamp, status: lamp.status === 'lit' ? 'extinguished' : 'lit' } : lamp) })
   }
 
+  if (action.type === 'evaluate-heat') {
+    const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
+    if (!container || container.heatingState.status !== 'heating' || container.contents.length === 0
+      || container.heatEvaluation.status !== 'pending' || container.heatEvaluation.requestId !== action.requestId) return state
+    const reactionResult = evaluateReaction({ contents: container.contents, trigger: 'heat' })
+    return { ...state, containers: state.containers.map((item) => item.id === container.id
+      ? { ...item, reactionResult, heatEvaluation: { status: 'evaluated' } } : item) }
+  }
+
   if (action.type === 'mix') {
     const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
-    if (!container || container.contents.length === 0) return state
+    if (!container || container.contents.length === 0 || isCompletedHeatReaction(container.reactionResult)) return state
     const reactionResult = evaluateReaction({ contents: container.contents, trigger: 'mix' })
     return {
       ...state,
-      containers: state.containers.map((item) => item.id === container.id ? { ...item, reactionResult } : item),
+      containers: state.containers.map((item) => item.id === container.id ? {
+        ...item, reactionResult,
+        heatEvaluation: item.heatEvaluation.status === 'pending' ? { status: 'cancelled' } : item.heatEvaluation,
+      } : item),
     }
   }
 
@@ -90,10 +116,10 @@ export function labWorkspaceReducer(
       ? container.contents.length ? [] : container.contents
       : addChemicalPortion(container.contents, action.chemicalId, action.quantity)
     if (contents === container.contents) return state
-    return {
+    return synchronizeHeating({
       ...state,
-      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents, reactionResult: null } : item),
-    }
+      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents, reactionResult: null, heatEvaluation: { status: 'idle' } } : item),
+    })
   }
 
   if (!Number.isFinite(action.position.x) || !Number.isFinite(action.position.y)) {
@@ -110,7 +136,7 @@ export function labWorkspaceReducer(
       ...state,
       equipment: [...state.equipment, instance],
       containers: isContainerEquipment(instance.equipmentType)
-        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [], reactionResult: null, heatingState: { status: 'not-heating' } }]
+        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [], reactionResult: null, heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' } }]
         : state.containers,
       lamps: instance.equipmentType === 'alcohol-lamp'
         ? [...state.lamps, { equipmentInstanceId: instance.id, status: 'extinguished' }] : state.lamps,

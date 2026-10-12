@@ -8,10 +8,12 @@ import { LabPalette } from './LabPalette'
 import { LabWorkspace } from './LabWorkspace'
 import { ContainerDetails } from './ContainerDetails'
 import { LampDetails } from './LampDetails'
+import { useHeatReactions } from '../hooks/useHeatReactions'
 
 export function LabPage() {
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
+  useHeatReactions(state.containers, dispatch, !!interaction.preview)
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
   const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
   const selectedLamp = state.lamps.find((lamp) => lamp.equipmentInstanceId === state.selectedEquipmentId)

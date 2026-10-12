@@ -6,6 +6,7 @@ import { EquipmentVisual } from './EquipmentVisual'
 import { useState } from 'react'
 import { SampleDetailDialog } from './SampleDetailDialog'
 import { HeatingStatus } from './HeatingStatus'
+import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 
 interface ContainerDetailsProps {
   container: ContainerState
@@ -20,7 +21,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, dis
   return (
     <section className="container-details" aria-labelledby="contents-title">
       <h3 id="contents-title">Selected container contents</h3>
-      <HeatingStatus state={container.heatingState} />
+      <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} />
       {container.contents.length === 0 ? <p className="empty-caption">This container is empty.</p> : (
         <ul className="contents-list" aria-label="Container contents">
           {container.contents.map((portion) => {
@@ -33,7 +34,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, dis
         </ul>
       )}
       <div className="container-actions">
-        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0} onClick={onMix}>Mix</button>
+        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0 || isCompletedHeatReaction(container.reactionResult)} onClick={onMix}>Mix</button>
         <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0}
           onClick={() => { setDetailOpen(false); onClear() }}>Empty container</button>
       </div>
@@ -48,7 +49,9 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, dis
       {isDetailOpen && container.contents.length > 0 && <SampleDetailDialog container={container} equipmentType={equipmentType}
         onDismiss={() => setDetailOpen(false)} />}
       <ReactionObservation result={container.reactionResult} />
-      <p className="empty-caption">Press Mix to check for a supported reaction. Amounts use simplified units; the list records starting substances and the drawing illustrates the result.</p>
+      {isCompletedHeatReaction(container.reactionResult) && <p className="empty-caption">This heated sample has transformed. Empty the container or add chemicals to start a fresh experiment; product reactions are not modeled.</p>}
+      <p className="empty-caption">{!isCompletedHeatReaction(container.reactionResult) && 'Press Mix to check for a supported reaction. '}
+        Amounts use simplified units; the list records starting substances and the drawing illustrates the result.</p>
     </section>
   )
 }

@@ -267,6 +267,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .sample-detail-content .reaction-details dd { font-size: 16px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .reaction-effects { pointer-events: none; }
+.reacted-solid { transition: fill 800ms ease-out; }
 .lamp-details { padding-top: var(--space-5); }
 .lamp-details .equipment-visual { height: 110px; margin: var(--space-4) 0; }
 .lamp-details .reset-button { margin-top: var(--space-3); }
@@ -294,6 +295,7 @@ h3 { font-size: 14px; font-weight: 600; }
 @keyframes bubble-release { 0%, 78% { opacity: 0; transform: scale(0.5); } 85% { opacity: 0.65; } 100% { opacity: 0; transform: scale(1.5); } }
 @keyframes warmth-emphasis { 50% { opacity: 0.45; } }
 @media (prefers-reduced-motion: reduce) {
+  .reacted-solid { transition: none; }
   .lamp-flame, .container-heat-glow { animation: none; }
   .reacted-liquid, .precipitate-cloud, .precipitate-bed, .precipitate-particle, .reaction-bubble, .bubble-surface-ring, .reaction-warmth, .warmth-indicator { animation: none; }
 }

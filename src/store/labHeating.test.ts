@@ -61,7 +61,7 @@ describe('M5 heating state transitions', () => {
     expect(changed.containers[0]?.reactionResult).toBe(original.reactionResult)
   })
 
-  it('does not evaluate R7/R8 when heating, and keeps physical heating on add/clear/Mix', () => {
+  it('waits for heat request completion, and keeps physical heating on add/clear/Mix', () => {
     let state = toggle(setup())
     state = labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-2', chemicalId: 'copper-carbonate', quantity: 1 })
     expect(state.containers[0]?.heatingState.status).toBe('heating')

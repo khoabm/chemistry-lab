@@ -80,8 +80,8 @@ describe('container state transitions', () => {
     state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'dropper', position: { x: 0, y: 0 } })
     state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 1, y: 1 } })
     expect(state.containers).toEqual([
-      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [], reactionResult: null, heatingState: { status: 'not-heating' } },
-      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [], reactionResult: null, heatingState: { status: 'not-heating' } },
+      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [], reactionResult: null, heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' } },
+      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [], reactionResult: null, heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' } },
     ])
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-3', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-4', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
@@ -165,7 +165,7 @@ describe('container state transitions', () => {
     const repeatedAddition = labWorkspaceReducer(mixed, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid', quantity: 1 })
     expect(repeatedAddition.containers[0]?.reactionResult).toBeNull()
     const unsupported = labWorkspaceReducer(added, { type: 'mix', equipmentId: 'equipment-1' })
-    expect(unsupported.containers[0]?.reactionResult).toEqual({ status: 'no-reaction', observation: 'No observable reaction.' })
+    expect(unsupported.containers[0]?.reactionResult).toEqual({ status: 'no-reaction', trigger: 'mix', observation: 'No observable reaction.' })
     const clear = labWorkspaceReducer(mixed, { type: 'clear-container', equipmentId: 'equipment-1' })
     expect(clear.containers[0]).toMatchObject({ contents: [], reactionResult: null })
     expect(clear.containers[1]).toBe(mixed.containers[1])

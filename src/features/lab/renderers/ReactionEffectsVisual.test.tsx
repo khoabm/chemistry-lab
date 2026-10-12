@@ -10,10 +10,40 @@ import { chemicals } from '../../../simulation/chemicals/catalog'
 const layout = getContentsLayout([{ chemicalId: 'silver-nitrate', quantity: 1 }], 'beaker')
 
 function result(effects: readonly ReactionEffect[]): ReactionResult {
-  return { status: 'reaction', reactionId: 'R6', name: 'Semantic result', equation: 'Example', products: [], effects, observation: 'Example observation' }
+  return { status: 'reaction', trigger: 'mix', reactionId: 'R6', name: 'Semantic result', equation: 'Example', products: [], effects, observation: 'Example observation' }
 }
 
 describe('semantic reaction presentation', () => {
+  for (const equipmentType of ['beaker', 'test-tube'] as const) {
+    it.each([
+      ['copper-carbonate', 'black', '#303330', true],
+      ['copper-sulfate-pentahydrate', 'pale-white', '#f2eee4', false],
+    ] as const)(`shows a transformed %s solid in ${equipmentType}, retaining color after cooling`, (chemicalId, color, fill, gas) => {
+      const effects: ReactionEffect[] = [{ id: 'sample-solid', type: 'solid-color-change', color }]
+      if (gas) effects.push({ id: 'sample-gas', type: 'gas', intensity: 'low' })
+      // Deliberately use unrelated reaction metadata: rendering follows semantic effects only.
+      const reactionResult = { ...result(effects), trigger: 'heat' } as const
+      const contents = [{ chemicalId, quantity: 1 }]
+      const { container, rerender } = render(<EquipmentVisual equipmentType={equipmentType} contents={contents} reactionResult={reactionResult} heating />)
+      expect(container.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', fill)
+      expect(container.querySelector('.reacted-liquid')).not.toBeInTheDocument()
+      expect(container.querySelector('.liquid-surface')).not.toBeInTheDocument()
+      expect(container.querySelector('.bubble-surface-ring')).not.toBeInTheDocument()
+      expect(container.querySelectorAll('.reaction-bubble')).toHaveLength(gas ? 3 : 0)
+      const bottom = equipmentType === 'beaker' ? 83 : 87
+      for (const particle of container.querySelectorAll<SVGGElement>('.reaction-bubble')) {
+        const cy = Number(particle.querySelector('circle')?.getAttribute('cy'))
+        expect(cy + parseFloat(particle.style.getPropertyValue('--bubble-rise'))).toBeCloseTo(bottom - 48)
+      }
+      expect(describeReactionEffects(effects)).toContain(color === 'black' ? 'toward black' : 'paler or white')
+      rerender(<EquipmentVisual equipmentType={equipmentType} contents={contents} reactionResult={reactionResult} />)
+      expect(container.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', fill)
+      expect(container.querySelector('.reaction-gas')).not.toBeInTheDocument()
+      rerender(<EquipmentVisual equipmentType={equipmentType} contents={contents} />)
+      expect(container.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    })
+  }
+
   it.each([
     ['white', '#fffefa'], ['blue', '#478ecb'], ['reddish-brown', '#a85a3a'],
   ] as const)('renders %s precipitate solely from its effect, with visible particles', (color, fill) => {
@@ -77,7 +107,7 @@ describe('semantic reaction presentation', () => {
     expect(container.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
     rerender(<EquipmentVisual equipmentType="beaker" contents={contents}
-      reactionResult={{ status: 'no-reaction', observation: 'No observable reaction.' }} />)
+      reactionResult={{ status: 'no-reaction', trigger: 'mix', observation: 'No observable reaction.' }} />)
     expect(container.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
     expect(container.querySelector('[data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
   })

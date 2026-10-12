@@ -15,6 +15,6 @@ export function LampDetails({ lamp, disabled, onToggle }: {
     </button>
     <p className="empty-caption">Move a beaker or test tube into the marked zone above this lamp to heat it.
       Move it away or extinguish the lamp to stop heating.</p>
-    <p className="empty-caption">This virtual setup does not calculate temperature or trigger heat reactions yet.</p>
+    <p className="empty-caption">A filled container is checked for a registered heat reaction after a short illustrative wait. No exact temperature is calculated.</p>
   </section>
 }

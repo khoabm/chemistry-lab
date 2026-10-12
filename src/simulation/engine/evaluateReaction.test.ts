@@ -17,7 +17,7 @@ function portions(ids: readonly ChemicalId[]): ChemicalPortion[] {
   return ids.map((chemicalId) => ({ chemicalId, quantity: 1 }))
 }
 
-const noReaction = { status: 'no-reaction', observation: 'No observable reaction.' }
+const noReaction = { status: 'no-reaction', trigger: 'mix', observation: 'No observable reaction.' }
 
 describe('registered mix reactions', () => {
   it('registers only R1–R6 with unique reaction/effect IDs and consistent product identities', () => {
@@ -64,7 +64,7 @@ describe('registered mix reactions', () => {
   })
 
   it.each(cases)('$id rejects the heat trigger', ({ reactants }) => {
-    expect(evaluateReaction({ contents: portions(reactants), trigger: 'heat' })).toEqual(noReaction)
+    expect(evaluateReaction({ contents: portions(reactants), trigger: 'heat' })).toEqual({ ...noReaction, trigger: 'heat' })
   })
 })
 
@@ -77,8 +77,8 @@ describe('reaction matching boundaries', () => {
     expect(evaluateReaction({ contents: portions(ids), trigger: 'mix' })).toEqual(noReaction)
   })
 
-  it.each(['copper-carbonate', 'copper-sulfate-pentahydrate'] as const)('does not implement future heat reaction for %s', (id) => {
-    expect(evaluateReaction({ contents: portions([id]), trigger: 'heat' })).toEqual(noReaction)
+  it.each(['copper-carbonate', 'copper-sulfate-pentahydrate'] as const)('requires heat rather than Mix for %s', (id) => {
+    expect(evaluateReaction({ contents: portions([id]), trigger: 'heat' }).status).toBe('reaction')
     expect(evaluateReaction({ contents: portions([id]), trigger: 'mix' })).toEqual(noReaction)
   })
 

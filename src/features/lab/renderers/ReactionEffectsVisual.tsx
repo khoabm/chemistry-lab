@@ -10,9 +10,10 @@ const flocPositions = [0.08, 0.28, 0.52, 0.75, 0.92, 0.18, 0.4, 0.64, 0.84, 0.35
 export function ReactionEffectsVisual({ effects, layout }: { effects: readonly ReactionEffect[]; layout: ContentsLayout }) {
   const liquidClipId = useId()
   const { x, width, surface, bottom, height } = layout
+  const solidSample = effects.some((effect) => effect.type === 'solid-color-change')
   if (effects.length === 0) return null
   return <g className="reaction-effects" stroke="none">
-    <defs><clipPath id={liquidClipId}><rect x={x} y={surface} width={width} height={height} /></clipPath></defs>
+    <defs><clipPath id={liquidClipId}><rect x={x} y={solidSample ? bottom - 55 : surface} width={width} height={solidSample ? 55 : height} /></clipPath></defs>
     <g clipPath={`url(#${liquidClipId})`}>
       {effects.map((effect) => {
         switch (effect.type) {
@@ -33,23 +34,24 @@ export function ReactionEffectsVisual({ effects, layout }: { effects: readonly R
             </g>
           )
           case 'gas': return (
-            <g key={effect.id} data-reaction-effect="gas" className="reaction-gas">
-              {bubblePositions.map((offset, index) => {
+            <g key={effect.id} data-reaction-effect="gas" className={`reaction-gas${solidSample ? ' is-solid-gas' : ''}`}>
+              {(effect.intensity === 'low' ? bubblePositions.slice(0, 3) : bubblePositions).map((offset, index) => {
                 const cx = x + 3 + (width - 6) * offset
-                const cy = bottom - 4 - index % 3
+                const cy = bottom - (solidSample ? 9 : 4) - index % 3
                 const radius = 1.1 + index % 3 * 0.45
                 const timing = { '--bubble-delay': `${-index * 0.47}s`, '--bubble-duration': `${2.2 + index % 3 * 0.35}s` } as CSSProperties
                 return <g key={offset} style={timing}>
-                  <g className="reaction-bubble" style={{ '--bubble-rise': `${surface + 2 - cy}px`, '--bubble-sway': `${index % 2 ? 1 : -1}px` } as CSSProperties}>
+                  <g className="reaction-bubble" style={{ '--bubble-rise': `${(solidSample ? bottom - 48 : surface + 2) - cy}px`, '--bubble-sway': `${index % 2 ? 1 : -1}px` } as CSSProperties}>
                     <circle cx={cx} cy={cy} r={radius} fill="#fffefa" fillOpacity="0.3" stroke="#628794" strokeWidth="0.65" />
                     <circle cx={cx - radius * 0.3} cy={cy - radius * 0.35} r={radius * 0.28} fill="#fffefa" />
                   </g>
-                  <ellipse className="bubble-surface-ring" cx={cx} cy={surface + 0.7} rx={radius * 1.3} ry="0.65"
-                    fill="none" stroke="#628794" strokeWidth="0.5" />
+                  {!solidSample && <ellipse className="bubble-surface-ring" cx={cx} cy={surface + 0.7} rx={radius * 1.3} ry="0.65"
+                    fill="none" stroke="#628794" strokeWidth="0.5" />}
                 </g>
               })}
             </g>
           )
+          case 'solid-color-change': return null // The shared sample drawing applies this semantic color.
           case 'temperature-rise': return (
             <g key={effect.id} data-reaction-effect="temperature-rise" className="reaction-warmth"
               transform={`translate(${x + width / 2}, ${surface + height / 2})`}>

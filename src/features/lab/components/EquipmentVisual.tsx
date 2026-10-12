@@ -7,6 +7,7 @@ import { ReactionEffectsVisual } from '../renderers/ReactionEffectsVisual'
 import { getContentsLayout } from '../renderers/contentsPresentation'
 import type { AlcoholLampState } from '../../../types/heating'
 import { isContainerEquipment } from '../../../types/container'
+import { solidProductColors } from '../renderers/reactionPresentation'
 
 export function EquipmentVisual({ equipmentType, contents = [], reactionResult = null, lampStatus = 'extinguished', heating = false }: {
   equipmentType: EquipmentType
@@ -17,7 +18,10 @@ export function EquipmentVisual({ equipmentType, contents = [], reactionResult =
 }) {
   const clipId = useId()
   const layout = getContentsLayout(contents, equipmentType)
-  const effects = reactionResult?.status === 'reaction' ? reactionResult.effects : []
+  const resultEffects = reactionResult?.status === 'reaction' ? reactionResult.effects : []
+  const solidEffect = resultEffects.find((effect) => effect.type === 'solid-color-change')
+  const solidColor = solidEffect?.type === 'solid-color-change' ? solidProductColors[solidEffect.color] : undefined
+  const effects = resultEffects.filter((effect) => effect.type !== 'gas' || !solidEffect || heating)
   return (
     <svg className="equipment-visual" viewBox="0 0 100 100" fill="none" aria-hidden="true">
       <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -27,7 +31,7 @@ export function EquipmentVisual({ equipmentType, contents = [], reactionResult =
           <path fill="#fffefa90" d="M24 20h47l6 7-5 4v48a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6Z" />
           <defs><clipPath id={clipId}><path d="M26 32h44v47a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4Z" /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
-            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} />
+            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} />
             <ReactionEffectsVisual effects={effects} layout={layout} />
           </g>
           <path d="M24 26h42M31 39h9M31 50h6M31 61h9M31 72h6M63 37v37" />
@@ -36,7 +40,7 @@ export function EquipmentVisual({ equipmentType, contents = [], reactionResult =
           <path fill="#fffefa90" d="M36 15h28v60a14 14 0 0 1-28 0Z" />
           <defs><clipPath id={clipId}><path d="M38 23h24v52a12 12 0 0 1-24 0Z" /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
-            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} />
+            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} />
             <ReactionEffectsVisual effects={effects} layout={layout} />
           </g>
           <path d="M32 15h36M32 20h36M43 30v41M55 78h1" />

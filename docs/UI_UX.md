@@ -283,6 +283,25 @@ modal share the same heating feedback. Reduced-motion disables flame/glow motion
 while preserving static shapes/text. M5 does not evaluate heat reactions, change
 chemical contents or invalidate existing Mix results.
 
+M6 extends this interaction with a short illustrative wait for filled containers.
+Show pending/completed heat evaluation separately from physical Heating. R7 changes
+the solid toward black with low outlined gas particles rising above the solid;
+R8 changes blue solid toward pale/white without inventing gas or liquid. Clearly
+label the particles as an illustration of colorless gas release, not boiling or
+steam. The returned equation and explanation appear in the existing observation
+panel and update an already-open close-up modal.
+
+Cancel pending evaluation on source exit/extinction, source change, clear/add/reset.
+Pause waits during drag previews; unrelated selection/updates retain each deadline.
+Keep successful solid color after cooling, with gas motion only while heated.
+Completed heat samples cannot Mix their retained starting portions as fresh
+reactants; clear/add begins another simplified experiment. Unsupported heat sets
+show No observable reaction. Do not calculate temperature, kinetics or yields.
+
+Explicit Mix supersedes a pending heat check and shows its cancellation status.
+Do not let the older delayed Heat result overwrite the user's newer Mix result.
+Changing contents/source or leaving/re-entering a lit zone can start a fresh check.
+
 ---
 
 ## 13. Reaction effects

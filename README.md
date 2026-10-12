@@ -95,7 +95,7 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M5 alcohol lamp and heating interaction, extending M4: place and move beakers, test tubes, droppers and
+M6 heat reactions, extending M5: place and move beakers, test tubes, droppers and
 alcohol lamps. Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
@@ -123,8 +123,20 @@ above it. Place the center of a beaker or test tube in that zone using drag or
 arrow keys; it shows a warm glow and Heating status. Moving the container/source
 out of alignment or extinguishing the source stops heating. Empty containers can
 also heat. Multiple lamps are independent; reset removes all heating state.
-Heating changes neither chemical contents nor existing Mix results. Heat reactions
-R7/R8 remain M6, and the dropper still supports placement/movement only.
+Filled containers wait approximately two seconds before heat evaluation. Copper
+carbonate shows R7 (black solid and low gas release); hydrated copper sulfate shows
+R8 (pale/white solid). Unsupported heated sets return No observable reaction.
+Solid gas particles are illustrative, not boiling bubbles or visible carbon dioxide.
+Moving away, changing source/contents, extinguishing or reset cancels stale waits;
+dragging pauses them. Selection/unrelated actions do not restart other deadlines.
+Explicit Mix cancels a pending heat check so an older callback cannot overwrite
+the new Mix result; re-entering a lit zone or changing contents starts another check.
+Each request evaluates once. Successful products retain their color after cooling
+and do not react again until contents change. Mix is unavailable for a transformed
+heat sample to avoid evaluating its retained starting portions as fresh reactants.
+Clear/add starts a new simplified experiment. Contents retain starting quantities;
+products are semantic data, without consumption/chaining or exact temperature.
+The dropper still supports placement/movement only.
 
 See the active milestone in `docs/MILESTONES.md`.
 
@@ -162,9 +174,10 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/types/equipment.ts`: stable equipment IDs/types and normalized positions.
 - `src/types/container.ts`: container associations and chemical portions.
 - `src/types/heating.ts`: lamp status and source-associated container heating state.
-- `src/simulation/heating/`: pure logical zone evaluation, without reaction triggers.
+- `src/features/lab/hooks/useHeatReactions.ts`: cancellable per-container delay orchestration.
+- `src/simulation/heating/`: pure logical zone evaluation.
 - `src/simulation/chemicals/`: the specified catalog and pure portion additions.
-- `src/simulation/reactions/`: typed R1–R6 rules, products and semantic effects.
+- `src/simulation/reactions/`: typed R1–R8 rules, products and semantic effects.
 - `src/simulation/engine/`: pure deterministic reaction evaluation and unit tests.
 - `src/styles/tokens.css`: shared colors, spacing, radii, and typography defaults.
 - `src/styles/global.css`: base styles and responsive laboratory layout.
@@ -172,7 +185,7 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/simulation/AGENTS.md`: chemistry/domain boundary instructions.
 
 Use functional React components, strict TypeScript, and plain CSS with shared
-tokens. M5 extends SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
+tokens. M6 extends SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
 dependency direction: Presentation → Application state → Simulation → Domain data.
 Create additional folders only when their code is needed.
 
@@ -221,6 +234,7 @@ The M2 implementation and validation record live in
 The M3 implementation and validation record live in `plans/m3-reaction-engine.md`.
 The M4 implementation and validation record live in `plans/m4-reaction-visualization.md`.
 The M5 implementation and validation record live in `plans/m5-alcohol-lamp-and-heating.md`.
+The M6 implementation and validation record live in `plans/m6-heat-reactions.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).
