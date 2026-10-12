@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M7 — Teaching UX`
+`M8 — Polish`
 
 ## Active milestone branch
 
-`M7`
+`M8`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
