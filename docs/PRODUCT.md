@@ -158,6 +158,18 @@ Initial visual vocabulary:
 Visual effects should communicate observable chemistry rather than attempt to
 simulate microscopic molecular behavior.
 
+The approved M4 visual standard is qualitative realism: recognizable material
+appearance and motion consistent with the registered observation. Learners should
+see gas rising through liquid, precipitate forming and settling as a distinct
+solid, and the specified clear/colored liquid or solid sample. Maintain this
+standard when later milestones introduce their registered effects.
+
+No numeric percentage of scientific accuracy is claimed. Illustrative animation
+timing, particle sizes and liquid levels do not model kinetics, concentration or
+yield. More polished presentation must not invent chemistry or activate future
+milestone interactions. Use existing SVG/CSS unless a demonstrated rendering need
+requires a compatible dependency.
+
 ---
 
 ## 9. Observation panel

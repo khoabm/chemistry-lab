@@ -64,6 +64,14 @@ Approximate priorities:
 
 Do not give side panels more visual weight than the laboratory.
 
+M4 layout refinement: desktop tools and observations have wider readable columns
+and independent bounded scrolling. Below 1200px, move observations to a full-width
+row rather than squeezing three columns; below 900px keep the existing sticky,
+collapsible Equipment & Chemicals bar. The bench owns its height independently
+from observations so selection, contents and reaction text cannot resize it or
+move normalized equipment positions. Equations stay on one line with local
+horizontal scrolling when the viewport cannot fit them.
+
 ---
 
 ## 4. Header
@@ -199,6 +207,20 @@ Liquid level may be simplified.
 
 Precise fluid simulation is not required.
 
+For M4, use restrained liquid transparency, a readable surface/meniscus and
+textured solid samples based on existing catalog appearance. Share the drawn
+liquid bounds with reaction effects so bubbles and suspended solids remain inside
+the liquid and container. Starting-substance bands remain a simplified inventory
+illustration, not a claim of immiscibility or density layering.
+
+The selected sample has an enlarged view in the observation panel, reusing the
+bench renderer. Its labeled close-up button opens an optional sample-detail modal
+with a larger drawing and the existing reaction information for presentations.
+Keep Mix/Empty controls above the close-up; the modal does not perform chemistry.
+Use native dialog focus containment and background inertness, Close/Escape/backdrop
+dismissal, background scroll locking and focus restoration to the opener. Reset
+or a different selected container must not leave a stale sample dialog open.
+
 ---
 
 ## 11. Mixing interaction
@@ -257,9 +279,20 @@ Possible visual techniques:
 - cloudiness
 - settling solid
 
+M4 acceptance: show a brief cloud forming through the liquid, visible flocs
+settling, and a persistent sediment bed in the specified white/blue/reddish-brown
+color. Distinguish a solid deposit from a uniformly colored solution; retain
+enough edge contrast to see a white deposit against clear liquid. Animation timing
+and the settled appearance are illustrative, not measured settling behavior.
+
 ### Gas
 
 Should appear as bubbles rising through the material or leaving the container.
+
+M4 acceptance: stagger bubble sizes, paths and timing; bubbles rise to the drawn
+liquid surface and fade with small surface rings. Do not imply boiling, smoke or
+an opaque gas. A repeating gas illustration denotes the stored reaction result,
+not an unlimited gas supply or a calculated reaction duration.
 
 ### Color change
 
@@ -272,6 +305,10 @@ Should visibly modify the represented solid sample.
 ### Temperature change
 
 Use subtle educational feedback.
+
+For R6 keep the representative solution clear and show a small thermometer/upward
+cue. Explain that the symbol indicates warming and does not measure temperature.
+Do not tint the liquid amber or add steam, bubbles or a flame to neutralization.
 
 Do not invent visually dramatic explosions for reactions that do not require
 them.
@@ -359,6 +396,12 @@ Avoid animation that exists only for decoration.
 
 Animation should generally be short enough that users are not forced to wait
 for routine interactions.
+
+The M4 visual standard also applies to future registered effects within their
+own milestones. Prefer the existing SVG/CSS renderer; never add chemical matching
+or animation state to simulation. Motion must remain non-blocking, deterministic
+in presentation and contained within the appropriate material geometry. Honor
+`prefers-reduced-motion` with static bubbles, settled solids and textual results.
 
 ---
 

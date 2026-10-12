@@ -12,6 +12,7 @@ export function LabPage() {
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
+  const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
   const dragSource = interaction.preview?.source
   const draggingContainer = dragSource?.kind === 'workspace'
     ? state.containers.find((container) => container.equipmentInstanceId === dragSource.id) : undefined
@@ -34,13 +35,13 @@ export function LabPage() {
           }} />
         <LabWorkspace state={state} interaction={interaction} />
         <LabObservations>
-          {selectedContainer && <ContainerDetails container={selectedContainer} disabled={!!interaction.preview}
+          {selectedContainer && selectedEquipment && <ContainerDetails key={selectedContainer.id} container={selectedContainer} equipmentType={selectedEquipment.equipmentType} disabled={!!interaction.preview}
             onMix={() => dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId })}
             onClear={() => dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId })} />}
         </LabObservations>
       </main>
       {interaction.preview && <EquipmentDragPreview preview={interaction.preview}
-        contents={draggingContainer?.contents ?? []} />}
+        contents={draggingContainer?.contents ?? []} reactionResult={draggingContainer?.reactionResult ?? null} />}
       <footer className="lab-footer">
         <p>Explore chemistry, one observation at a time.</p>
         <p>Virtual demonstrations <span aria-hidden="true">·</span> Introductory chemistry</p>

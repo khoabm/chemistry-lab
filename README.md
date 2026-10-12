@@ -95,7 +95,7 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M3 mixing reaction engine, extending the M2 container system: place and move beakers, test tubes, droppers and unlit
+M4 reaction visualization, extending the M3 mixing engine: place and move beakers, test tubes, droppers and unlit
 alcohol lamps. Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
@@ -111,9 +111,11 @@ evaluate chemistry. Press Mix in the selected container's details to identify on
 of the six registered mix reactions (R1–R6); other combinations return
 `No observable reaction.` Matching ignores order and requires the exact supported
 set of substances. Results belong to each container and are cleared when its
-contents change. Reaction products/effects are semantic data; contents retain the
-starting substances and simplified quantities, without stoichiometric consumption
-or reaction chaining. Reaction visualization and heating remain later milestones.
+contents change. Supported results now show precipitate, gas bubbles or subtle
+warmth inside the container, with a visible observation, equation and educational
+explanation in the details panel. Reaction products/effects are semantic data;
+contents retain the starting substances and simplified quantities, without
+stoichiometric consumption or reaction chaining. Heating remains a later milestone.
 
 See the active milestone in `docs/MILESTONES.md`.
 
@@ -146,6 +148,7 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/features/lab/components/`: focused laboratory presentation components.
 - `src/features/lab/hooks/useEquipmentInteraction.ts`: shared pointer/keyboard interaction.
 - `src/features/lab/interactions/`: bench coordinate conversion and geometry tests.
+- `src/features/lab/renderers/`: semantic reaction effect visuals and presentation descriptions.
 - `src/store/labWorkspace.ts`: pure equipment/container state transitions and unit tests.
 - `src/types/equipment.ts`: stable equipment IDs/types and normalized positions.
 - `src/types/container.ts`: container associations and chemical portions.
@@ -158,11 +161,16 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/simulation/AGENTS.md`: chemistry/domain boundary instructions.
 
 Use functional React components, strict TypeScript, and plain CSS with shared
-tokens. M3 extends the page-local React reducer with no new dependencies. Preserve the
+tokens. M4 reuses SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
 dependency direction: Presentation → Application state → Simulation → Domain data.
 Create additional folders only when their code is needed.
 
-The desktop layout prioritizes the laboratory workspace. At widths up to 900px,
+The desktop layout prioritizes the laboratory workspace.
+On large desktops, wider tools/observation panels scroll independently;
+at 901–1199px the observation region moves below the tools and workspace. The
+bench has its own bounded height so changing selection or reaction details does
+not resize it. Equations stay on one line with local scrolling when necessary.
+At widths up to 900px,
 the Equipment & Chemicals palette becomes a collapsible sticky bar above the
 bench. Its content has a bounded height and scrolls internally for longer lists;
 The chemical catalog shares this scrollable panel. Tap/click or Enter adds
@@ -173,10 +181,26 @@ square grid. The shell includes semantic landmarks, a keyboard skip link,
 visible focus styles, and readable empty states. Equipment positions adapt to
 the bench size and stay within its bounds. Overlapping equipment is allowed;
 the selected instance appears above other equipment. Liquid portions use separate
-representative bands, and solids use basic sample shapes. These do not represent
+representative bands, and solids use textured sample shapes. These do not represent
 reaction products or physically accurate layering. Visual levels are capped;
-the details panel retains the simplified quantity counts. Mix provides basic textual
-identification; semantic reaction effects are not rendered yet.
+the details panel retains the simplified quantity counts. After a successful Mix,
+a neutral representative liquid and semantic effect overlays illustrate the result.
+The drawing is qualitative, without concentration, duration or yield calculations.
+The refined M4 visuals add translucent liquid surfaces and textured solid samples.
+An enlarged selected-sample view reuses the same renderer in the observation panel.
+Click its close-up button to open a presentation-sized native dialog with the
+sample and existing reaction details; Close, Escape or the backdrop dismiss it
+and return focus. The dialog changes no experiment data.
+Precipitate clouds form and flocs settle into a visible deposit; gas bubbles rise
+to the actual drawn liquid surface and fade with small rings. R6 keeps clear liquid
+and uses an explicitly explained thermometer symbol, without a measured temperature,
+steam or solution color change. Motion and geometry illustrate the registered
+observation rather than physical settling times or individual product morphology.
+Gas bubbles repeat while that result is displayed, and persist when moving a
+container or showing its drag preview. Reduced-motion preferences disable effect
+animation while retaining static shapes and textual observations. Each equipment
+instance exposes its result through an accessible description. Clear/add/reset
+remove the corresponding effects and educational result.
 
 The M0 ExecPlan and validation record live in `plans/m0-project-foundation.md`.
 The M1 implementation and validation record live in
@@ -184,6 +208,7 @@ The M1 implementation and validation record live in
 The M2 implementation and validation record live in
 `plans/m2-container-and-chemical-system.md`.
 The M3 implementation and validation record live in `plans/m3-reaction-engine.md`.
+The M4 implementation and validation record live in `plans/m4-reaction-visualization.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

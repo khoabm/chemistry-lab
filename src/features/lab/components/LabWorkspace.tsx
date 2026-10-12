@@ -4,6 +4,7 @@ import { equipmentLabels } from '../equipment'
 import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { equipmentPositionStyle } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
+import { describeReactionEffects } from '../renderers/reactionPresentation'
 
 interface LabWorkspaceProps {
   state: LabWorkspaceState
@@ -19,7 +20,8 @@ export function LabWorkspace({
   const labeledEquipment = state.equipment.map((instance) => {
     const number = (counts.get(instance.equipmentType) ?? 0) + 1
     counts.set(instance.equipmentType, number)
-    return { instance, label: `${equipmentLabels[instance.equipmentType]} ${number}` }
+    const container = state.containers.find((item) => item.equipmentInstanceId === instance.id)
+    return { instance, container, label: `${equipmentLabels[instance.equipmentType]} ${number}` }
   })
 
   return (
@@ -56,7 +58,7 @@ export function LabWorkspace({
             Drag equipment here, or click an item in the palette to begin.
           </p>
         </div>}
-        {labeledEquipment.map(({ instance, label }) => (
+        {labeledEquipment.map(({ instance, label, container }) => (
           <button
             key={instance.id}
             type="button"
@@ -65,12 +67,17 @@ export function LabWorkspace({
             data-equipment-id={instance.id}
             aria-label={label}
             aria-pressed={state.selectedEquipmentId === instance.id}
-            aria-describedby="equipment-movement-hint"
+            aria-describedby={`equipment-movement-hint ${instance.id}-result`}
             {...getEquipmentHandlers({ kind: 'workspace', equipmentType: instance.equipmentType, id: instance.id })}
           >
             <EquipmentVisual equipmentType={instance.equipmentType}
-              contents={state.containers.find((container) => container.equipmentInstanceId === instance.id)?.contents ?? []} />
+              contents={container?.contents ?? []} reactionResult={container?.reactionResult ?? null} />
             <span>{label}</span>
+            <span className="visually-hidden" id={`${instance.id}-result`}>
+              {container?.reactionResult?.status === 'reaction'
+                ? `${container.reactionResult.name}. ${describeReactionEffects(container.reactionResult.effects)}`
+                : container?.reactionResult?.observation}
+            </span>
           </button>
         ))}
         <span className="bench-caption" aria-hidden="true">VIRTUAL LABORATORY</span>

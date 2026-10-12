@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M3 — Mixing Reaction Engine`
+`M4 — Reaction Visualization`
 
 ## Active milestone branch
 
-`M3`
+`M4`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
@@ -242,6 +242,10 @@ Reaction engine tests cover:
 
 Make mix reactions visually understandable.
 
+User-approved M4 refinement: prioritize qualitative visual realism and classroom
+recognition using the existing presentation stack. This is part of M4, while
+heating and other later interactions keep their original milestone boundaries.
+
 ## Deliverables
 
 - semantic effect renderer
@@ -270,6 +274,15 @@ Do not implement heating reactions.
 ## Completion criteria
 
 Every M3 reaction has an understandable visual/educational result.
+
+For the approved visual refinement, also verify:
+
+- gas bubbles animate through the liquid to its surface
+- precipitation shows cloud formation, settling particles and a distinct deposit
+- specified colors and clear/solid appearances remain recognizable in both containers
+- R6 uses a labeled temperature cue without implying liquid color change or gas
+- reduced-motion users retain understandable static results and observations
+- rendering remains driven by semantic effects, without chemistry/state changes
 
 ---
 

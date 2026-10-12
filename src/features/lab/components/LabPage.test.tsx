@@ -122,6 +122,7 @@ describe('M2 chemical and container interactions', () => {
     expect(screen.getByRole('button', { name: 'Add Copper(II) sulfate' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Empty container' })).toBeDisabled()
     expect(document.querySelector('.equipment-drag-preview [data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
+    expect(screen.getByRole('button', { name: 'Enlarge selected sample' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
     expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
@@ -181,6 +182,106 @@ describe('M3 explicit mixing', () => {
     expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
     expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
+  })
+})
+
+describe('M4 reaction visualization', () => {
+  const reactions = [
+    { first: 'Silver nitrate', second: 'Sodium chloride', name: 'Silver chloride precipitation', type: 'precipitate', observation: 'A white precipitate forms.', equation: 'AgNO3 + NaCl → AgCl↓ + NaNO3', explanation: 'Silver ions and chloride ions form insoluble silver chloride, producing a white precipitate.' },
+    { first: 'Copper(II) sulfate', second: 'Sodium hydroxide', name: 'Copper(II) hydroxide precipitation', type: 'precipitate', observation: 'A blue precipitate forms.', equation: 'CuSO4 + 2NaOH → Cu(OH)2↓ + Na2SO4', explanation: 'Copper(II) ions react with hydroxide ions to form insoluble copper(II) hydroxide.' },
+    { first: 'Iron(III) chloride', second: 'Sodium hydroxide', name: 'Iron(III) hydroxide precipitation', type: 'precipitate', observation: 'A reddish-brown precipitate forms.', equation: 'FeCl3 + 3NaOH → Fe(OH)3↓ + 3NaCl', explanation: 'Iron(III) ions react with hydroxide ions to form insoluble iron(III) hydroxide.' },
+    { first: 'Calcium chloride', second: 'Sodium carbonate', name: 'Calcium carbonate precipitation', type: 'precipitate', observation: 'A white precipitate forms.', equation: 'CaCl2 + Na2CO3 → CaCO3↓ + 2NaCl', explanation: 'Calcium ions and carbonate ions form insoluble calcium carbonate.' },
+    { first: 'Hydrochloric acid', second: 'Sodium bicarbonate', name: 'Acid and bicarbonate gas formation', type: 'gas', observation: 'Gas bubbles are produced.', equation: 'HCl + NaHCO3 → NaCl + H2O + CO2↑', explanation: 'The reaction releases carbon dioxide gas, which appears as bubbles.' },
+    { first: 'Hydrochloric acid', second: 'Sodium hydroxide', name: 'Simplified acid-base neutralization', type: 'temperature-rise', observation: 'A subtle temperature rise is indicated; no precipitate or gas forms.', equation: 'HCl + NaOH → NaCl + H2O', explanation: 'Hydrochloric acid and sodium hydroxide neutralize each other to form water and sodium chloride.' },
+  ] as const
+
+  for (const equipment of ['Beaker', 'Test tube']) {
+    it.each(reactions)(`shows $name and educational output inside a ${equipment}`, (reaction) => {
+      fireEvent.click(screen.getByRole('button', { name: `Add ${equipment}` }))
+      fireEvent.click(screen.getByRole('button', { name: `Add ${reaction.first}` }))
+      fireEvent.click(screen.getByRole('button', { name: `Add ${reaction.second}` }))
+      const instance = screen.getByRole('button', { name: `${equipment} 1` })
+      expect(instance.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+      expect(screen.queryByText(reaction.equation)).not.toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+      expect(instance.querySelector(`[data-reaction-effect="${reaction.type}"]`)).toBeInTheDocument()
+      expect(instance.querySelectorAll('[data-reaction-effect]')).toHaveLength(1)
+      expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent(reaction.name)
+      expect(screen.getByText(reaction.observation)).toBeInTheDocument()
+      expect(screen.getByText(reaction.equation)).toBeInTheDocument()
+      expect(screen.getByText(reaction.explanation)).toBeInTheDocument()
+      expect(instance).toHaveAccessibleDescription(expect.stringContaining(reaction.observation))
+      const closeup = screen.getByRole('figure', { name: 'Selected sample close-up' })
+      expect(closeup.querySelector(`[data-reaction-effect="${reaction.type}"]`)).toBeInTheDocument()
+      if (reaction.type === 'temperature-rise') {
+        expect(screen.getByText(/The thermometer symbol indicates warming/)).toBeInTheDocument()
+        expect(instance.querySelector('.reacted-liquid')).toHaveAttribute('fill', '#d7e9ed')
+        expect(instance.querySelector('.reaction-gas')).not.toBeInTheDocument()
+      }
+    })
+  }
+
+  it('keeps outcomes on independent containers and removes stale visuals/education on additions, clear and reset', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Silver nitrate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium chloride' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    const beaker = screen.getByRole('button', { name: 'Beaker 1' })
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Hydrochloric acid' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium bicarbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    const tube = screen.getByRole('button', { name: 'Test tube 1' })
+    expect(beaker.querySelector('[data-reaction-effect="precipitate"]')).toBeInTheDocument()
+    expect(tube.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
+    fireEvent.click(beaker)
+    expect(screen.getByText(reactions[0].equation)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) sulfate' }))
+    expect(beaker.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    expect(screen.queryByText(reactions[0].equation)).not.toBeInTheDocument()
+    expect(screen.getByRole('figure', { name: 'Selected sample close-up' }).querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    expect(beaker).not.toHaveAccessibleDescription(expect.stringContaining('precipitate'))
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('No observable reaction.')
+    expect(beaker.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    expect(screen.queryByText('Explanation')).not.toBeInTheDocument()
+    fireEvent.click(tube)
+    expect(screen.getByText(reactions[4].equation)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Empty container' }))
+    expect(tube.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    expect(screen.queryByText(reactions[4].equation)).not.toBeInTheDocument()
+    expect(screen.queryByRole('figure', { name: 'Selected sample close-up' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
+    expect(document.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    expect(screen.queryByText('Equation')).not.toBeInTheDocument()
+  })
+
+  it('preserves results during keyboard movement, drag preview and cancellation', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Hydrochloric acid' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Sodium bicarbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
+    const source = screen.getByRole('button', { name: 'Beaker 1' })
+    fireEvent.keyDown(source, { key: 'ArrowRight' })
+    expect(source.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
+    const position = source.getAttribute('style')
+    pointer(source, 'down', 400, 200)
+    pointer(source, 'move', 600, 300)
+    expect(document.querySelector('.equipment-drag-preview [data-reaction-effect="gas"]')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
+    fireEvent.keyDown(source, { key: 'Escape' })
+    pointer(source, 'up', 600, 300)
+    fireEvent.click(source, { detail: 1 })
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(source).toHaveAttribute('style', position)
+    expect(source.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
+    expect(screen.getByText(reactions[4].equation)).toBeInTheDocument()
+    pointer(source, 'down', 400, 200)
+    pointer(source, 'move', 600, 300)
+    pointer(source, 'up', 600, 300)
+    fireEvent.click(source, { detail: 1 })
+    expect(source.getAttribute('style')).not.toBe(position)
+    expect(source.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
   })
 })
 

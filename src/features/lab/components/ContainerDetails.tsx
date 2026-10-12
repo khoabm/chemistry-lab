@@ -1,14 +1,21 @@
 import { findChemical } from '../../../simulation/chemicals/catalog'
 import type { ContainerState } from '../../../types/container'
+import { ReactionObservation } from './ReactionObservation'
+import type { EquipmentType } from '../../../types/equipment'
+import { EquipmentVisual } from './EquipmentVisual'
+import { useState } from 'react'
+import { SampleDetailDialog } from './SampleDetailDialog'
 
 interface ContainerDetailsProps {
   container: ContainerState
+  equipmentType: EquipmentType
   onClear: () => void
   onMix: () => void
   disabled: boolean
 }
 
-export function ContainerDetails({ container, onClear, onMix, disabled }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onMix, disabled }: ContainerDetailsProps) {
+  const [isDetailOpen, setDetailOpen] = useState(false)
   return (
     <section className="container-details" aria-labelledby="contents-title">
       <h3 id="contents-title">Selected container contents</h3>
@@ -25,14 +32,20 @@ export function ContainerDetails({ container, onClear, onMix, disabled }: Contai
       )}
       <div className="container-actions">
         <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0} onClick={onMix}>Mix</button>
-        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0} onClick={onClear}>Empty container</button>
+        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0}
+          onClick={() => { setDetailOpen(false); onClear() }}>Empty container</button>
       </div>
-      <p className="mix-result" role="status" aria-label="Mix result" aria-atomic="true">
-        {container.reactionResult?.status === 'reaction'
-          ? `Reaction identified: ${container.reactionResult.name}.`
-          : container.reactionResult?.observation}
-      </p>
-      <p className="empty-caption">Press Mix to check for a supported reaction. Amounts use simplified units; the list and drawing show starting substances, not reaction products.</p>
+      {container.contents.length > 0 && <figure className="sample-closeup" aria-label="Selected sample close-up">
+        <button type="button" disabled={disabled} aria-label="Enlarge selected sample" aria-haspopup="dialog"
+          onClick={() => setDetailOpen(true)}>
+          <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult} />
+          <span className="sample-closeup-label">Selected sample · close-up <span aria-hidden="true">↗</span></span>
+        </button>
+      </figure>}
+      {isDetailOpen && container.contents.length > 0 && <SampleDetailDialog container={container} equipmentType={equipmentType}
+        onDismiss={() => setDetailOpen(false)} />}
+      <ReactionObservation result={container.reactionResult} />
+      <p className="empty-caption">Press Mix to check for a supported reaction. Amounts use simplified units; the list records starting substances and the drawing illustrates the result.</p>
     </section>
   )
 }

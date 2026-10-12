@@ -2,22 +2,37 @@ import type { EquipmentType } from '../../../types/equipment'
 import { useId } from 'react'
 import type { ChemicalPortion } from '../../../types/container'
 import { ContainerContentsVisual } from './ContainerContentsVisual'
+import type { ReactionResult } from '../../../simulation/reactions/types'
+import { ReactionEffectsVisual } from '../renderers/ReactionEffectsVisual'
+import { getContentsLayout } from '../renderers/contentsPresentation'
 
-export function EquipmentVisual({ equipmentType, contents = [] }: { equipmentType: EquipmentType; contents?: readonly ChemicalPortion[] }) {
+export function EquipmentVisual({ equipmentType, contents = [], reactionResult = null }: {
+  equipmentType: EquipmentType
+  contents?: readonly ChemicalPortion[]
+  reactionResult?: ReactionResult | null
+}) {
   const clipId = useId()
+  const layout = getContentsLayout(contents, equipmentType)
+  const effects = reactionResult?.status === 'reaction' ? reactionResult.effects : []
   return (
     <svg className="equipment-visual" viewBox="0 0 100 100" fill="none" aria-hidden="true">
       <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {equipmentType === 'beaker' && <>
           <path fill="#fffefa90" d="M24 20h47l6 7-5 4v48a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6Z" />
           <defs><clipPath id={clipId}><path d="M26 32h44v47a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4Z" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}><ContainerContentsVisual contents={contents} /></g>
+          <g clipPath={`url(#${clipId})`}>
+            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} />
+            <ReactionEffectsVisual effects={effects} layout={layout} />
+          </g>
           <path d="M24 26h42M31 39h9M31 50h6M31 61h9M31 72h6M63 37v37" />
         </>}
         {equipmentType === 'test-tube' && <>
           <path fill="#fffefa90" d="M36 15h28v60a14 14 0 0 1-28 0Z" />
           <defs><clipPath id={clipId}><path d="M38 23h24v52a12 12 0 0 1-24 0Z" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}><ContainerContentsVisual contents={contents} /></g>
+          <g clipPath={`url(#${clipId})`}>
+            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} />
+            <ReactionEffectsVisual effects={effects} layout={layout} />
+          </g>
           <path d="M32 15h36M32 20h36M43 30v41M55 78h1" />
         </>}
         {equipmentType === 'dropper' && <>

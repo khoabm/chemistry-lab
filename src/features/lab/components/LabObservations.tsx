@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 export function LabObservations({ children }: { children?: ReactNode }) {
   return (
-    <aside className="lab-observations" aria-labelledby="observations-title">
+    <aside className="lab-observations" aria-labelledby="observations-title" tabIndex={0}>
       <div className="panel-heading">
         <p className="eyebrow">Notice what changes</p>
         <h2 id="observations-title">Observations</h2>
