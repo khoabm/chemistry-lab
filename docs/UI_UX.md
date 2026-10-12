@@ -263,6 +263,26 @@ Heating feedback may include:
 
 Do not use a complex temperature dashboard.
 
+M5 interaction: select a placed lamp and use the explicit Ignite lamp / Extinguish
+lamp button in its observation details. Clicking the lamp itself selects it;
+moving it never toggles ignition. New lamps start extinguished. Lit lamps show an
+animated flame and a dashed, pointer-transparent aiming zone above them. Place
+the center of a beaker/test tube inside the zone using existing drag or arrow-key
+movement. Show a warm container glow, a Heating badge and a textual status. Empty
+containers also heat; droppers and lamps cannot be heated containers.
+
+The simplified zone uses normalized bench coordinates: horizontally +/-0.07 from
+the lamp, vertically 0.16–0.30 above it, clipped to usable bench bounds. It denotes
+interaction alignment, not realistic distance or heat transfer. Resize preserves
+logical relationships. Moving the source/sample away or extinguishing the source
+ends heating; another overlapping lit source may continue it. A lamp too close to
+the top has no usable zone until moved lower. Reset removes all lamp/heating state.
+During dragging, controls are disabled and previews retain committed state until
+a valid drop; cancelled/invalid drops leave heating unchanged. The close-up and
+modal share the same heating feedback. Reduced-motion disables flame/glow motion
+while preserving static shapes/text. M5 does not evaluate heat reactions, change
+chemical contents or invalidate existing Mix results.
+
 ---
 
 ## 13. Reaction effects

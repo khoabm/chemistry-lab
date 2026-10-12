@@ -5,6 +5,7 @@ import type { EquipmentType } from '../../../types/equipment'
 import { EquipmentVisual } from './EquipmentVisual'
 import { useState } from 'react'
 import { SampleDetailDialog } from './SampleDetailDialog'
+import { HeatingStatus } from './HeatingStatus'
 
 interface ContainerDetailsProps {
   container: ContainerState
@@ -19,6 +20,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, dis
   return (
     <section className="container-details" aria-labelledby="contents-title">
       <h3 id="contents-title">Selected container contents</h3>
+      <HeatingStatus state={container.heatingState} />
       {container.contents.length === 0 ? <p className="empty-caption">This container is empty.</p> : (
         <ul className="contents-list" aria-label="Container contents">
           {container.contents.map((portion) => {
@@ -38,7 +40,8 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, dis
       {container.contents.length > 0 && <figure className="sample-closeup" aria-label="Selected sample close-up">
         <button type="button" disabled={disabled} aria-label="Enlarge selected sample" aria-haspopup="dialog"
           onClick={() => setDetailOpen(true)}>
-          <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult} />
+          <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
+            heating={container.heatingState.status === 'heating'} />
           <span className="sample-closeup-label">Selected sample · close-up <span aria-hidden="true">↗</span></span>
         </button>
       </figure>}

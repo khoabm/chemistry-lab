@@ -136,6 +136,7 @@ export function useEquipmentInteraction(
         if (event.pointerId === sessionRef.current?.pointerId) cancelDrag()
       },
       onClick(event) {
+        if (sessionRef.current?.dragging) return
         if (event.detail !== 0 && suppressPointerClickRef.current) {
           suppressPointerClickRef.current = false
           return
@@ -152,6 +153,10 @@ export function useEquipmentInteraction(
         if (event.key === 'Escape') {
           event.preventDefault()
           cancelDrag()
+          return
+        }
+        if (sessionRef.current?.dragging) {
+          if (event.key.startsWith('Arrow') || event.key === 'Enter' || event.key === ' ') event.preventDefault()
           return
         }
         if (source.kind !== 'workspace') return

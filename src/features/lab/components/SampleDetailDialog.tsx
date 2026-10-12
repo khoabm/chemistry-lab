@@ -4,6 +4,7 @@ import type { EquipmentType } from '../../../types/equipment'
 import { equipmentLabels } from '../equipment'
 import { EquipmentVisual } from './EquipmentVisual'
 import { ReactionObservation } from './ReactionObservation'
+import { HeatingStatus } from './HeatingStatus'
 
 export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
   container: ContainerState
@@ -34,9 +35,11 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
       </header>
       <div className="sample-detail-content">
         <div className="sample-detail-visual">
-          <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult} />
+          <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
+            heating={container.heatingState.status === 'heating'} />
         </div>
         <div>
+          <HeatingStatus state={container.heatingState} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
             : <p className="empty-caption">Starting sample. No mixing result yet.</p>}
         </div>

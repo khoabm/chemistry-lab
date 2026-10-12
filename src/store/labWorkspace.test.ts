@@ -80,8 +80,8 @@ describe('container state transitions', () => {
     state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'dropper', position: { x: 0, y: 0 } })
     state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 1, y: 1 } })
     expect(state.containers).toEqual([
-      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [], reactionResult: null },
-      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [], reactionResult: null },
+      { id: 'container-equipment-1', equipmentInstanceId: 'equipment-1', contents: [], reactionResult: null, heatingState: { status: 'not-heating' } },
+      { id: 'container-equipment-2', equipmentInstanceId: 'equipment-2', contents: [], reactionResult: null, heatingState: { status: 'not-heating' } },
     ])
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-3', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)
     expect(labWorkspaceReducer(state, { type: 'add-chemical', equipmentId: 'equipment-4', chemicalId: 'silver-nitrate', quantity: 1 })).toBe(state)

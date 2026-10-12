@@ -5,6 +5,7 @@ import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { equipmentPositionStyle } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
 import { describeReactionEffects } from '../renderers/reactionPresentation'
+import { HeatingZone } from './HeatingZone'
 
 interface LabWorkspaceProps {
   state: LabWorkspaceState
@@ -21,7 +22,8 @@ export function LabWorkspace({
     const number = (counts.get(instance.equipmentType) ?? 0) + 1
     counts.set(instance.equipmentType, number)
     const container = state.containers.find((item) => item.equipmentInstanceId === instance.id)
-    return { instance, container, label: `${equipmentLabels[instance.equipmentType]} ${number}` }
+    const lamp = state.lamps.find((item) => item.equipmentInstanceId === instance.id)
+    return { instance, container, lamp, label: `${equipmentLabels[instance.equipmentType]} ${number}` }
   })
 
   return (
@@ -58,7 +60,9 @@ export function LabWorkspace({
             Drag equipment here, or click an item in the palette to begin.
           </p>
         </div>}
-        {labeledEquipment.map(({ instance, label, container }) => (
+        {labeledEquipment.filter(({ lamp }) => lamp?.status === 'lit').map(({ instance }) =>
+          <HeatingZone key={`zone-${instance.id}`} position={instance.position} />)}
+        {labeledEquipment.map(({ instance, label, container, lamp }) => (
           <button
             key={instance.id}
             type="button"
@@ -71,9 +75,14 @@ export function LabWorkspace({
             {...getEquipmentHandlers({ kind: 'workspace', equipmentType: instance.equipmentType, id: instance.id })}
           >
             <EquipmentVisual equipmentType={instance.equipmentType}
-              contents={container?.contents ?? []} reactionResult={container?.reactionResult ?? null} />
+              contents={container?.contents ?? []} reactionResult={container?.reactionResult ?? null}
+              lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
             <span>{label}</span>
+            {(lamp || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">
+              {lamp ? lamp.status === 'lit' ? 'Lit' : 'Off' : 'Heating'}
+            </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
+              {lamp ? `Lamp ${lamp.status}. Select to ignite or extinguish.` : container?.heatingState.status === 'heating' ? 'Heating over a lit alcohol lamp. ' : ''}
               {container?.reactionResult?.status === 'reaction'
                 ? `${container.reactionResult.name}. ${describeReactionEffects(container.reactionResult.effects)}`
                 : container?.reactionResult?.observation}

@@ -41,6 +41,24 @@ function openDetail() {
 }
 
 describe('selected sample detail', () => {
+  it('shares physical heating in the close-up/dialog without inventing a reaction', () => {
+    addSample('Copper(II) carbonate')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
+    const sample = screen.getByRole('button', { name: 'Beaker 1' })
+    fireEvent.click(sample)
+    for (let step = 0; step < 3; step++) fireEvent.keyDown(sample, { key: 'ArrowRight', shiftKey: true })
+    for (let step = 0; step < 5; step++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
+    expect(screen.getByRole('figure', { name: 'Selected sample close-up' }).querySelector('.container-heat-glow')).toBeInTheDocument()
+    const { dialog } = openDetail()
+    expect(dialog.querySelector('.container-heat-glow')).toBeInTheDocument()
+    expect(within(dialog).getByRole('status', { name: 'Container heating' })).toHaveTextContent('Heating over a lit alcohol lamp.')
+    expect(dialog.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
+    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
+  })
+
   it.each(['button', 'escape', 'backdrop'])('opens starting contents by keyboard and closes via %s with focus restored', (method) => {
     addSample('Copper(II) sulfate')
     const { opener, dialog } = openDetail()
