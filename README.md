@@ -95,7 +95,7 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M6 heat reactions, extending M5: place and move beakers, test tubes, droppers and
+M7 teaching UX, extending M6: place and move beakers, test tubes, droppers and
 alcohol lamps. Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
@@ -137,6 +137,22 @@ heat sample to avoid evaluating its retained starting portions as fresh reactant
 Clear/add starts a new simplified experiment. Contents retain starting quantities;
 products are semantic data, without consumption/chaining or exact temperature.
 The dropper still supports placement/movement only.
+
+Open How to use this lab for a short, non-blocking Mix/Heat guide, keyboard
+controls and sample labels. Closing/reopening Help does not change experiments.
+Chemical labels distinguish liquid solutions and solid samples; units are
+illustrative, not mL or mol. Empty/ready samples and the placement-only dropper
+show contextual next steps. Reset describes its full scope before use and still
+clears immediately; Empty container affects only the selected sample.
+
+Reaction names are prominent headings. The observation panel and enlarged dialog
+share returned equations, explanations and product names/formulas, with ↓/↑
+legend text for precipitate/gas effects. No observable reaction remains a neutral
+outcome; additional guidance explains that no registered demonstration matches
+the selected trigger, without claiming real-world chemical impossibility.
+Exact temperature/concentration and real laboratory procedures remain outside
+the virtual model. M7 changes presentation only; chemistry and state transitions
+are unchanged.
 
 See the active milestone in `docs/MILESTONES.md`.
 
@@ -185,7 +201,7 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/simulation/AGENTS.md`: chemistry/domain boundary instructions.
 
 Use functional React components, strict TypeScript, and plain CSS with shared
-tokens. M6 extends SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
+tokens. M7 continues SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
 dependency direction: Presentation → Application state → Simulation → Domain data.
 Create additional folders only when their code is needed.
 
@@ -235,6 +251,7 @@ The M3 implementation and validation record live in `plans/m3-reaction-engine.md
 The M4 implementation and validation record live in `plans/m4-reaction-visualization.md`.
 The M5 implementation and validation record live in `plans/m5-alcohol-lamp-and-heating.md`.
 The M6 implementation and validation record live in `plans/m6-heat-reactions.md`.
+The M7 implementation and validation record live in `plans/m7-teaching-ux.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

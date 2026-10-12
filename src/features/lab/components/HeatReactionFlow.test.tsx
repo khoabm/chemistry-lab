@@ -52,6 +52,8 @@ describe('M6 laboratory heat flow', () => {
     it.each(reactions)(`${equipment} shows $name after the illustrative wait and preserves products on cooling`, ({ chemical, color, name, equation, gas }) => {
       const { sample, lamp } = heat(equipment, chemical)
       expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting for heat reaction')
+      expect(screen.getByText(/Heat check pending/)).toHaveTextContent('Mix cancels the pending heat check')
+      expect(screen.queryByText(/Sample ready/)).not.toBeInTheDocument()
       expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
       tick(heatReactionDelayMs - 1)
       expect(screen.queryByRole('status', { name: 'Heat result' })).not.toBeInTheDocument()

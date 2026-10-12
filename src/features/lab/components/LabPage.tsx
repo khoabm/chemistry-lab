@@ -9,6 +9,7 @@ import { LabWorkspace } from './LabWorkspace'
 import { ContainerDetails } from './ContainerDetails'
 import { LampDetails } from './LampDetails'
 import { useHeatReactions } from '../hooks/useHeatReactions'
+import { LabHelp } from './LabHelp'
 
 export function LabPage() {
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
@@ -34,6 +35,7 @@ export function LabPage() {
     >
       <a className="skip-link" href="#laboratory">Skip to laboratory</a>
       <LabHeader canReset={state.equipment.length > 0} onReset={interaction.resetWorkspace} />
+      <LabHelp />
       <main id="laboratory" className="lab-layout" tabIndex={-1}>
         <LabPalette interaction={interaction} canAddChemical={!!selectedContainer && !interaction.preview}
           onAddChemical={(chemicalId) => {
@@ -43,7 +45,10 @@ export function LabPage() {
         <LabObservations>
           {selectedLamp ? <LampDetails lamp={selectedLamp} disabled={!!interaction.preview}
             onToggle={() => dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId })} />
-            : selectedContainer && selectedEquipment && <ContainerDetails key={selectedContainer.id} container={selectedContainer} equipmentType={selectedEquipment.equipmentType} disabled={!!interaction.preview}
+            : selectedEquipment?.equipmentType === 'dropper' ? <section className="container-details">
+              <h3>Selected dropper</h3>
+              <p className="empty-caption">This dropper can be placed and moved. Reagent delivery is not available. Select a beaker or test tube and use Chemicals to add a sample.</p>
+            </section> : selectedContainer && selectedEquipment && <ContainerDetails key={selectedContainer.id} container={selectedContainer} equipmentType={selectedEquipment.equipmentType} disabled={!!interaction.preview}
             onMix={() => dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId })}
             onClear={() => dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId })} />}
         </LabObservations>

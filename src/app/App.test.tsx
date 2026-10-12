@@ -25,7 +25,7 @@ describe('laboratory foundation', () => {
     expect(within(materials).getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     expect(screen.getByText('Empty workspace')).toBeInTheDocument()
     expect(within(screen.getByRole('complementary', { name: 'Observations' })).getByText(/No observations yet/)).toBeInTheDocument()
-    expect(screen.getByText(/then press Mix to check for a supported reaction/)).toBeInTheDocument()
+    expect(screen.getByText(/Press Mix, or use a lit alcohol lamp/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset lab' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: /mix|heat/i })).not.toBeInTheDocument()
   })

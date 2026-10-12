@@ -41,7 +41,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
         <div>
           <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
-            : <p className="empty-caption">Starting sample. No mixing result yet.</p>}
+            : <p className="empty-caption">Starting sample. No reaction result yet; use Mix or heat the container over a lit lamp to check a supported demonstration.</p>}
         </div>
       </div>
     </div>

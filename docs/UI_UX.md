@@ -387,6 +387,17 @@ The panel must support:
 
 without treating it as an application error.
 
+M7 teaching refinement: show the returned reaction name as a prominent heading
+and list returned product names/formulas in both this panel and the existing
+enlarged sample dialog. Explain ↓ as an insoluble precipitate and ↑ as gas release
+when the semantic effects include them. Keep explanations sourced from the engine;
+do not add presentation-side reaction rules or a second teaching-data registry.
+
+For unsupported Mix/Heat, retain No observable reaction and explain that no
+registered demonstration matches this sample/trigger. This is not a conclusion
+about all real-world chemistry. Suggest a fresh sample or another supported
+trigger without identifying invented reactions.
+
 ---
 
 ## 15. Visual style
@@ -484,6 +495,16 @@ A short non-blocking hint may explain the first interaction.
 
 Avoid long onboarding flows.
 
+M7 adds a reopenable How to use this lab disclosure below the header. It contains
+short Mix/Heat steps, movement controls, solution/solid label meanings, simplified
+unit limits and the placement-only dropper limitation. It does not block the
+bench or persist onboarding state. Empty containers explain chemical addition;
+filled unevaluated containers offer Mix/Heat next steps.
+When a Heat check is pending, replace the ready hint with wait guidance and explain
+that explicit Mix cancels the pending check. Do not change the evaluation lifecycle.
+Selected droppers explain that reagent delivery is unavailable. Existing panel layout/bench geometry and
+animations remain unchanged.
+
 ---
 
 ## 20. Reset
@@ -499,6 +520,12 @@ After reset:
 - laboratory returns to its initial usable state
 
 Reset should not reload the browser page.
+
+M7 describes the implemented full-lab Reset scope visibly and through its
+accessible description: equipment, contents, lamps and results are removed.
+Reset remains immediate, with the existing cleared-bench status feedback.
+Distinguish Empty container: only that container's sample/result is cleared;
+equipment and other experiments remain.
 
 ---
 
