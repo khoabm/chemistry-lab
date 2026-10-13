@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { StrictMode } from 'react'
 import { LabPage } from './LabPage'
+import { ExperimentPanel } from './ExperimentPanel'
 import { heatReactionDelayMs } from '../hooks/useHeatReactions'
 
 afterEach(() => { cleanup(); vi.useRealTimers() })
@@ -23,8 +24,9 @@ function mixSilver() {
 }
 
 describe('Experiment Sample/Result tabs', () => {
-  it('defaults to Sample and exposes matching tab/panel semantics', () => {
+  it.each(['Beaker', 'Test tube'])('%s defaults to Sample and exposes matching tab/panel semantics', (equipment) => {
     render(<LabPage />)
+    fireEvent.click(screen.getByRole('button', { name: `Add ${equipment}` }))
     expect(screen.getByRole('complementary', { name: 'Experiment' })).toBeInTheDocument()
     expect(screen.getByRole('tablist', { name: 'Experiment views' })).toBeInTheDocument()
     expect(sampleTab()).toHaveAttribute('aria-selected', 'true')
@@ -37,6 +39,57 @@ describe('Experiment Sample/Result tabs', () => {
     expect(resultTab()).toHaveAttribute('aria-controls', resultPanel().id)
     expect(resultPanel()).toHaveAttribute('aria-labelledby', resultTab().id)
     expect(resultPanel()).toHaveTextContent('No experiment result yet')
+  })
+
+  it('shows empty help directly without tabs when nothing is selected', () => {
+    render(<LabPage />)
+    const panel = screen.getByRole('complementary', { name: 'Experiment' })
+    expect(within(panel).getByText(/No observations yet/)).toBeVisible()
+    expect(within(panel).queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
+    expect(within(panel).queryByRole('tabpanel', { hidden: true })).not.toBeInTheDocument()
+  })
+
+  it('shows functional lamp details directly without tabs', () => {
+    render(<LabPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
+    const panel = screen.getByRole('complementary', { name: 'Experiment' })
+    expect(within(panel).getByRole('heading', { name: 'Selected alcohol lamp' })).toBeVisible()
+    expect(within(panel).queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
+    expect(within(panel).queryByRole('tabpanel', { hidden: true })).not.toBeInTheDocument()
+    fireEvent.click(within(panel).getByRole('button', { name: 'Ignite lamp' }))
+    expect(within(panel).getByRole('status', { name: 'Lamp status' })).toHaveTextContent('Lamp lit.')
+    fireEvent.click(within(panel).getByRole('button', { name: 'Extinguish lamp' }))
+    expect(within(panel).getByRole('status', { name: 'Lamp status' })).toHaveTextContent('Lamp extinguished.')
+  })
+
+  it('shows an existing internal dropper directly without tabs or reagent actions', () => {
+    render(<ExperimentPanel equipment={{ id: 'existing-dropper', equipmentType: 'dropper', position: { x: 0.5, y: 0.5 } }}
+      container={null} lamp={null} disabled={false} onMix={vi.fn()} onClear={vi.fn()} onToggleLamp={vi.fn()} />)
+    const panel = screen.getByRole('complementary', { name: 'Experiment' })
+    expect(within(panel).getByRole('heading', { name: 'Selected dropper' })).toBeVisible()
+    expect(within(panel).getByText(/Reagent delivery is not available/)).toBeVisible()
+    expect(within(panel).queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
+    expect(within(panel).queryByRole('tabpanel', { hidden: true })).not.toBeInTheDocument()
+    expect(within(panel).queryByRole('button', { name: 'Mix' })).not.toBeInTheDocument()
+  })
+
+  it('switches equipment-specific views without carrying stale tabs or losing a container result', () => {
+    mixSilver()
+    fireEvent.click(sampleTab())
+    expect(resultTab()).toHaveAccessibleDescription('A result is available for this sample.')
+    fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
+    expect(screen.queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
+    expect(screen.queryByRole('tabpanel', { hidden: true })).not.toBeInTheDocument()
+    expect(screen.queryByText('A result is available for this sample.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Products')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    expect(sampleTab()).toHaveAttribute('aria-selected', 'true')
+    expect(resultTab()).not.toHaveAttribute('aria-describedby')
+    fireEvent.click(screen.getByRole('button', { name: 'Beaker 1' }))
+    expect(resultPanel()).toHaveTextContent('Silver chloride precipitation')
+    fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
+    expect(screen.queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
+    expect(screen.queryByText('Products')).not.toBeInTheDocument()
   })
 
   it('supports arrow/Home/End activation and focus without changing the sample', () => {
@@ -112,6 +165,10 @@ describe('Experiment Sample/Result tabs', () => {
     if (action === 'reset') {
       fireEvent.click(resultTab())
       fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
+      expect(screen.queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
+      expect(screen.queryByText('A result is available for this sample.')).not.toBeInTheDocument()
+      expect(screen.queryByText('Products')).not.toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
     }
     if (action === 'add') {
       fireEvent.click(resultTab())

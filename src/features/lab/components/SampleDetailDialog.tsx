@@ -31,7 +31,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
       <header className="sample-detail-header">
         <div><p className="eyebrow">{equipmentLabels[equipmentType]} · enlarged view</p>
           <h2 id={titleId}>Selected sample detail</h2></div>
-        <button type="button" className="reset-button" onClick={onDismiss}>Close</button>
+        <button type="button" className="action-button action-button--secondary" onClick={onDismiss}>Close</button>
       </header>
       <div className="sample-detail-content">
         <div className="sample-detail-visual">

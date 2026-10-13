@@ -92,6 +92,7 @@ describe('selected sample detail', () => {
     expect(dialog.querySelector('[data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
     expect(dialog.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
     expect(within(dialog).getByRole('button', { name: 'Close' })).toHaveFocus()
+    expect(within(dialog).getByRole('button', { name: 'Close' })).toHaveClass('action-button', 'action-button--secondary')
     // StrictMode cleanup can queue a native close event before the second showModal.
     fireEvent(dialog, new Event('close'))
     expect(dialog).toHaveAttribute('open')

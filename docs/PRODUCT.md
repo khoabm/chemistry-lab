@@ -96,6 +96,11 @@ Initial equipment:
 
 Equipment may be expanded in later versions.
 
+M8 palette visibility: offer beaker, test tube and alcohol lamp. Dropper is hidden
+while reagent delivery is unavailable; its type, renderer and existing-instance
+compatibility remain supported internally. Delivery still requires explicit
+future approval.
+
 The MVP should not attempt to reproduce a complete laboratory inventory.
 
 ### Intended functional roles

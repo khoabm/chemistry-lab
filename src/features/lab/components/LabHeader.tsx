@@ -22,7 +22,7 @@ export function LabHeader({ canReset, onReset }: LabHeaderProps) {
         <span className="preview-label">Interactive laboratory</span>
         <div className="reset-action">
           <button
-            className="reset-button"
+            className="action-button action-button--secondary"
             type="button"
             disabled={!canReset}
             onClick={onReset}

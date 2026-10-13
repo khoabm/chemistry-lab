@@ -18,6 +18,23 @@ from returned result text. Defaults/invalidation/selection return to Sample;
 new success or no-reaction results open Result. Manual navigation is pure
 presentation; a subtle availability dot appears on Result while Sample is active.
 
+Selection-semantics correction: render those tabs only for selected supported
+containers with container state. Render existing lamp/dropper/empty content
+directly in the same Experiment panel. Preserve container tab behavior and all
+equipment interactions; no new product behavior or changes outside the panel.
+
+Palette-visibility correction: hide Dropper only from the normal equipment
+palette, using an explicit presentation list containing beaker, test tube and
+alcohol lamp. Keep all supported equipment types/labels, SVG rendering, internal
+instance compatibility and dropper constraints. Update palette-dependent tests
+to use visible equipment or direct internal fixtures; do not add reagent transfer.
+
+Action-hierarchy polish: replace the existing reset-button styling name with a
+shared action-button base and primary/secondary variants. Mix and Ignite are
+primary; Empty, Extinguish, Reset and dialog Close are secondary. Reuse existing
+palette tokens, sizing, focus and motion rules. Change only classes/styles, never
+handlers, disabled predicates, timers, simulation, tabs, palette or workspace.
+
 Implement a bounded M8 polish pass: accessible equation scrolling and chemical
 metadata, derived live contents feedback, consistent control/focus/pressed states,
 reduced-motion-aware transitions, short-screen responsive bench sizing, memoized
@@ -58,6 +75,9 @@ do not hide/close it. Existing lamp/dropper information retains its behavior.
 Dismissal returns to Sample before the dialog restores focus to its opener.
 Use tablist/tab/tabpanel, matching useId IDs, roving tabindex, arrow/Home/End
 activation, visible focus and an accessible result-availability description.
+Reuse isContainerEquipment with the selected container/equipment props to guard
+the tab UI. Existing LabPage equipment-ID keys reset local presentation state on
+selection changes; no new global state, reducer action or capability registry.
 
 Keep Presentation → Application state → Simulation → Domain unchanged. Add
 described-by metadata on chemical actions, a named focusable equation region,
@@ -145,6 +165,15 @@ remain intact. Optional sound is excluded; multi-engine QA is limited by availab
 - [x] Split Experiment Sample/Result with presentation-only state and preserved modal.
 - [x] Add tab tests and update existing interaction tests for visible navigation.
 - [x] Validate panel task and synchronize docs/final outcomes.
+- [x] Verify M8/clean Git state and inspect selected equipment/container/lamp flow for the tab applicability correction.
+- [x] Render existing non-container details directly and update selection tests/docs.
+- [x] Validate selection correction and record outcomes.
+- [x] Inspect Dropper type/catalog/palette/test assumptions and verify M8 branch.
+- [x] Define visible palette list; preserve Dropper coverage with internal fixtures.
+- [x] Validate palette correction and synchronize documentation/outcomes.
+- [x] Inspect M8 branch, existing action usage, CSS/tokens and disabled behavior.
+- [x] Apply shared action hierarchy and add semantic styling/regression assertions.
+- [x] Validate action hierarchy and synchronize outcomes.
 
 ## Surprises and discoveries
 
@@ -177,6 +206,106 @@ timeouts or omit tests.
 - Memoize only the shared SVG hot path; keep existing components/state architecture.
 
 ## Outcomes and retrospective
+
+### Experiment action hierarchy — 2026-10-13
+
+Renamed the existing general reset-button style to action-button and added
+primary/secondary variants. Mix and Ignite use the existing accent background,
+light panel-colored text and 600 weight; hover/press uses the existing dark text
+token. Empty, Extinguish, Reset and dialog Close keep the existing quieter
+outlined treatment. Disabled actions retain the muted transparent base. All
+44px targets, contextual margins, SVG sizing, global focus-visible rules and
+120ms no-preference-only background/border transitions are preserved. No new
+design-system component, token, dependency, gradient, shadow or scale animation.
+
+Production changes are limited to action class assignments in ContainerDetails,
+LampDetails, LabHeader and SampleDetailDialog and their shared CSS. All handlers,
+disabled predicates, simulation/state/heat code, tabs, palette visibility and
+workspace/renderer files retain their task-baseline behavior and hashes.
+Baseline is M8/67ab8ec with authorized pending panel/palette work preserved.
+
+Added two Polish integration tests for action classification, empty/filled
+disabled states, Mix/Empty/Reset flows and Ignite/Extinguish disabled during
+dragging. Existing dialog tests assert Close is secondary. Assertions target
+classification and behavior, not exact colors or CSS declarations. All 269 tests
+in 18 files pass (npm test -- --maxWorkers=2, 75.30s). npm run typecheck, npm run
+lint (zero warnings), npm run build and git diff --check pass. Build transforms
+48 modules; CSS 21.99 kB / JS 267.46 kB.
+
+In-app browser QA confirmed prominent Mix/Ignite versus quieter secondary
+actions, muted empty-sample buttons, 44px targets, visible Mix keyboard focus,
+working lamp toggle and secondary modal Close. Escape restores close-up opener
+focus. No horizontal page overflow or console warnings/errors observed. Loaded
+CSS restricts action transitions to prefers-reduced-motion: no-preference;
+actual OS preference toggling was not exercised. Proof image
+m8-action-hierarchy.jpg is saved outside the repository in the task visualization
+directory. The temporary QA tab was closed, no viewport override or development
+server change was made. UI_UX and this plan reflect the hierarchy. No commit,
+push, merge or milestone advancement occurred.
+
+### Dropper palette visibility correction — 2026-10-13
+
+Added explicit paletteEquipmentTypes in features/lab/equipment.ts containing
+beaker, test-tube and alcohol-lamp. LabPalette maps this list, without filtering
+inside JSX or changing handlers. The complete equipmentTypes/EquipmentType model,
+labels and Dropper SVG remain intact. Existing internal instances can still be
+rendered, selected and moved. No reagent transfer, contents, titration or new
+trigger was added. ExperimentPanel.tsx and every workspace/renderer/interaction/
+state/simulation/type/style file retain their baseline hashes from this task.
+
+App assertions verify exactly three available equipment actions and absence of
+Dropper text/button. Generic drag/cancellation/reset tests now use Test tube;
+multi-type placement checks the three visible types plus a repeated beaker.
+Internal Dropper panel tests use direct props rather than a palette action.
+Added DropperSupport.test.tsx with a reducer-seeded existing instance: typed
+support, label/SVG, selection, stable-ID keyboard movement and no heating over
+a lit lamp. Existing store/heat/renderer Dropper tests are unchanged and pass.
+
+| Validation | Result |
+| --- | --- |
+| npm run typecheck | PASS, exit 0 |
+| npm run lint | PASS, exit 0, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 267 tests in 18 files, 42.27s |
+| npm run build | PASS, 48 modules; CSS 21.60 kB / JS 267.30 kB |
+| git diff --check | PASS |
+| Active/required/current branch | M8/M8/M8 |
+| Dependencies, domain, simulation, heat and instance behavior | Unchanged |
+
+The baseline includes authorized uncommitted container-only panel work on
+67ab8ec, preserved here. Only equipment.ts/LabPalette.tsx changed in production
+source for this task. README, PRODUCT, UI_UX and this plan clarify visible
+equipment versus retained internal support. No additional browser QA was run
+for this isolated visibility change. No new dependency, commit, push, merge or
+milestone advancement occurred. Future Dropper exposure/delivery requires
+explicit approval.
+
+### Container-only tab semantics correction — 2026-10-13
+
+ExperimentPanel now renders Sample/Result only when selected equipment passes
+the existing isContainerEquipment predicate and has container state. LampDetails,
+existing dropper information and empty help render directly in the same panel.
+No new panel system, state, dependency or styling was introduced. LabPage remains
+unchanged: its equipment-ID key already resets local tab/modal state on selection
+changes, while stored container results remain intact. Reset removes selection
+and tabs; selecting a new empty container restores Sample. Existing repeated
+Mix/no-reaction/Heat auto-switch, keyboard tabs, indicator, Empty and modal flows
+remain covered and pass.
+
+Updated the default semantics test to cover both beaker and test tube, added
+four non-container/selection tests and updated reset expectations. The new
+expectations produced five failures before the correction; final validation
+passes 266 tests in 17 files (npm test -- --maxWorkers=2, 96.92s). npm run typecheck,
+npm run lint (zero warnings), npm run build and git diff --check all pass. Build
+transforms 48 modules; CSS remains 21.60 kB and JS is 267.31 kB. Selection/lamp
+behavior is verified with integration tests; no additional browser QA was run
+for this isolated semantic correction.
+
+Verified clean M8 branch at baseline 67ab8ec; active/required/current remain M8.
+Hash comparison confirms only ExperimentPanel.tsx and ExperimentPanel.test.tsx
+changed under src. README/UI_UX and this plan now describe container-only tabs.
+Package/lockfile, LabPage, styles, application state, chemistry, simulation, heat
+logic and all unrelated equipment UI remain unchanged. No reagent delivery,
+commit, push, merge or milestone advancement occurred.
 
 ### Experiment panel follow-up — 2026-10-13
 

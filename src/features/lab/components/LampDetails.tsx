@@ -10,7 +10,7 @@ export function LampDetails({ lamp, disabled, onToggle }: {
     <h3 id="lamp-details-title">Selected alcohol lamp</h3>
     <EquipmentVisual equipmentType="alcohol-lamp" lampStatus={lamp.status} />
     <p role="status" aria-label="Lamp status">{lamp.status === 'lit' ? 'Lamp lit.' : 'Lamp extinguished.'}</p>
-    <button type="button" className="reset-button" disabled={disabled} onClick={onToggle}>
+    <button type="button" className={`action-button action-button--${lamp.status === 'lit' ? 'secondary' : 'primary'}`} disabled={disabled} onClick={onToggle}>
       {lamp.status === 'lit' ? 'Extinguish lamp' : 'Ignite lamp'}
     </button>
     <p className="empty-caption">Move a beaker or test tube into the marked zone above this lamp to heat it.

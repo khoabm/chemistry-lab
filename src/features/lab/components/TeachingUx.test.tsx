@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
+import { ExperimentPanel } from './ExperimentPanel'
 import { ReactionObservation } from './ReactionObservation'
 import { chemicals } from '../../../simulation/chemicals/catalog'
 import { mixReactions } from '../../../simulation/reactions/mixReactions'
@@ -60,12 +61,11 @@ describe('M7 teaching workflow', () => {
     expect(screen.getByRole('heading', { name: 'Silver chloride precipitation.' })).toBeInTheDocument()
   })
 
-  it('explains the placement-only dropper and keeps reagent addition unavailable for it', () => {
-    render(<LabPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
+  it('explains reagent delivery is unavailable for an existing internal dropper', () => {
+    render(<ExperimentPanel equipment={{ id: 'existing-dropper', equipmentType: 'dropper', position: { x: 0.5, y: 0.5 } }}
+      container={null} lamp={null} disabled={false} onMix={vi.fn()} onClear={vi.fn()} onToggleLamp={vi.fn()} />)
     expect(screen.getByRole('heading', { name: 'Selected dropper' })).toBeInTheDocument()
     expect(screen.getByText(/This dropper can be placed and moved/)).toHaveTextContent('Reagent delivery is not available')
-    expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: 'Mix' })).not.toBeInTheDocument()
   })
 

@@ -75,7 +75,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .lab-help-content ol { margin: var(--space-3) 0 0; padding-left: 20px; }
 .lab-help-limit { padding: var(--space-4); border-top: 1px solid var(--color-line); color: var(--color-muted); }
 .preview-label { color: var(--color-muted); font-size: 12px; }
-.reset-button {
+.action-button {
   min-height: 44px;
   display: flex;
   align-items: center;
@@ -87,8 +87,8 @@ h3 { font-size: 14px; font-weight: 600; }
   color: var(--color-muted);
   font-size: 12px;
 }
-.reset-button:disabled { cursor: not-allowed; }
-.reset-button svg { width: 17px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.action-button:disabled { cursor: not-allowed; }
+.action-button svg { width: 17px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
 .lab-layout {
   flex: 1;
@@ -174,12 +174,16 @@ h3 { font-size: 14px; font-weight: 600; }
 .bench-caption { position: absolute; bottom: var(--space-5); left: var(--space-5); color: var(--color-muted); font-size: 9px; letter-spacing: 0.16em; }
 .workspace-footnote { padding: var(--space-4) 0 0; text-align: center; font-size: 12px; color: var(--color-muted); }
 
-.reset-button:not(:disabled) { cursor: pointer; color: var(--color-accent); background: var(--color-panel); }
-.reset-button:not(:disabled):hover { background: var(--color-accent-soft); }
-.reset-button:not(:disabled):active, .chemical-palette-item:not(:disabled):active,
+.action-button:not(:disabled) { cursor: pointer; }
+.action-button--primary { font-weight: 600; }
+.action-button--primary:not(:disabled) { color: var(--color-panel); background: var(--color-accent); border-color: var(--color-accent); }
+.action-button--primary:not(:disabled):hover, .action-button--primary:not(:disabled):active { background: var(--color-text); border-color: var(--color-text); }
+.action-button--secondary:not(:disabled) { color: var(--color-accent); background: var(--color-panel); }
+.action-button--secondary:not(:disabled):hover { background: var(--color-accent-soft); }
+.action-button--secondary:not(:disabled):active, .chemical-palette-item:not(:disabled):active,
 .palette-toggle:not(:disabled):active, .lab-help summary:active { background: #dce8dc; }
 @media (prefers-reduced-motion: no-preference) {
-  .reset-button, .equipment-palette-item, .chemical-palette-item,
+  .action-button, .equipment-palette-item, .chemical-palette-item,
   .workspace-equipment, .sample-closeup button, .palette-toggle, .lab-help summary {
     transition: background-color 120ms ease-out, border-color 120ms ease-out;
   }
@@ -265,7 +269,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .contents-list li { display: grid; gap: 5px; padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
 .contents-list strong { font-size: 13px; line-height: 1.6; font-weight: 500; }
 .contents-list span { font-size: 12px; color: var(--color-muted); }
-.container-details .reset-button { margin-top: var(--space-4); }
+.container-details .action-button { margin-top: var(--space-4); }
 .container-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .sample-closeup { margin: var(--space-4) 0 0; padding: var(--space-2); border: 1px solid var(--color-line); border-radius: var(--radius-small); background: #edf2ee; color: var(--color-accent); }
 .sample-closeup .equipment-visual { height: 164px; }
@@ -288,7 +292,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .sample-detail-body { padding: var(--space-6); }
 .sample-detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); }
 .sample-detail-header h2 { margin-top: var(--space-2); font-size: 24px; }
-.sample-detail-header .reset-button { margin: 0; flex-shrink: 0; }
+.sample-detail-header .action-button { margin: 0; flex-shrink: 0; }
 .sample-detail-content { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--space-6); align-items: center; margin-top: var(--space-5); }
 .sample-detail-visual { display: grid; place-items: center; min-width: 0; border-radius: var(--radius-panel); background: #edf2ee; color: var(--color-accent); }
 .sample-detail-visual .equipment-visual { height: clamp(260px, 48svh, 520px); }
@@ -299,7 +303,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .reacted-solid { transition: fill 800ms ease-out; }
 .lamp-details { padding-top: var(--space-5); }
 .lamp-details .equipment-visual { height: 110px; margin: var(--space-4) 0; }
-.lamp-details .reset-button { margin-top: var(--space-3); }
+.lamp-details .action-button { margin-top: var(--space-3); }
 .heating-status { margin: var(--space-3) 0; font-size: 13px; line-height: 1.6; }
 .heating-status .is-heating { color: #80541c; font-weight: 600; }
 .equipment-state { position: absolute; top: 0; right: 0; padding: 2px 5px; border-radius: 4px; background: #f9ebcd; color: #80541c; font-size: 10px; pointer-events: none; }

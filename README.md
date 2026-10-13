@@ -95,8 +95,10 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M8 polish, extending M7: place and move beakers, test tubes, droppers and
-alcohol lamps. Drag equipment from the palette onto the bench or click to add it.
+M8 polish, extending M7: place and move beakers, test tubes and alcohol lamps.
+These three types are exposed by the explicit paletteEquipmentTypes list;
+Dropper remains supported internally but is hidden from the normal 2D palette.
+Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
 clears the bench without reloading the page.
@@ -104,11 +106,13 @@ clears the bench without reloading the page.
 Select a beaker or test tube, then click/tap a chemical in the palette to add one
 simplified unit. All eleven specified chemicals are available, with name,
 formula and solution/solid labels. Containers display basic starting liquid/solid
-appearance and keep independent contents while moving. The right Experiment panel
-separates Sample (contents, heating, Mix/Empty and close-up) from Result (observation,
+appearance and keep independent contents while moving. For a selected beaker or
+test tube, the right Experiment panel separates Sample (contents, heating,
+Mix/Empty and close-up) from Result (observation,
 equation, explanation and products). New Mix/Heat results, including no observable
 reaction, open Result automatically; manual tab changes preserve the experiment.
 A small dot on Result indicates an available outcome while Sample is active.
+Lamp/dropper details and no-selection help appear directly without tabs.
 Empty container clears only that container and returns to Sample. Reset
 lab removes equipment, contents and reaction results. Adding substances does not
 evaluate chemistry. Press Mix in the selected container's details to identify one
@@ -140,12 +144,13 @@ and do not react again until contents change. Mix is unavailable for a transform
 heat sample to avoid evaluating its retained starting portions as fresh reactants.
 Clear/add starts a new simplified experiment. Contents retain starting quantities;
 products are semantic data, without consumption/chaining or exact temperature.
-The dropper still supports placement/movement only.
+Internal dropper instances still support placement/movement only; hiding the
+palette entry does not remove their type, label, SVG or compatibility.
 
 Open How to use this lab for a short, non-blocking Mix/Heat guide, keyboard
 controls and sample labels. Closing/reopening Help does not change experiments.
 Chemical labels distinguish liquid solutions and solid samples; units are
-illustrative, not mL or mol. Empty/ready samples and the placement-only dropper
+illustrative, not mL or mol. Empty/ready samples and any existing internal dropper
 show contextual next steps. Reset describes its full scope before use and still
 clears immediately; Empty container affects only the selected sample.
 

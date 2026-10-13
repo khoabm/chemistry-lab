@@ -44,8 +44,6 @@ describe('M2 chemical and container interactions', () => {
       expect(within(palette).getByText(chemical.formula)).toBeInTheDocument()
       expect(within(palette).getByRole('button', { name: `Add ${chemical.name}` })).toBeDisabled()
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
-    expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
     expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
@@ -179,7 +177,7 @@ describe('M3 explicit mixing', () => {
     expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Test tube 1' }))
     expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('No observable reaction.')
-    fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
     expect(screen.queryByRole('button', { name: 'Mix' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
     expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()
@@ -284,10 +282,8 @@ describe('M5 alcohol lamp interaction', () => {
     expect(screen.getByRole('button', { name: 'Extinguish lamp' })).toBeEnabled()
   })
 
-  it('never heats a dropper and isolates/reset multiple lamp instances', () => {
+  it('isolates/reset multiple lamp instances', () => {
     const first = litLamp()
-    const dropper = place('Dropper', 0.5, 0.48)
-    expect(dropper.querySelector('.container-heat-glow')).not.toBeInTheDocument()
     expect(screen.queryByRole('status', { name: 'Container heating' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
     const second = screen.getByRole('button', { name: 'Alcohol lamp 2' })
@@ -519,24 +515,24 @@ describe('laboratory equipment interactions', () => {
     expect(screen.getByRole('button', { name: 'Beaker 1' })).toHaveAttribute('data-equipment-id', 'equipment-1')
   })
 
-  it('places all four supported types, permits repeated instances and resets without reusing IDs', () => {
-    for (const name of ['Beaker', 'Test tube', 'Dropper', 'Alcohol lamp', 'Beaker']) {
+  it('places all three palette types, permits repeated instances and resets without reusing IDs', () => {
+    for (const name of ['Beaker', 'Test tube', 'Alcohol lamp', 'Beaker']) {
       fireEvent.click(screen.getByRole('button', { name: `Add ${name}` }))
     }
-    expect(items()).toHaveLength(5)
+    expect(items()).toHaveLength(4)
     const ids = items().map((item) => item.getAttribute('data-equipment-id'))
-    expect(new Set(ids).size).toBe(5)
-    for (const label of ['Beaker 1', 'Test tube 1', 'Dropper 1', 'Alcohol lamp 1', 'Beaker 2']) {
+    expect(new Set(ids).size).toBe(4)
+    for (const label of ['Beaker 1', 'Test tube 1', 'Alcohol lamp 1', 'Beaker 2']) {
       expect(within(bench()).getByRole('button', { name: label })).toHaveTextContent(label)
     }
     expect(screen.getByRole('button', { name: 'Alcohol lamp 1' })).toHaveAttribute('aria-pressed', 'false')
     fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
     expect(items()).toHaveLength(0)
     expect(screen.getByRole('button', { name: 'Reset lab' })).toBeDisabled()
-    for (const name of ['Beaker', 'Test tube', 'Dropper', 'Alcohol lamp', 'Beaker']) {
+    for (const name of ['Beaker', 'Test tube', 'Alcohol lamp', 'Beaker']) {
       fireEvent.click(screen.getByRole('button', { name: `Add ${name}` }))
     }
-    for (const label of ['Beaker 1', 'Test tube 1', 'Dropper 1', 'Alcohol lamp 1', 'Beaker 2']) {
+    for (const label of ['Beaker 1', 'Test tube 1', 'Alcohol lamp 1', 'Beaker 2']) {
       expect(within(bench()).getByRole('button', { name: label })).toHaveTextContent(label)
     }
     for (const item of items()) expect(ids).not.toContain(item.getAttribute('data-equipment-id'))
@@ -558,7 +554,7 @@ describe('laboratory equipment interactions', () => {
   })
 
   it('rejects invalid palette drops without accidentally adding equipment', () => {
-    const source = screen.getByRole('button', { name: 'Add Dropper' })
+    const source = screen.getByRole('button', { name: 'Add Test tube' })
     pointer(source, 'down', 100, 200)
     pointer(source, 'move', 200, 300)
     expect(bench()).toHaveClass('is-drop-invalid')
@@ -611,7 +607,7 @@ describe('laboratory equipment interactions', () => {
 
   it.each(['Escape', 'pointercancel', 'lostpointercapture', 'reset'])('cancels a pending pointer press on %s before it becomes a drag', (reason) => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
-    const source = screen.getByRole('button', { name: 'Add Dropper' })
+    const source = screen.getByRole('button', { name: 'Add Test tube' })
     pointer(source, 'down', 100, 200)
     pointer(source, 'move', 102, 201)
     if (reason === 'Escape') fireEvent.keyDown(source, { key: 'Escape' })
@@ -621,19 +617,19 @@ describe('laboratory equipment interactions', () => {
     pointer(source, 'up', 102, 201)
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(reason === 'reset' ? 0 : 1)
-    expect(screen.queryByRole('button', { name: 'Dropper 1' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Test tube 1' })).not.toBeInTheDocument()
 
     // Cancellation must not swallow the next deliberate pointer click.
     pointer(source, 'down', 100, 200)
     pointer(source, 'up', 100, 200)
     fireEvent.click(source, { detail: 1 })
-    expect(screen.getByRole('button', { name: 'Dropper 1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Test tube 1' })).toBeInTheDocument()
   })
 
   it.each(['tools', 'reset'])('cancels a drag with Escape after focus moves to %s', (target) => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
     fireEvent.click(screen.getByRole('button', { name: 'Equipment & Chemicals' }))
-    const source = screen.getByRole('button', { name: 'Add Dropper' })
+    const source = screen.getByRole('button', { name: 'Add Test tube' })
     pointer(source, 'down', 100, 200)
     pointer(source, 'move', 600, 300)
     const focused = target === 'tools'
@@ -669,7 +665,7 @@ describe('laboratory equipment interactions', () => {
 
   it('clears an active drag when reset is used', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
-    const source = screen.getByRole('button', { name: 'Add Dropper' })
+    const source = screen.getByRole('button', { name: 'Add Test tube' })
     pointer(source, 'down', 100, 200)
     pointer(source, 'move', 600, 300)
     fireEvent.click(screen.getByRole('button', { name: 'Reset lab' }))
@@ -681,7 +677,7 @@ describe('laboratory equipment interactions', () => {
   })
 
   it('keeps short clicks distinct from drags and ignores unrelated pointers', () => {
-    const source = screen.getByRole('button', { name: 'Add Dropper' })
+    const source = screen.getByRole('button', { name: 'Add Test tube' })
     pointer(source, 'down', 100, 200)
     pointer(source, 'move', 102, 201)
     expect(bench()).not.toHaveClass('is-drop-invalid')
@@ -691,6 +687,6 @@ describe('laboratory equipment interactions', () => {
     pointer(source, 'up', 102, 201)
     fireEvent.click(source, { detail: 1 })
     expect(items()).toHaveLength(1)
-    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Dropper added to the bench.')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Test tube added to the bench.')
   })
 })

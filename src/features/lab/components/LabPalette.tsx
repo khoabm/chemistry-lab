@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { equipmentLabels, equipmentTypes } from '../equipment'
+import { equipmentLabels, paletteEquipmentTypes } from '../equipment'
 import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { EquipmentVisual } from './EquipmentVisual'
 import type { ChemicalId } from '../../../simulation/chemicals/catalog'
@@ -49,7 +49,7 @@ export function LabPalette({ interaction, canAddChemical, onAddChemical }: {
         <section className="palette-section" aria-labelledby="equipment-title">
           <h3 id="equipment-title">Equipment</h3>
           <div className="equipment-palette">
-            {equipmentTypes.map((equipmentType) => (
+            {paletteEquipmentTypes.map((equipmentType) => (
               <button
                 key={equipmentType}
                 className="equipment-palette-item"

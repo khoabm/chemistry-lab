@@ -123,12 +123,16 @@ be announced without an additional state or announcement system.
 
 ## 6. Equipment palette
 
-Initial equipment:
+Currently visible equipment in the M8 palette:
 
 - beaker
 - test tube
-- dropper
 - alcohol lamp
+
+Dropper remains a supported internal type with its label/SVG and existing-instance
+behavior, but is hidden from the normal palette. Future exposure or reagent-delivery
+work requires explicit approval. Do not remove its internal support or implement delivery as
+part of this visibility correction.
 
 Equipment should have clear visual icons or illustrations.
 
@@ -373,15 +377,21 @@ them.
 
 ## 14. Experiment panel
 
-The right panel is headed Experiment and has Sample and Result tabs. Sample
+The right panel is headed Experiment. Sample and Result tabs appear only when
+a supported container (beaker/test tube) with container state is selected. Lamp
+details, dropper information and the no-selection help appear directly, without
+tabs or tabpanel semantics. Do not change their existing interactions. Sample
 contains selected-container contents/quantities, heating status, Mix/Empty actions
 and the close-up. Result contains reaction name, Observation, equation,
 explanation and products, or No observable reaction. Do not duplicate this result
 text within Sample. The optional existing detail dialog retains enlarged drawing
 and result information for presentations.
 
-Tab state belongs only to presentation. Sample is the default without a result,
-after selecting a sample without a result, Empty container, or Reset lab. Every
+Tab state belongs only to presentation. For a selected container, Sample is the
+default without a result, after selecting a sample without a result or Empty
+container. Reset lab clears selection and removes tabs/results; selecting a new
+empty container restores Sample. Selection changes reset local presentation
+state using the existing equipment-ID key and preserve stored container results. Every
 new Mix/Heat outcome, including no registered reaction, opens Result immediately.
 Manual navigation never changes or evaluates chemistry. A small dot and accessible
 description on Result indicate an available result while Sample is active;
@@ -456,6 +466,13 @@ Avoid:
 - childish cartoon overload
 
 The interface may be playful, but should remain credible for teaching.
+
+M8 action hierarchy: use a shared action-button style with primary/secondary
+variants. Mix and Ignite lamp use the existing accent background with light,
+high-contrast text; Empty container, Extinguish lamp, Reset lab and dialog Close
+remain quieter outlined actions. Preserve 44px minimum targets, visible keyboard
+focus, disabled conditions and existing no-preference-only color/border
+transitions. Do not add scaling, dramatic shadows or a general design system.
 
 ---
 

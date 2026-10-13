@@ -41,8 +41,8 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
           ? 'Heat check pending. Keep this sample in the lit zone and wait for the result; Mix cancels the pending heat check.'
           : 'Sample ready. Add another chemical if needed, then press Mix; or place this container above a lit alcohol lamp to check a heat reaction.'}</p>}
       <div className="container-actions">
-        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0 || isCompletedHeatReaction(container.reactionResult)} onClick={onMix}>Mix</button>
-        <button type="button" className="reset-button" disabled={disabled || container.contents.length === 0}
+        <button type="button" className="action-button action-button--primary" disabled={disabled || container.contents.length === 0 || isCompletedHeatReaction(container.reactionResult)} onClick={onMix}>Mix</button>
+        <button type="button" className="action-button action-button--secondary" disabled={disabled || container.contents.length === 0}
           onClick={onClear}>Empty container</button>
       </div>
       <p className="empty-caption">Empty container removes only this sample and its result; equipment and other experiments stay on the bench.</p>
