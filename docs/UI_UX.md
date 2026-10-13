@@ -72,6 +72,13 @@ from observations so selection, contents and reaction text cannot resize it or
 move normalized equipment positions. Equations stay on one line with local
 horizontal scrolling when the viewport cannot fit them.
 
+M8 retains those breakpoints and normalized positions. At widths up to 900px and
+heights up to 500px, use a 300px bench to reduce vertical travel in landscape.
+Keep the bounded sticky tools and dialog scrolling; selection must not resize
+the bench. Give action buttons/Help at least a 44px target height. Focus rings
+inside scrolling regions must remain visible. Equations are named, focusable
+regions so keyboard users can reach and scroll them without moving equipment.
+
 ---
 
 ## 4. Header
@@ -106,6 +113,11 @@ Optional visual metadata:
 The palette should make chemicals easy to drag or select.
 
 Avoid showing advanced chemical properties that are not used by the MVP.
+
+M8 chemical actions keep their existing names and describe the displayed formula
+and solution/solid state. A polite, always-mounted sample status derives quantities
+from the selected container so first/repeated additions and Empty container can
+be announced without an additional state or announcement system.
 
 ---
 
@@ -187,6 +199,11 @@ indicate that it is a valid target.
 
 Invalid drops should return gracefully without error dialogs.
 
+M8 cancels pointer sessions on window blur or document-hidden transitions and
+releases capture on unmount. Stale releases cannot commit a cancelled operation;
+the committed sample/position/result stay intact. Reuse the existing cancellation
+path, feedback and heat-wait pause behavior.
+
 ---
 
 ## 10. Container appearance
@@ -213,7 +230,7 @@ liquid bounds with reaction effects so bubbles and suspended solids remain insid
 the liquid and container. Starting-substance bands remain a simplified inventory
 illustration, not a claim of immiscibility or density layering.
 
-The selected sample has an enlarged view in the observation panel, reusing the
+The selected sample has an enlarged view in the Experiment panel's Sample tab, reusing the
 bench renderer. Its labeled close-up button opens an optional sample-detail modal
 with a larger drawing and the existing reaction information for presentations.
 Keep Mix/Empty controls above the close-up; the modal does not perform chemistry.
@@ -354,10 +371,26 @@ them.
 
 ---
 
-## 14. Observation panel
+## 14. Experiment panel
 
-The observation panel should show information about the most recent relevant
-experiment.
+The right panel is headed Experiment and has Sample and Result tabs. Sample
+contains selected-container contents/quantities, heating status, Mix/Empty actions
+and the close-up. Result contains reaction name, Observation, equation,
+explanation and products, or No observable reaction. Do not duplicate this result
+text within Sample. The optional existing detail dialog retains enlarged drawing
+and result information for presentations.
+
+Tab state belongs only to presentation. Sample is the default without a result,
+after selecting a sample without a result, Empty container, or Reset lab. Every
+new Mix/Heat outcome, including no registered reaction, opens Result immediately.
+Manual navigation never changes or evaluates chemistry. A small dot and accessible
+description on Result indicate an available result while Sample is active;
+invalidation removes both stale content and the indicator.
+
+Use tablist/tab/tabpanel with matching IDs, aria-selected, roving tabindex,
+Left/Right and Home/End navigation and visible focus. Keep panels mounted with
+native hidden semantics. Keep the dialog outside hidden panels so delayed Heat
+can update it; dismissal returns to Sample to restore focus to its close-up opener.
 
 Possible structure:
 
@@ -388,7 +421,7 @@ The panel must support:
 without treating it as an application error.
 
 M7 teaching refinement: show the returned reaction name as a prominent heading
-and list returned product names/formulas in both this panel and the existing
+and list returned product names/formulas in both Result and the existing
 enlarged sample dialog. Explain ↓ as an insoluble precipitate and ↑ as gas release
 when the semantic effects include them. Keep explanations sourced from the engine;
 do not add presentation-side reaction rules or a second teaching-data registry.
@@ -429,6 +462,12 @@ The interface may be playful, but should remain credible for teaching.
 ## 16. Animation
 
 Animation should explain state changes.
+
+M8 adds only brief background/border transitions to existing controls when
+prefers-reduced-motion is no-preference; it does not animate equipment positions
+or resize the bench on focus. Preserve the existing static reaction output for
+reduced-motion. The shared SVG component skips unchanged immutable props with
+React.memo and still updates contents, results, lamp status and heating normally.
 
 Use animation for:
 

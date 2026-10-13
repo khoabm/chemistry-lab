@@ -6,9 +6,9 @@ import type { ChemicalPortion } from '../../../types/container'
 import type { ReactionResult } from '../../../simulation/reactions/types'
 import type { AlcoholLampState } from '../../../types/heating'
 
-export function EquipmentDragPreview({ preview, contents = [], reactionResult = null, lampStatus = 'extinguished', heating = false }: {
+export function EquipmentDragPreview({ preview, contents, reactionResult = null, lampStatus = 'extinguished', heating = false }: {
   preview: DragPreview
-  contents?: readonly ChemicalPortion[]
+  contents?: readonly ChemicalPortion[] | undefined
   reactionResult?: ReactionResult | null
   lampStatus?: AlcoholLampState['status']
   heating?: boolean

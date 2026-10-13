@@ -45,6 +45,7 @@ describe('M6 laboratory heat flow', () => {
     tick(heatReactionDelayMs * 2)
     expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('Simplified acid-base neutralization')
     expect(sample.querySelector('[data-reaction-effect="temperature-rise"]')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
     expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('cancelled by Mix')
   })
 
@@ -60,6 +61,7 @@ describe('M6 laboratory heat flow', () => {
       tick(1)
       expect(screen.getByRole('status', { name: 'Heat result' })).toHaveTextContent(name)
       expect(screen.getByText(equation)).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
       expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('complete')
       expect(sample.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', color)
       expect(sample.querySelector('.reacted-liquid')).not.toBeInTheDocument()
@@ -119,6 +121,7 @@ describe('M6 laboratory heat flow', () => {
     tick()
     expect(screen.getByRole('status', { name: 'Heat result' })).toHaveTextContent('No observable reaction.')
     expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
     fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
     expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('Simplified acid-base neutralization')
     tick(heatReactionDelayMs * 2)

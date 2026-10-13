@@ -13,6 +13,8 @@ svg { display: block; }
   outline: 3px solid var(--color-accent);
   outline-offset: 4px;
 }
+.lab-help summary:focus-visible, .palette-content:focus-visible,
+.lab-observations:focus-visible, .reaction-equation:focus-visible { outline-offset: -3px; }
 
 .lab-page {
   --lab-bench-height: clamp(480px, calc(100svh - 300px), 800px);
@@ -66,7 +68,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .reset-action { max-width: 210px; }
 .reset-action p { margin-top: var(--space-2); font-size: 10px; line-height: 1.5; color: var(--color-muted); }
 .lab-help { margin-top: var(--space-4); border: 1px solid var(--color-line); border-radius: var(--radius-small); background: var(--color-panel); }
-.lab-help summary { padding: var(--space-3) var(--space-4); cursor: pointer; color: var(--color-accent); font-size: 13px; font-weight: 600; }
+.lab-help summary { min-height: 44px; padding: var(--space-3) var(--space-4); cursor: pointer; color: var(--color-accent); font-size: 13px; font-weight: 600; }
 .lab-help-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-5); padding: var(--space-4); }
 .lab-help-content p, .lab-help-content li, .lab-help-limit { font-size: 12px; line-height: 1.7; }
 .lab-help-content p { margin-top: var(--space-3); }
@@ -74,6 +76,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .lab-help-limit { padding: var(--space-4); border-top: 1px solid var(--color-line); color: var(--color-muted); }
 .preview-label { color: var(--color-muted); font-size: 12px; }
 .reset-button {
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -111,6 +114,12 @@ h3 { font-size: 14px; font-weight: 600; }
 .palette-mobile-hint { display: none; }
 .palette-content { display: flex; flex: 1; flex-direction: column; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
 .lab-observations { grid-area: observations; height: var(--lab-panel-height); overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; }
+.experiment-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-4); }
+.experiment-tabs button { min-height: 44px; border: 0; border-bottom: 2px solid transparent; border-radius: var(--radius-small); background: transparent; color: var(--color-muted); cursor: pointer; font-size: 13px; }
+.experiment-tabs button[aria-selected="true"] { border-bottom-color: var(--color-accent); background: var(--color-accent-soft); color: var(--color-accent); font-weight: 600; }
+.experiment-tabs button:focus-visible, .experiment-tabpanel:focus-visible { outline-offset: -3px; }
+.experiment-tabpanel { min-width: 0; padding-top: var(--space-3); }
+.result-available-dot { display: inline-block; width: 6px; height: 6px; margin-left: var(--space-2); border-radius: 50%; background: var(--color-accent); vertical-align: middle; }
 .panel-heading { padding-bottom: var(--space-5); border-bottom: 1px solid var(--color-line); }
 .panel-heading h2 { margin-top: var(--space-2); }
 .palette-section { padding: var(--space-5) 0; }
@@ -167,6 +176,14 @@ h3 { font-size: 14px; font-weight: 600; }
 
 .reset-button:not(:disabled) { cursor: pointer; color: var(--color-accent); background: var(--color-panel); }
 .reset-button:not(:disabled):hover { background: var(--color-accent-soft); }
+.reset-button:not(:disabled):active, .chemical-palette-item:not(:disabled):active,
+.palette-toggle:not(:disabled):active, .lab-help summary:active { background: #dce8dc; }
+@media (prefers-reduced-motion: no-preference) {
+  .reset-button, .equipment-palette-item, .chemical-palette-item,
+  .workspace-equipment, .sample-closeup button, .palette-toggle, .lab-help summary {
+    transition: background-color 120ms ease-out, border-color 120ms ease-out;
+  }
+}
 .equipment-palette { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-4); }
 .equipment-palette-item {
   display: flex;
@@ -262,7 +279,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .reaction-name { margin-top: var(--space-1); font-size: 17px; line-height: 1.5; color: var(--color-accent); }
 .no-reaction-guidance { margin-top: var(--space-3); padding-left: var(--space-3); border-left: 2px solid var(--color-line); font-size: 12px; line-height: 1.7; color: var(--color-muted); }
 .no-reaction-guidance p + p { margin-top: var(--space-2); }
-.reaction-details { margin: var(--space-4) 0 0; display: grid; gap: var(--space-4); }
+.reaction-details { margin: var(--space-4) 0 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
 .reaction-details dt { margin-bottom: var(--space-1); color: var(--color-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .reaction-details dd { margin: 0; font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
 .reaction-details .reaction-equation { padding: var(--space-2); background: var(--color-accent-soft); border-radius: var(--radius-small); white-space: nowrap; overflow-wrap: normal; overflow-x: auto; max-width: 100%; }
@@ -398,4 +415,8 @@ h3 { font-size: 14px; font-weight: 600; }
   .sample-detail-header h2 { font-size: 20px; }
   .sample-detail-content { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
   .sample-detail-visual .equipment-visual { height: clamp(220px, 36svh, 320px); }
+}
+
+@media (max-width: 900px) and (max-height: 500px) {
+  .workbench { min-height: 300px; height: 300px; }
 }

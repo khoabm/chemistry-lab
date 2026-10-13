@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ButtonHTMLAttributes, Dispatch } from 'react'
 import type { LabWorkspaceAction, LabWorkspaceState } from '../../../store/labWorkspace'
 import { nextEquipmentPosition } from '../../../store/labWorkspace'
@@ -52,22 +52,35 @@ export function useEquipmentInteraction(
     benchRef.current = element
   }, [])
 
-  function clearSession() {
+  const clearSession = useCallback(() => {
     const session = sessionRef.current
     sessionRef.current = null
     setPreview(null)
     if (session?.target.hasPointerCapture?.(session.pointerId)) {
       session.target.releasePointerCapture(session.pointerId)
     }
-  }
+  }, [])
 
-  function cancelDrag() {
+  const cancelDrag = useCallback(() => {
     if (sessionRef.current) {
       suppressPointerClickRef.current = true
       setMessage('Placement cancelled. Equipment is unchanged.')
     }
     clearSession()
-  }
+  }, [clearSession])
+
+  useEffect(() => {
+    const cancelWhenHidden = () => {
+      if (document.visibilityState === 'hidden') cancelDrag()
+    }
+    window.addEventListener('blur', cancelDrag)
+    document.addEventListener('visibilitychange', cancelWhenHidden)
+    return () => {
+      window.removeEventListener('blur', cancelDrag)
+      document.removeEventListener('visibilitychange', cancelWhenHidden)
+      clearSession()
+    }
+  }, [cancelDrag, clearSession])
 
   function resetWorkspace() {
     cancelDrag()

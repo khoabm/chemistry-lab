@@ -17,10 +17,10 @@ export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
       <div className="chemical-palette">
         {chemicals.map((chemical) => (
           <button key={chemical.id} className="chemical-palette-item" type="button"
-            disabled={!canAdd} aria-label={`Add ${chemical.name}`} aria-describedby="chemical-palette-hint"
+            disabled={!canAdd} aria-label={`Add ${chemical.name}`} aria-describedby={`chemical-palette-hint chemical-${chemical.id}-details`}
             onClick={() => onAdd(chemical.id)}>
             <span className={`chemical-swatch is-${chemical.state}`} style={{ backgroundColor: chemical.color }} aria-hidden="true" />
-            <span><strong>{chemical.formula}</strong><span>{chemical.name}</span><small>{chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample'}</small></span>
+            <span id={`chemical-${chemical.id}-details`}><strong>{chemical.formula}</strong><span>{chemical.name}</span><small>{chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample'}</small></span>
           </button>
         ))}
       </div>

@@ -11,7 +11,7 @@ describe('laboratory foundation', () => {
     expect(screen.getByRole('main')).toHaveAttribute('id', 'laboratory')
     expect(screen.getByRole('complementary', { name: 'Lab materials' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Laboratory workspace' })).toBeInTheDocument()
-    expect(screen.getByRole('complementary', { name: 'Observations' })).toBeInTheDocument()
+    expect(screen.getByRole('complementary', { name: 'Experiment' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Skip to laboratory' })).toHaveAttribute('href', '#laboratory')
   })
 
@@ -24,7 +24,7 @@ describe('laboratory foundation', () => {
     expect(within(screen.getByRole('region', { name: 'Chemicals' })).getAllByRole('button')).toHaveLength(11)
     expect(within(materials).getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     expect(screen.getByText('Empty workspace')).toBeInTheDocument()
-    expect(within(screen.getByRole('complementary', { name: 'Observations' })).getByText(/No observations yet/)).toBeInTheDocument()
+    expect(within(screen.getByRole('complementary', { name: 'Experiment' })).getByText(/No observations yet/)).toBeInTheDocument()
     expect(screen.getByText(/Press Mix, or use a lit alcohol lamp/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset lab' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: /mix|heat/i })).not.toBeInTheDocument()

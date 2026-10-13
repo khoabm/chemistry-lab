@@ -3,11 +3,9 @@ import { createLabWorkspaceState, labWorkspaceReducer } from '../../../store/lab
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { EquipmentDragPreview } from './EquipmentDragPreview'
 import { LabHeader } from './LabHeader'
-import { LabObservations } from './LabObservations'
+import { ExperimentPanel } from './ExperimentPanel'
 import { LabPalette } from './LabPalette'
 import { LabWorkspace } from './LabWorkspace'
-import { ContainerDetails } from './ContainerDetails'
-import { LampDetails } from './LampDetails'
 import { useHeatReactions } from '../hooks/useHeatReactions'
 import { LabHelp } from './LabHelp'
 
@@ -42,19 +40,14 @@ export function LabPage() {
             if (selectedContainer && !interaction.preview) dispatch({ type: 'add-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId, quantity: 1 })
           }} />
         <LabWorkspace state={state} interaction={interaction} />
-        <LabObservations>
-          {selectedLamp ? <LampDetails lamp={selectedLamp} disabled={!!interaction.preview}
-            onToggle={() => dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId })} />
-            : selectedEquipment?.equipmentType === 'dropper' ? <section className="container-details">
-              <h3>Selected dropper</h3>
-              <p className="empty-caption">This dropper can be placed and moved. Reagent delivery is not available. Select a beaker or test tube and use Chemicals to add a sample.</p>
-            </section> : selectedContainer && selectedEquipment && <ContainerDetails key={selectedContainer.id} container={selectedContainer} equipmentType={selectedEquipment.equipmentType} disabled={!!interaction.preview}
-            onMix={() => dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId })}
-            onClear={() => dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId })} />}
-        </LabObservations>
+        <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
+          container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={!!interaction.preview}
+          onMix={() => { if (selectedContainer) dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId }) }}
+          onClear={() => { if (selectedContainer) dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId }) }}
+          onToggleLamp={() => { if (selectedLamp) dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId }) }} />
       </main>
       {interaction.preview && <EquipmentDragPreview preview={interaction.preview}
-        contents={draggingContainer?.contents ?? []} reactionResult={draggingContainer?.reactionResult ?? null}
+        contents={draggingContainer?.contents} reactionResult={draggingContainer?.reactionResult ?? null}
         lampStatus={draggingLamp?.status ?? 'extinguished'} heating={draggingContainer?.heatingState.status === 'heating'} />}
       <footer className="lab-footer">
         <p>Explore chemistry, one observation at a time.</p>

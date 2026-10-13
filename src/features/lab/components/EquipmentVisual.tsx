@@ -1,5 +1,5 @@
 import type { EquipmentType } from '../../../types/equipment'
-import { useId } from 'react'
+import { memo, useId } from 'react'
 import type { ChemicalPortion } from '../../../types/container'
 import { ContainerContentsVisual } from './ContainerContentsVisual'
 import type { ReactionResult } from '../../../simulation/reactions/types'
@@ -9,9 +9,9 @@ import type { AlcoholLampState } from '../../../types/heating'
 import { isContainerEquipment } from '../../../types/container'
 import { solidProductColors } from '../renderers/reactionPresentation'
 
-export function EquipmentVisual({ equipmentType, contents = [], reactionResult = null, lampStatus = 'extinguished', heating = false }: {
+export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], reactionResult = null, lampStatus = 'extinguished', heating = false }: {
   equipmentType: EquipmentType
-  contents?: readonly ChemicalPortion[]
+  contents?: readonly ChemicalPortion[] | undefined
   reactionResult?: ReactionResult | null
   lampStatus?: AlcoholLampState['status']
   heating?: boolean
@@ -63,4 +63,4 @@ export function EquipmentVisual({ equipmentType, contents = [], reactionResult =
       </g>
     </svg>
   )
-}
+})

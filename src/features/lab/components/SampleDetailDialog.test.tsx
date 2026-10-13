@@ -36,6 +36,7 @@ function addSample(first: string, second?: string) {
 }
 
 function openDetail() {
+  fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
   const opener = screen.getByRole('button', { name: 'Enlarge selected sample' })
   opener.focus()
   fireEvent.click(opener, { detail: 0 })
@@ -60,6 +61,8 @@ describe('selected sample detail', () => {
     expect(dialog.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', '#303330')
     expect(dialog.querySelectorAll('.reaction-bubble')).toHaveLength(3)
     fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
+    expect(screen.getByRole('tab', { name: 'Sample' })).toHaveAttribute('aria-selected', 'true')
+    fireEvent.click(screen.getByRole('tab', { name: 'Result' }))
     expect(screen.getByRole('status', { name: 'Heat result' })).toHaveTextContent('Thermal decomposition')
   })
 
@@ -78,7 +81,7 @@ describe('selected sample detail', () => {
     expect(within(dialog).getByRole('status', { name: 'Container heating' })).toHaveTextContent('Heating over a lit alcohol lamp.')
     expect(dialog.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
     fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
-    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
+    expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()
   })
 
   it.each(['button', 'escape', 'backdrop'])('opens starting contents by keyboard and closes via %s with focus restored', (method) => {
@@ -99,7 +102,7 @@ describe('selected sample detail', () => {
     if (method === 'backdrop') fireEvent.click(dialog)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(opener).toHaveFocus()
-    expect(screen.getByRole('status', { name: 'Mix result' })).toBeEmptyDOMElement()
+    expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()
     expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText('1 unit · Solution')).toBeInTheDocument()
   })
 
@@ -111,6 +114,7 @@ describe('selected sample detail', () => {
     addSample(first, second)
     fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
     const status = screen.getByRole('status', { name: 'Mix result' }).textContent
+    fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
     const contents = screen.getByRole('list', { name: 'Container contents' }).textContent
     const equation = document.querySelector('.reaction-equation')?.textContent
     const { dialog } = openDetail()
@@ -119,6 +123,7 @@ describe('selected sample detail', () => {
     expect(dialog.querySelector('.reaction-equation')).toHaveTextContent(equation ?? '')
     fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
     expect(screen.getByRole('list', { name: 'Container contents' })).toHaveTextContent(contents ?? '')
+    fireEvent.click(screen.getByRole('tab', { name: 'Result' }))
     expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent(status ?? '')
     expect(screen.getByRole('button', { name: 'Beaker 1' }).querySelector(`[data-reaction-effect="${effect}"]`)).toBeInTheDocument()
   })

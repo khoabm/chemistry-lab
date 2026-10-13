@@ -75,7 +75,7 @@ export function LabWorkspace({
             {...getEquipmentHandlers({ kind: 'workspace', equipmentType: instance.equipmentType, id: instance.id })}
           >
             <EquipmentVisual equipmentType={instance.equipmentType}
-              contents={container?.contents ?? []} reactionResult={container?.reactionResult ?? null}
+              contents={container?.contents} reactionResult={container?.reactionResult ?? null}
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
             <span>{label}</span>
             {(lamp || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">

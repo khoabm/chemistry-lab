@@ -95,7 +95,7 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M7 teaching UX, extending M6: place and move beakers, test tubes, droppers and
+M8 polish, extending M7: place and move beakers, test tubes, droppers and
 alcohol lamps. Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
@@ -104,8 +104,12 @@ clears the bench without reloading the page.
 Select a beaker or test tube, then click/tap a chemical in the palette to add one
 simplified unit. All eleven specified chemicals are available, with name,
 formula and solution/solid labels. Containers display basic starting liquid/solid
-appearance and keep independent contents while moving. The right panel lists the
-selected container's contents; Empty container clears only that container. Reset
+appearance and keep independent contents while moving. The right Experiment panel
+separates Sample (contents, heating, Mix/Empty and close-up) from Result (observation,
+equation, explanation and products). New Mix/Heat results, including no observable
+reaction, open Result automatically; manual tab changes preserve the experiment.
+A small dot on Result indicates an available outcome while Sample is active.
+Empty container clears only that container and returns to Sample. Reset
 lab removes equipment, contents and reaction results. Adding substances does not
 evaluate chemistry. Press Mix in the selected container's details to identify one
 of the six registered mix reactions (R1–R6); other combinations return
@@ -154,6 +158,19 @@ Exact temperature/concentration and real laboratory procedures remain outside
 the virtual model. M7 changes presentation only; chemistry and state transitions
 are unchanged.
 
+M8 refines the existing UI: chemical actions describe their formula/sample state,
+the selected sample announces updated quantities politely, and reaction equations
+are named keyboard-focusable regions with local horizontal scrolling. Controls
+have comfortable hit areas and contained focus rings; restrained color/border
+transitions honor reduced-motion. On narrow landscape screens the bench uses a
+300px height without changing logical equipment/heating positions. The existing
+sticky tool bar and independently scrolling panels remain.
+
+Window blur or a hidden document cancels an interrupted drag rather than committing
+it; unmount releases pointer capture. The shared SVG drawing uses React.memo with
+immutable props to skip unchanged drawings during interaction updates. Mix/Heat,
+reaction rules and application state are preserved. Sound remains optional and absent.
+
 See the active milestone in `docs/MILESTONES.md`.
 
 ## Local development
@@ -201,7 +218,7 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 - `src/simulation/AGENTS.md`: chemistry/domain boundary instructions.
 
 Use functional React components, strict TypeScript, and plain CSS with shared
-tokens. M7 continues SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
+tokens. M8 continues SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
 dependency direction: Presentation → Application state → Simulation → Domain data.
 Create additional folders only when their code is needed.
 
@@ -252,6 +269,7 @@ The M4 implementation and validation record live in `plans/m4-reaction-visualiza
 The M5 implementation and validation record live in `plans/m5-alcohol-lamp-and-heating.md`.
 The M6 implementation and validation record live in `plans/m6-heat-reactions.md`.
 The M7 implementation and validation record live in `plans/m7-teaching-ux.md`.
+The M8 implementation, acceptance and browser-verification limits live in `plans/m8-polish.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).
