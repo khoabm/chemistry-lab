@@ -48,6 +48,10 @@ Chemistry behavior:
 
 `docs/CHEMISTRY.md`
 
+Reaction dynamics:
+
+`docs/REACTION_DYNAMICS.md`
+
 UI/UX:
 
 `docs/UI_UX.md`
