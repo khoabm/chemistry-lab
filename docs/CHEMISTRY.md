@@ -11,6 +11,11 @@ It is not intended to predict arbitrary real-world chemistry.
 Only behavior explicitly defined in this specification or intentionally added
 later is supported.
 
+For M9 qualitative reaction progression and visual-scientific constraints, also
+read `docs/REACTION_DYNAMICS.md`. This document remains the source of truth for
+supported chemistry; the dynamics specification defines how the registered
+phenomena may be time-compressed and presented without changing that chemistry.
+
 ---
 
 ## 2. Simulation philosophy
