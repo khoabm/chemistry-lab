@@ -207,6 +207,7 @@ remain intact. Optional sound is excluded; multi-engine QA is limited by availab
 - [x] Verify M8, existing scripts/lockfile/Node engine and absence of equivalent CI.
 - [x] Add minimal CI workflow and a short README note; preserve prior UI work.
 - [x] Validate YAML/local commands and record CI follow-up outcomes.
+- [x] Synchronize the first successful hosted M8 CI result and final acceptance note.
 
 - [x] Verify clean M8 branch and inspect palette structure, CSS, stack and tests.
 - [x] Apply scoped Lab materials typography/spacing refinements.
@@ -309,9 +310,28 @@ Local npm run typecheck, npm run lint, npm test -- --maxWorkers=2 (269 tests/18
 files, 41.03s), npm run build and git diff --check all PASS. Local environment:
 Windows, Node 25.2.1/npm 11.6.2; CI is configured for Ubuntu/Node 24.
 
-GitHub-hosted CI has NOT executed and is not reported as passing. Actual
-clean-environment npm ci/action execution still requires a pushed workflow and
-a GitHub Actions run. No commits, pushes, merges or milestone advancement.
+Hosted validation was pending at the initial local-validation checkpoint above.
+The first M8 GitHub Actions CI run subsequently completed successfully:
+[run 38580515163](https://github.com/khoabm/chemistry-lab/actions/runs/38580515163),
+validating M8 HEAD `9e315126211a4ab23f8183d17dced0f6a6125ec1`.
+Hosted job logs confirm Ubuntu with Node.js 24 (v24.21.0), successful npm ci,
+npm run typecheck, npm run lint, npm test -- --maxWorkers=2 and npm run build.
+Vitest passed all 18 test files and 269 tests. This later hosted result is
+distinct from the historical Windows/Node 25 local results retained above.
+
+### Final M8 acceptance — 2026-10-14
+
+The scoped M8 work has no known blocking validation failure at the validated
+HEAD above, based on the recorded local/browser checks and successful hosted CI.
+Verification remains limited: no broad multi-browser automation, no physical
+touch-device verification and no physical projector verification. Existing
+reduced-motion preference-toggle limits and optional-sound exclusion remain.
+Milestone advancement remains a user decision; the active milestone stays M8.
+
+This documentation-only synchronization changes no application/package/workflow
+files. No new hosted run is claimed for this uncommitted documentation change;
+the recorded CI result applies to the validated SHA above. No commit, push or
+merge was performed during this correction.
 
 ### Lab materials readability polish — 2026-10-14
 
