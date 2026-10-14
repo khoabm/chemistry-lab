@@ -96,7 +96,31 @@ Initial equipment:
 
 Equipment may be expanded in later versions.
 
+M8 palette visibility: offer beaker, test tube and alcohol lamp. Dropper is hidden
+while reagent delivery is unavailable; its type, renderer and existing-instance
+compatibility remain supported internally. Delivery still requires explicit
+future approval.
+
 The MVP should not attempt to reproduce a complete laboratory inventory.
+
+### Intended functional roles
+
+The alcohol lamp and dropper should become usable tools in experiments, beyond
+placement and movement. Neither tool is a chemical reactant, and neither should
+be required for every reaction.
+
+- Alcohol lamp: provide the supported heating interaction in M5, then enable
+  the registered `heat` reactions R7 and R8 in M6. It must not cause mix-only
+  reactions to match a heat trigger.
+- Dropper: add or transfer supported liquid reagents into a beaker or test tube
+  using simplified quantities. Chemical delivery changes container contents;
+  evaluation still requires the explicit `mix` action. The dropper does not
+  introduce a new reaction trigger or new chemistry rules.
+
+As of M3, both tools support placement and movement only. This note records the
+requested future behavior; it does not expand M3 completion criteria. Dropper
+interaction has no assigned implementation milestone yet. Its milestone placement
+and interaction design require explicit user approval before implementation.
 
 ---
 
@@ -138,6 +162,18 @@ Initial visual vocabulary:
 
 Visual effects should communicate observable chemistry rather than attempt to
 simulate microscopic molecular behavior.
+
+The approved M4 visual standard is qualitative realism: recognizable material
+appearance and motion consistent with the registered observation. Learners should
+see gas rising through liquid, precipitate forming and settling as a distinct
+solid, and the specified clear/colored liquid or solid sample. Maintain this
+standard when later milestones introduce their registered effects.
+
+No numeric percentage of scientific accuracy is claimed. Illustrative animation
+timing, particle sizes and liquid levels do not model kinetics, concentration or
+yield. More polished presentation must not invent chemistry or activate future
+milestone interactions. Use existing SVG/CSS unless a demonstrated rendering need
+requires a compatible dependency.
 
 ---
 

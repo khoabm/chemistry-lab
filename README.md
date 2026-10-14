@@ -95,9 +95,86 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M0 project foundation: a static, empty laboratory shell. Equipment and chemical
-palettes are placeholders; reset is disabled. Laboratory interactions and
-chemistry are reserved for later milestones.
+M8 polish, extending M7: place and move beakers, test tubes and alcohol lamps.
+These three types are exposed by the explicit paletteEquipmentTypes list;
+Dropper remains supported internally but is hidden from the normal 2D palette.
+Drag equipment from the palette onto the bench or click to add it.
+Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
+farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
+clears the bench without reloading the page.
+
+Select a beaker or test tube, then click/tap a chemical in the palette to add one
+simplified unit. All eleven specified chemicals are available, with name,
+formula and solution/solid labels. Containers display basic starting liquid/solid
+appearance and keep independent contents while moving. For a selected beaker or
+test tube, the right Experiment panel separates Sample (contents, heating,
+Mix/Empty and close-up) from Result (observation,
+equation, explanation and products). New Mix/Heat results, including no observable
+reaction, open Result automatically; manual tab changes preserve the experiment.
+A small dot on Result indicates an available outcome while Sample is active.
+Lamp/dropper details and no-selection help appear directly without tabs.
+Empty container clears only that container and returns to Sample. Reset
+lab removes equipment, contents and reaction results. Adding substances does not
+evaluate chemistry. Press Mix in the selected container's details to identify one
+of the six registered mix reactions (R1–R6); other combinations return
+`No observable reaction.` Matching ignores order and requires the exact supported
+set of substances. Results belong to each container and are cleared when its
+contents change. Supported results now show precipitate, gas bubbles or subtle
+warmth inside the container, with a visible observation, equation and educational
+explanation in the details panel. Reaction products/effects are semantic data;
+contents retain the starting substances and simplified quantities, without
+stoichiometric consumption or reaction chaining.
+
+Select an alcohol lamp and press Ignite lamp / Extinguish lamp in its details.
+Each new lamp starts extinguished. A lit lamp displays a flame and a marked zone
+above it. Place the center of a beaker or test tube in that zone using drag or
+arrow keys; it shows a warm glow and Heating status. Moving the container/source
+out of alignment or extinguishing the source stops heating. Empty containers can
+also heat. Multiple lamps are independent; reset removes all heating state.
+Filled containers wait approximately two seconds before heat evaluation. Copper
+carbonate shows R7 (black solid and low gas release); hydrated copper sulfate shows
+R8 (pale/white solid). Unsupported heated sets return No observable reaction.
+Solid gas particles are illustrative, not boiling bubbles or visible carbon dioxide.
+Moving away, changing source/contents, extinguishing or reset cancels stale waits;
+dragging pauses them. Selection/unrelated actions do not restart other deadlines.
+Explicit Mix cancels a pending heat check so an older callback cannot overwrite
+the new Mix result; re-entering a lit zone or changing contents starts another check.
+Each request evaluates once. Successful products retain their color after cooling
+and do not react again until contents change. Mix is unavailable for a transformed
+heat sample to avoid evaluating its retained starting portions as fresh reactants.
+Clear/add starts a new simplified experiment. Contents retain starting quantities;
+products are semantic data, without consumption/chaining or exact temperature.
+Internal dropper instances still support placement/movement only; hiding the
+palette entry does not remove their type, label, SVG or compatibility.
+
+Open How to use this lab for a short, non-blocking Mix/Heat guide, keyboard
+controls and sample labels. Closing/reopening Help does not change experiments.
+Chemical labels distinguish liquid solutions and solid samples; units are
+illustrative, not mL or mol. Empty/ready samples and any existing internal dropper
+show contextual next steps. Reset describes its full scope before use and still
+clears immediately; Empty container affects only the selected sample.
+
+Reaction names are prominent headings. The observation panel and enlarged dialog
+share returned equations, explanations and product names/formulas, with ↓/↑
+legend text for precipitate/gas effects. No observable reaction remains a neutral
+outcome; additional guidance explains that no registered demonstration matches
+the selected trigger, without claiming real-world chemical impossibility.
+Exact temperature/concentration and real laboratory procedures remain outside
+the virtual model. M7 changes presentation only; chemistry and state transitions
+are unchanged.
+
+M8 refines the existing UI: chemical actions describe their formula/sample state,
+the selected sample announces updated quantities politely, and reaction equations
+are named keyboard-focusable regions with local horizontal scrolling. Controls
+have comfortable hit areas and contained focus rings; restrained color/border
+transitions honor reduced-motion. On narrow landscape screens the bench uses a
+300px height without changing logical equipment/heating positions. The existing
+sticky tool bar and independently scrolling panels remain.
+
+Window blur or a hidden document cancels an interrupted drag rather than committing
+it; unmount releases pointer capture. The shared SVG drawing uses React.memo with
+immutable props to skip unchanged drawings during interaction updates. Mix/Heat,
+reaction rules and application state are preserved. Sound remains optional and absent.
 
 See the active milestone in `docs/MILESTONES.md`.
 
@@ -123,27 +200,85 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 | `npm test` | Run the Vitest test suite once |
 | `npm run test:watch` | Run Vitest in watch mode |
 
+GitHub Actions CI runs on pushes to `M*` milestone branches, pull requests and
+manual dispatch. It uses Ubuntu, Node.js 24 and `npm ci`, then runs typecheck,
+lint, `npm test -- --maxWorkers=2` and build.
+
 ## Source and styling conventions
 
 - `src/main.tsx`: browser entry and global styles.
 - `src/app/`: application composition and application smoke tests.
 - `src/features/lab/components/`: focused laboratory presentation components.
+- `src/features/lab/hooks/useEquipmentInteraction.ts`: shared pointer/keyboard interaction.
+- `src/features/lab/interactions/`: bench coordinate conversion and geometry tests.
+- `src/features/lab/renderers/`: semantic reaction effect visuals and presentation descriptions.
+- `src/store/labWorkspace.ts`: pure equipment/container state transitions and unit tests.
+- `src/types/equipment.ts`: stable equipment IDs/types and normalized positions.
+- `src/types/container.ts`: container associations and chemical portions.
+- `src/types/heating.ts`: lamp status and source-associated container heating state.
+- `src/features/lab/hooks/useHeatReactions.ts`: cancellable per-container delay orchestration.
+- `src/simulation/heating/`: pure logical zone evaluation.
+- `src/simulation/chemicals/`: the specified catalog and pure portion additions.
+- `src/simulation/reactions/`: typed R1–R8 rules, products and semantic effects.
+- `src/simulation/engine/`: pure deterministic reaction evaluation and unit tests.
 - `src/styles/tokens.css`: shared colors, spacing, radii, and typography defaults.
 - `src/styles/global.css`: base styles and responsive laboratory layout.
 - `tests/setup.ts`: jsdom assertions and cleanup for React Testing Library.
-- `src/simulation/AGENTS.md`: existing instructions for future simulation work.
+- `src/simulation/AGENTS.md`: chemistry/domain boundary instructions.
 
 Use functional React components, strict TypeScript, and plain CSS with shared
-tokens. No store or simulation implementation exists in M0. Preserve the
+tokens. M8 continues SVG/CSS and the page-local React reducer with no new dependencies. Preserve the
 dependency direction: Presentation → Application state → Simulation → Domain data.
 Create additional folders only when their code is needed.
 
-The desktop layout prioritizes the laboratory workspace. Side panels stack at
-narrow widths. The shell includes semantic landmarks, a keyboard skip link,
-visible focus styles, and readable empty states; no interactive experiment is
-available yet.
+The desktop layout prioritizes the laboratory workspace.
+On large desktops, wider tools/observation panels scroll independently;
+at 901–1199px the observation region moves below the tools and workspace. The
+bench has its own bounded height so changing selection or reaction details does
+not resize it. Equations stay on one line with local scrolling when necessary.
+At widths up to 900px,
+the Equipment & Chemicals palette becomes a collapsible sticky bar above the
+bench. Its content has a bounded height and scrolls internally for longer lists;
+The chemical catalog shares this scrollable panel. Tap/click or Enter adds
+equipment; on narrow touch screens vertical swipes scroll tools, and dragging
+on the bench moves placed equipment. Escape closes the tools and restores toggle
+focus when no drag is active. The bench is a single flat surface with a subtle
+square grid. The shell includes semantic landmarks, a keyboard skip link,
+visible focus styles, and readable empty states. Equipment positions adapt to
+the bench size and stay within its bounds. Overlapping equipment is allowed;
+the selected instance appears above other equipment. Liquid portions use separate
+representative bands, and solids use textured sample shapes. These do not represent
+reaction products or physically accurate layering. Visual levels are capped;
+the details panel retains the simplified quantity counts. After a successful Mix,
+a neutral representative liquid and semantic effect overlays illustrate the result.
+The drawing is qualitative, without concentration, duration or yield calculations.
+The refined M4 visuals add translucent liquid surfaces and textured solid samples.
+An enlarged selected-sample view reuses the same renderer in the observation panel.
+Click its close-up button to open a presentation-sized native dialog with the
+sample and existing reaction details; Close, Escape or the backdrop dismiss it
+and return focus. The dialog changes no experiment data.
+Precipitate clouds form and flocs settle into a visible deposit; gas bubbles rise
+to the actual drawn liquid surface and fade with small rings. R6 keeps clear liquid
+and uses an explicitly explained thermometer symbol, without a measured temperature,
+steam or solution color change. Motion and geometry illustrate the registered
+observation rather than physical settling times or individual product morphology.
+Gas bubbles repeat while that result is displayed, and persist when moving a
+container or showing its drag preview. Reduced-motion preferences disable effect
+animation while retaining static shapes and textual observations. Each equipment
+instance exposes its result through an accessible description. Clear/add/reset
+remove the corresponding effects and educational result.
 
 The M0 ExecPlan and validation record live in `plans/m0-project-foundation.md`.
+The M1 implementation and validation record live in
+`plans/m1-interactive-laboratory-workspace.md`.
+The M2 implementation and validation record live in
+`plans/m2-container-and-chemical-system.md`.
+The M3 implementation and validation record live in `plans/m3-reaction-engine.md`.
+The M4 implementation and validation record live in `plans/m4-reaction-visualization.md`.
+The M5 implementation and validation record live in `plans/m5-alcohol-lamp-and-heating.md`.
+The M6 implementation and validation record live in `plans/m6-heat-reactions.md`.
+The M7 implementation and validation record live in `plans/m7-teaching-ux.md`.
+The M8 implementation, acceptance and browser-verification limits live in `plans/m8-polish.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

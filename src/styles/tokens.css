@@ -1,7 +1,7 @@
 :root {
   font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #263e38;
-  background: #f4f6f3;
+  color: var(--color-text);
+  background: var(--color-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

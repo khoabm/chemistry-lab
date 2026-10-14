@@ -11,7 +11,7 @@ describe('laboratory foundation', () => {
     expect(screen.getByRole('main')).toHaveAttribute('id', 'laboratory')
     expect(screen.getByRole('complementary', { name: 'Lab materials' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Laboratory workspace' })).toBeInTheDocument()
-    expect(screen.getByRole('complementary', { name: 'Observations' })).toBeInTheDocument()
+    expect(screen.getByRole('complementary', { name: 'Experiment' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Skip to laboratory' })).toHaveAttribute('href', '#laboratory')
   })
 
@@ -19,11 +19,19 @@ describe('laboratory foundation', () => {
     render(<App />)
 
     const materials = screen.getByRole('complementary', { name: 'Lab materials' })
-    expect(within(materials).getByText('No equipment available yet.')).toBeInTheDocument()
-    expect(within(materials).getByText('No chemicals available yet.')).toBeInTheDocument()
-    expect(within(materials).queryByRole('button')).not.toBeInTheDocument()
+    const equipment = within(screen.getByRole('region', { name: 'Equipment' }))
+    expect(equipment.getAllByRole('button')).toHaveLength(3)
+    for (const name of ['Beaker', 'Test tube', 'Alcohol lamp']) {
+      expect(equipment.getByRole('button', { name: `Add ${name}` })).toBeEnabled()
+    }
+    expect(equipment.queryByRole('button', { name: 'Add Dropper', hidden: true })).not.toBeInTheDocument()
+    expect(equipment.queryByText('Dropper')).not.toBeInTheDocument()
+    expect(within(materials).getByRole('button', { name: 'Add Beaker' })).toBeEnabled()
+    expect(within(screen.getByRole('region', { name: 'Chemicals' })).getAllByRole('button')).toHaveLength(11)
+    expect(within(materials).getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     expect(screen.getByText('Empty workspace')).toBeInTheDocument()
-    expect(within(screen.getByRole('complementary', { name: 'Observations' })).getByText(/No observations yet/)).toBeInTheDocument()
+    expect(within(screen.getByRole('complementary', { name: 'Experiment' })).getByText(/No observations yet/)).toBeInTheDocument()
+    expect(screen.getByText(/Press Mix, or use a lit alcohol lamp/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset lab' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: /mix|heat/i })).not.toBeInTheDocument()
   })
