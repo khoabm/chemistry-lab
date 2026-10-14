@@ -79,6 +79,14 @@ the bench. Give action buttons/Help at least a 44px target height. Focus rings
 inside scrolling regions must remain visible. Equations are named, focusable
 regions so keyboard users can reach and scroll them without moving equipment.
 
+M8 workspace emphasis: statically scale only the SVG directly inside placed
+workspace equipment by 20%, around its center. Keep the existing button footprint,
+labels/selection, normalized positioning, drag offsets and heating zone unchanged.
+Palette/drag preview/close-up/dialog drawings retain their sizes. Reduce grid-line
+opacity from 12% to 6%, preserving its spacing and bench background. This visual
+scale is not an animation or a larger logical interaction area; existing desktop,
+narrow and short-landscape layouts/breakpoints remain unchanged.
+
 ---
 
 ## 4. Header
@@ -291,6 +299,13 @@ animated flame and a dashed, pointer-transparent aiming zone above them. Place
 the center of a beaker/test tube inside the zone using existing drag or arrow-key
 movement. Show a warm container glow, a Heating badge and a textual status. Empty
 containers also heat; droppers and lamps cannot be heated containers.
+
+M8 heating-cue refinement: flame is the visible lit-lamp cue; omit its redundant
+Lit badge. Keep Off for extinguished lamps. The dashed/tinted zone remains as a
+spatial guide without Heat zone text. Keep one Heating label on each actively
+heated container. Existing hidden aria-describedby lamp/heating descriptions,
+equipment names, SVG glow/reaction effects and panel statuses remain unchanged.
+No zone geometry, timing, interaction or simulation behavior changes.
 
 The simplified zone uses normalized bench coordinates: horizontally +/-0.07 from
 the lamp, vertically 0.16–0.30 above it, clipped to usable bench bounds. It denotes

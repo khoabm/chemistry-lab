@@ -35,6 +35,18 @@ primary; Empty, Extinguish, Reset and dialog Close are secondary. Reuse existing
 palette tokens, sizing, focus and motion rules. Change only classes/styles, never
 handlers, disabled predicates, timers, simulation, tabs, palette or workspace.
 
+Workspace-dominance follow-up: enlarge only placed equipment SVGs by a static
+20% CSS scale and halve workbench grid opacity from 12% to 6%. Keep the 88x126
+button/interaction footprint, normalized anchors, labels/selection, SVG viewBox,
+palette/preview/close-up/dialog, keyboard steps and heating geometry unchanged.
+Verify normal desktop with multiple items, narrow and short-landscape browser
+flows before deciding whether a scoped narrow exception is necessary.
+
+Heating-cue simplification: remove the lit-lamp Lit badge and the Heat zone text.
+Retain flame, the existing dashed/tinted zone and one container Heating label;
+keep Off for extinguished lamps. Preserve hidden aria-describedby lamp/heating
+state, all SVG/effect visuals and all geometry/state/heat timing/interaction code.
+
 Implement a bounded M8 polish pass: accessible equation scrolling and chemical
 metadata, derived live contents feedback, consistent control/focus/pressed states,
 reduced-motion-aware transitions, short-screen responsive bench sizing, memoized
@@ -98,6 +110,13 @@ regions, restrained color/border transitions only without reduced-motion, and
 clear pressed/selected feedback without scaling/position animation. A short-height
 media query reduces narrow bench height; logical positions and heating zones stay
 unchanged. Preserve desktop geometry, sticky bounded tools and local equation scroll.
+
+For workspace emphasis, use a static scale(1.2) on
+.workspace-equipment > .equipment-visual only. It does not change SVG flow or
+the parent's inline 88x126 footprint/translate positioning used by dragging and
+heating-zone presentation. Existing SVG pointer-events remain none. Labels and
+selection frames are unchanged; all other drawing contexts retain their sizing.
+Grid line alpha changes from 0.12 to 0.06 with the same 48px spacing/background.
 
 ## Data model
 
@@ -174,6 +193,12 @@ remain intact. Optional sound is excluded; multi-engine QA is limited by availab
 - [x] Inspect M8 branch, existing action usage, CSS/tokens and disabled behavior.
 - [x] Apply shared action hierarchy and add semantic styling/regression assertions.
 - [x] Validate action hierarchy and synchronize outcomes.
+- [x] Read workspace sizing/geometry/heating implementation and verify clean M8 branch.
+- [x] Apply scoped SVG scale/grid refinement and verify responsive interaction.
+- [x] Run validation and record workspace-dominance outcome.
+- [x] Inspect M8 branch, heating presentation/state tests and accessible descriptions.
+- [x] Remove redundant visible heating labels and update label-specific assertions.
+- [x] Validate heating-cue simplification and record browser/results.
 
 ## Surprises and discoveries
 
@@ -206,6 +231,91 @@ timeouts or omit tests.
 - Memoize only the shared SVG hot path; keep existing components/state architecture.
 
 ## Outcomes and retrospective
+
+### Workspace heating-cue simplification — 2026-10-13
+
+LabWorkspace no longer renders Lit for a burning lamp; flame remains the main
+lit-state cue. Off remains for an extinguished lamp. Each actively heated
+container retains one visible Heating badge. HeatingZone renders its existing
+dashed/tinted rectangle without Heat zone text. Removed only the now-unused
+zone-text CSS and empty-zone content centering. Border/fill, dimensions and all
+inline geometry calculations are unchanged. EquipmentVisual, including existing
+flame/glow/reaction drawing and motion, is unchanged.
+
+The existing visually-hidden aria-describedby text still announces Lamp lit /
+Lamp extinguished and Heating over a lit alcohol lamp. Equipment names and
+keyboard descriptions remain intact. No accessible state was removed with the
+decorative zone text, which was already aria-hidden. No new badge, animation,
+state, dependency, geometry adjustment or interaction code was introduced.
+
+Updated existing M5 LabPage assertions for absence of Lit/Heat zone, retained
+flame/zone/Off, exactly one Heating label and its removal/accessibility update
+on leaving the zone. Original state/timing/renderer/pointer/keyboard tests are
+unchanged. Full npm test -- --maxWorkers=2 passes 269 tests in 18 files (62.41s).
+npm run typecheck, npm run lint (zero warnings), npm run build and git diff
+--check pass. Build transforms 48 modules; CSS 21.98 kB / JS 267.42 kB.
+
+Desktop in-app browser QA at 1280x900 used a lit lamp, a CuCO3 test tube in its
+zone and a nearby blue beaker. Flame and spatial rectangle remain visible,
+names/selection are readable and the only state badge is Heating. Read DOM
+descriptions confirm the hidden lamp/heating state. The pending Heat check still
+produces the registered R7 outcome. Extinguishing removes flame/zone/Heating and
+restores Off. No horizontal page overflow (1265/1265) or console warnings/errors.
+Proof image m8-heating-cues.jpg is saved outside the repository in the task
+visualization directory. Temporary viewport was reset and QA tab closed; the
+user's server was unchanged. Additional engines/physical touch were not tested.
+
+Baseline is M8/3f7881f with authorized pending equipment-scale/grid work preserved.
+Hash comparison confirms only LabWorkspace.tsx, HeatingZone.tsx, LabPage.test.tsx
+and global.css changed under src for this task. Store/simulation/heat hooks,
+positioning, EquipmentVisual/renderers, tabs, palette, actions and all remaining
+source are unchanged. UI_UX and this plan reflect the reduced label hierarchy.
+Active/required/current remain M8. No commit, push, merge or milestone advancement.
+
+### Workspace visual dominance — 2026-10-13
+
+Only global.css changed under src: placed SVG scale(1.2) with centered origin,
+and grid line opacity 12% to 6%. No SVG/viewBox, React component, effect/timing,
+state/geometry/heating, preview, palette, tabs, actions or typography changes.
+Hash comparison against the clean M8/3f7881f baseline confirms every source file
+except global.css unchanged. UI_UX and this plan describe the refinement.
+
+Browser measurements at 1280x900 before/after confirmed the selected button stays
+88x126 with identical inline coordinates, while its SVG rect changes from
+80.4x84 to 96.48x100.8 (20%). Palette SVGs stay 80x65, close-up 285.6x164 and
+dialog drawing 568x432. The preview keeps its independent styling/footprint;
+the workspace-only selector does not match it. Label/selection dimensions and
+SVG pointer-event behavior are unchanged. The grid remains a visible but quieter
+spatial reference. Four placed items are readable and balanced on desktop.
+
+| Browser QA | Result |
+| --- | --- |
+| Desktop 1280x900 with two beakers, tube and lamp | PASS; bench drawings more prominent than palette, selection/labels retained |
+| Native pointer drag | PASS; Beaker 2 retained ID and selection, moved across bench using unchanged footprint |
+| Narrow 320x700 | PASS; page client/scroll width 305/305, four items usable and keyboard movement retained |
+| Keyboard | PASS; three ArrowUp presses changed tube y from 0.40 to 0.28, existing 0.04 steps |
+| Landscape 844x390 | PASS; existing 300px bench, page client/scroll width 829/829, coherent tube/lamp Heat placement |
+| Heat/cooling | PASS; pending -> registered CuCO3 result/black solid; extinguishing removes glow while keeping products/result |
+| Console | No application warnings/errors |
+
+No narrow size exception or breakpoint change was necessary. Existing equipment
+overlap remains permitted and users can reposition items with normal controls;
+no automatic rearrangement was introduced. A late browser selector timeout was
+resolved by checking fresh accessibility state and selecting the existing tube
+with the documented native tab API. Final cooling/result state was confirmed.
+Only the available in-app browser was tested; physical touch/additional engines
+were not exercised. Temporary viewport override was reset, the QA tab closed,
+and the user's development server left untouched. Proof images
+m8-workspace-desktop.jpg, m8-workspace-narrow.jpg and m8-workspace-landscape.jpg
+are saved outside the repository in the task visualization directory.
+
+Existing tests already cover placement, selection, pointer/keyboard movement,
+responsive geometry and heating. No brittle CSS/color/pixel assertions or new
+test changes were needed. npm test -- --maxWorkers=2 passes all 269 tests in
+18 files (64.43s); npm run typecheck, npm run lint (zero warnings), npm run build
+and git diff --check pass. Build transforms 48 modules; CSS 22.07 kB / JS
+267.46 kB. Active/required/current branch remain M8. No dependency, commit,
+push, merge or milestone advancement occurred.
 
 ### Experiment action hierarchy — 2026-10-13
 

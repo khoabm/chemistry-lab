@@ -12,5 +12,5 @@ export function HeatingZone({ position }: { position: Point }) {
     left: anchor.left, top: anchor.top,
     width: `calc(${width * 100}% - ${width * equipmentFootprint.width}px)`,
     height: `calc(${height * 100}% - ${height * equipmentFootprint.height}px)`,
-  }}><span>Heat zone</span></div>
+  }} />
 }

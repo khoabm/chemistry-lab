@@ -78,8 +78,8 @@ export function LabWorkspace({
               contents={container?.contents} reactionResult={container?.reactionResult ?? null}
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
             <span>{label}</span>
-            {(lamp || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">
-              {lamp ? lamp.status === 'lit' ? 'Lit' : 'Off' : 'Heating'}
+            {(lamp?.status === 'extinguished' || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">
+              {lamp ? 'Off' : 'Heating'}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
               {lamp ? `Lamp ${lamp.status}. Select to ignite or extinguish.` : container?.heatingState.status === 'heating' ? 'Heating over a lit alcohol lamp. ' : ''}

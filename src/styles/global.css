@@ -150,7 +150,7 @@ h3 { font-size: 14px; font-weight: 600; }
   border: 1px solid #d6dfd3;
   border-radius: var(--radius-panel);
   background: var(--color-bench);
-  background-image: linear-gradient(rgb(128 148 125 / 12%) 1px, transparent 1px), linear-gradient(90deg, rgb(128 148 125 / 12%) 1px, transparent 1px);
+  background-image: linear-gradient(rgb(128 148 125 / 6%) 1px, transparent 1px), linear-gradient(90deg, rgb(128 148 125 / 6%) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 .workspace-empty { max-width: 380px; padding: var(--space-6); text-align: center; }
@@ -226,6 +226,8 @@ h3 { font-size: 14px; font-weight: 600; }
   background: transparent;
 }
 .workspace-equipment { position: absolute; z-index: 1; cursor: grab; touch-action: none; user-select: none; }
+/* Enlarge only the bench drawing; preserve the button's interaction footprint. */
+.workspace-equipment > .equipment-visual { transform: scale(1.2); transform-origin: center; }
 .workspace-equipment:hover { background: rgb(255 254 250 / 40%); }
 .workspace-equipment.is-selected { z-index: 3; border-color: #829b7b; background: rgb(255 254 250 / 55%); }
 .workspace-equipment.is-moving { opacity: 0.35; }
@@ -307,8 +309,7 @@ h3 { font-size: 14px; font-weight: 600; }
 .heating-status { margin: var(--space-3) 0; font-size: 13px; line-height: 1.6; }
 .heating-status .is-heating { color: #80541c; font-weight: 600; }
 .equipment-state { position: absolute; top: 0; right: 0; padding: 2px 5px; border-radius: 4px; background: #f9ebcd; color: #80541c; font-size: 10px; pointer-events: none; }
-.heating-zone { position: absolute; z-index: 0; border: 1px dashed #ae7d38; border-radius: 8px; background: rgb(231 177 93 / 9%); pointer-events: none; display: grid; place-items: center; }
-.heating-zone span { font-size: 9px; color: #80541c; text-align: center; }
+.heating-zone { position: absolute; z-index: 0; border: 1px dashed #ae7d38; border-radius: 8px; background: rgb(231 177 93 / 9%); pointer-events: none; }
 .lamp-flame { transform-box: fill-box; transform-origin: bottom; animation: flame-flicker 900ms ease-in-out infinite alternate; }
 .container-heat-glow { animation: heating-glow 1.8s ease-in-out infinite alternate; }
 @keyframes flame-flicker { to { transform: scaleX(0.88) scaleY(1.06); opacity: 0.88; } }
