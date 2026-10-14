@@ -12,6 +12,12 @@ all registered Mix/Heat behavior.
 
 ## Scope
 
+Experiment readability polish: modestly increase important sample/lamp state,
+chemical entries and educational result text using scoped plain CSS. Keep
+secondary operational guidance quieter and reduce only local excess spacing.
+Preserve panel dimensions/layout, Sample/Result semantics, actions, equation
+scrolling/focus, dialog styling and all behavior. No global typography changes.
+
 User-authorized addition on 2026-10-13: refactor only the right panel into
 Experiment with Sample/Result tabs. Keep Sample manipulation/close-up separate
 from returned result text. Defaults/invalidation/selection return to Sample;
@@ -186,6 +192,10 @@ remain intact. Optional sound is excluded; multi-engine QA is limited by availab
 
 ## Progress
 
+- [x] Verify clean M8 branch and inspect Experiment components/shared CSS/dialog.
+- [x] Apply scoped panel typography hierarchy and local spacing refinements.
+- [x] Validate existing panel flows, responsive browser QA and final outcomes.
+
 - [x] Read instructions/docs, inspect source/stack and verify clean M8 branch.
 - [x] Create ExecPlan before implementation.
 - [x] Implement accessible metadata/equation/sample feedback with tests.
@@ -243,6 +253,10 @@ timeouts or omit tests.
 
 ## Decision log
 
+- Scope readability overrides to the existing panel's direct tab/lamp/content
+  roots, excluding its detail-dialog sibling. Shared renderers and global text
+  stay unchanged, without new typography infrastructure or component wrappers.
+
 - Keep audio absent: optional sound is unnecessary for classroom usability and
   would add scope without a concrete need.
 - Derive live feedback from container state: repeated additions announce changed
@@ -253,6 +267,57 @@ timeouts or omit tests.
   keep focus-visible independent and preserve interaction geometry/renderer data.
 
 ## Outcomes and retrospective
+
+### Experiment readability polish — 2026-10-14
+
+Verified clean M8/required M8 at HEAD e816985 before implementation. Retained
+React/TypeScript/Vite, plain CSS/tokens, native interactions and Vitest/RTL.
+Only global.css, UI_UX and this ExecPlan changed; source-file hash comparison
+confirmed every component/hook/store/simulation/domain file is unchanged.
+No new dependencies, state/types, wording, actions or architecture changes.
+
+Panel-scoped styles strengthen lamp/heating state to 15px medium (active heating
+remains semibold), chemical names to 14px semibold and quantities to 13px normal
+text color. Heat-evaluation feedback is 14px muted. Educational Result bodies
+and equations use 15px/1.65, with an 18px reaction name and 11px accent labels.
+No-reaction message is 15px medium, with 14px muted guidance; operational captions
+are 13px muted. Keep all existing text and status/tab/heading/region semantics.
+Sample top padding drops 24 -> 16px and action top spacing 16 -> 12px; retain
+contents/result group spacing and all action variants/target dimensions.
+
+Overrides are bounded to existing direct panel children. The shared detail modal
+retains its original 13px heating text, 12px guidance, 16px result body and 17px
+reaction name, verified in browser. Global empty-caption, palette/workspace,
+equipment scale/selection, effects and page typography remain intact. Equation
+nowrap/overflow/tabindex/focus rules, panel width/height/breakpoints and behavior
+are unchanged. Existing tests were retained; no font/color/pixel tests added.
+
+Available in-app browser QA covered filled two-chemical Sample, successful Mix
+Result, no-reaction Result, Ignite/Extinguish, manual tabs/availability dot and
+detail-dialog opening/closing. Results auto-opened Result; current state is
+clearer and secondary guidance remains quieter. Desktop panel height stays
+bounded; mobile/landscape use the existing auto-height layout. At 320x700, page
+client/scroll width was 305/305 and panel width 271/271. The equation remained
+keyboard-focusable, with nonzero local scroll after ArrowRight. Mix/Empty/tabs
+retained 44px target height and fit the panel. At 844x390, page widths were
+829/829 and panel widths 779/779, with no clipping or horizontal overflow and
+the existing short bench preserved. No responsive override was needed.
+Console had no warnings/errors; viewport reset and temporary QA tab closed.
+
+| Validation | Result |
+| --- | --- |
+| npm run typecheck | PASS, exit 0 |
+| npm run lint | PASS, exit 0, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 269 tests in 18 files, 78.77s |
+| npm run build | PASS, 48 modules; CSS 23.71 kB / JS 267.34 kB |
+| git diff --check | PASS |
+
+Existing panel, lamp, delayed Heat/Mix auto-switch, dialog and accessibility
+regressions all pass. Proof images m8-experiment-readability-result.jpg and
+m8-experiment-readability-mobile.jpg are outside the repository in the task
+visualization directory. Additional browser engines, physical touch hardware
+and projector hardware were not exercised. No commits, pushes, merges or
+milestone advancement occurred.
 
 ### Selection versus focus follow-up verification — 2026-10-14
 

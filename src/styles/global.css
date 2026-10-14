@@ -311,6 +311,37 @@ h3 { font-size: 14px; font-weight: 600; }
 .lamp-details .action-button { margin-top: var(--space-3); }
 .heating-status { margin: var(--space-3) 0; font-size: 13px; line-height: 1.6; }
 .heating-status .is-heating { color: #80541c; font-weight: 600; }
+
+/* Experiment typography stays local; shared detail-dialog styles remain intact. */
+.lab-observations > .experiment-tabpanel .container-details { padding-top: var(--space-4); }
+.lab-observations > .experiment-tabpanel .container-details h3,
+.lab-observations > .lamp-details h3,
+.lab-observations > .container-details h3 { font-size: 15px; line-height: 1.5; }
+.lab-observations > .lamp-details > [role='status'],
+.lab-observations > .experiment-tabpanel .heating-status > p:first-child {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.lab-observations > .experiment-tabpanel .heating-status > .is-heating { font-weight: 600; }
+.lab-observations > .experiment-tabpanel .heating-status > [aria-label='Heat evaluation'] {
+  margin-top: var(--space-1);
+  font-size: 14px;
+  color: var(--color-muted);
+}
+.lab-observations > .experiment-tabpanel .contents-list strong { font-size: 14px; font-weight: 600; }
+.lab-observations > .experiment-tabpanel .contents-list span { font-size: 13px; line-height: 1.5; color: var(--color-text); }
+.lab-observations > :not(.sample-detail-dialog) .empty-caption,
+.lab-observations > .experiment-tabpanel .sample-closeup-label,
+.lab-observations > .observation-empty p { font-size: 13px; line-height: 1.6; }
+.lab-observations > .experiment-tabpanel .container-actions .action-button { margin-top: var(--space-3); }
+.lab-observations > .experiment-tabpanel .mix-result { font-size: 15px; line-height: 1.6; font-weight: 500; }
+.lab-observations > .experiment-tabpanel .mix-result > span { font-size: 13px; font-weight: 400; color: var(--color-muted); }
+.lab-observations > .experiment-tabpanel .reaction-name { font-size: 18px; line-height: 1.5; }
+.lab-observations > .experiment-tabpanel .reaction-details dt { font-size: 11px; color: var(--color-accent); }
+.lab-observations > .experiment-tabpanel .reaction-details dd { font-size: 15px; line-height: 1.65; }
+.lab-observations > .experiment-tabpanel .no-reaction-guidance { font-size: 14px; line-height: 1.6; }
+
 .equipment-state { position: absolute; top: 0; right: 0; padding: 2px 5px; border-radius: 4px; background: #f9ebcd; color: #80541c; font-size: 10px; pointer-events: none; }
 .heating-zone { position: absolute; z-index: 0; border: 1px dashed #ae7d38; border-radius: 8px; background: rgb(231 177 93 / 9%); pointer-events: none; }
 .lamp-flame { transform-box: fill-box; transform-origin: bottom; animation: flame-flicker 900ms ease-in-out infinite alternate; }

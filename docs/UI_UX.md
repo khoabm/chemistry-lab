@@ -406,6 +406,15 @@ them.
 
 ## 14. Experiment panel
 
+M8 readability refinement is scoped to panel content, excluding the shared detail
+dialog and global typography. Important lamp/heating state uses 15px medium text;
+sample entries use 14px semibold names and 13px quantities. Result uses an 18px
+reaction name, 15px educational body/equation text and 11px accent section labels.
+No-reaction guidance is 14px; operational captions are quieter 13px muted text.
+Retain semantic groups and result spacing, with slightly less top padding in
+Sample and space above actions to offset the larger text. Preserve panel sizing,
+tabs, action styling, status semantics and local focusable equation scrolling.
+
 The right panel is headed Experiment. Sample and Result tabs appear only when
 a supported container (beaker/test tube) with container state is selected. Lamp
 details, dropper information and the no-selection help appear directly, without
