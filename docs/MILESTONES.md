@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M8 — Polish`
+`M9 — Reaction Dynamics Foundation`
 
 ## Active milestone branch
 
-`M8`
+`M9`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
@@ -419,3 +419,99 @@ Possible work:
 - cross-browser verification
 
 M8 is a refinement milestone, not a feature-expansion milestone.
+
+---
+
+# M9 — Reaction Dynamics Foundation
+
+## Goal
+
+Make the existing registered reaction effects communicate a meaningful,
+scientifically plausible qualitative progression instead of behaving like
+indefinite visual loops.
+
+M9 prioritizes classroom-readable visual behavior and time-compressed
+demonstration. It does not introduce quantitative reaction kinetics.
+
+The approved product and scientific behavior is defined in:
+
+`docs/REACTION_DYNAMICS.md`
+
+## Deliverables
+
+- finite, meaningful dynamics for the existing reaction effects
+- clear distinction between transient reaction activity and persistent final state
+- qualitative effect intensity that respects the registered chemistry
+- correct visual context for gas released from liquid reactions versus heated solids
+- time-compressed presentation without claiming measured reaction duration
+- reduced-motion behavior that preserves the same chemistry meaning
+- synchronized presentation of an existing reaction result without implying a new reaction when another view is opened
+- tests and documentation for the approved behavior
+
+## User-visible result
+
+Existing reactions R1–R8 still follow the same registered chemistry, but their
+visual effects now progress toward a clear final state.
+
+Examples include:
+
+- precipitate forms and settles, leaving a deposit
+- gas evolution rises and then ends instead of looping forever
+- a warming cue is temporary
+- solid transformations reach and retain their final appearance
+- R7 gas release remains less vigorous and visually distinct from R5 bubbling
+
+## Scientific requirement
+
+Qualitative simplification must not produce behavior that contradicts the
+registered reaction.
+
+A visual effect may be time-compressed, but it must preserve the important
+observable meaning, relative registered intensity and physical context described
+in `docs/REACTION_DYNAMICS.md`.
+
+Do not invent quantitative yield, exact duration, exact temperature or kinetics
+that the current simulation model does not support.
+
+## Architectural requirement
+
+Preserve the existing dependency direction and the separation between chemistry
+semantics and presentation.
+
+This milestone specification intentionally does not prescribe the implementation
+architecture or affected source files. Codex must inspect the current repository
+and create an ExecPlan following `.agent/PLANS.md` before implementation.
+
+## Non-goals
+
+Do not add:
+
+- new chemicals or reactions
+- new reaction triggers
+- dropper reagent delivery
+- pouring or liquid transfer
+- exact stoichiometry, concentration, gas volume or precipitate yield
+- exact temperature or realistic reaction kinetics
+- detailed thermodynamics or fluid simulation
+- molecular simulation
+- 3D rendering
+- real experiment video
+- sound
+- backend or persistence
+- broad laboratory UI redesign
+
+## Completion criteria
+
+M9 is complete when:
+
+- all existing R1–R8 chemistry rules remain valid and deterministic
+- R1–R4 show finite precipitate formation/settling and retain the correct final deposit
+- R5 shows finite medium gas evolution from a liquid reaction and eventually stops
+- R6 shows only a finite subtle warming cue without invented gas/steam/precipitate/color change
+- R7 shows persistent green-to-black transformation plus finite low gas release from a heated solid, visually less vigorous than R5
+- R8 shows gradual persistent blue-to-pale/white transformation without adding a new M9 gas/vapor effect
+- transient reaction activity no longer loops indefinitely after completion
+- reopening or re-rendering an existing result does not semantically restart the reaction
+- reduced-motion behavior retains the same educational meaning
+- relevant tests, type checking, linting and build validation pass
+- the M9 ExecPlan and documentation match the delivered implementation
