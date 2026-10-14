@@ -119,6 +119,12 @@ There is only one main laboratory experience.
 
 ## 5. Chemical palette
 
+M8 Lab materials readability uses scoped typography: 14px semibold formula,
+13px medium chemical name and 11px muted state/type metadata, with a 4px text
+gap. Keep card padding, swatches, the single chemical column and bounded scrolling
+unchanged. Section headings use 15px accent text with a restrained 4px additional
+separation before Chemicals, retaining the existing thin divider.
+
 The chemical palette should display available chemicals in an easily
 recognizable manner.
 
@@ -144,6 +150,11 @@ be announced without an additional state or announcement system.
 ---
 
 ## 6. Equipment palette
+
+M8 equipment-card labels use scoped 12px medium text with readable wrapping.
+Preserve drawing size, card padding, existing desktop/narrow columns and the
+current responsive tool-bar behavior. Do not enlarge equipment drawings or
+introduce a second palette structure as part of typography refinement.
 
 Currently visible equipment in the M8 palette:
 

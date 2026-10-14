@@ -269,6 +269,16 @@ h3 { font-size: 14px; font-weight: 600; }
 .chemical-palette-item small { color: var(--color-muted); font-size: 10px; }
 .chemical-swatch { width: 16px; height: 24px; flex-shrink: 0; border: 1px solid #849a84; border-radius: 3px 3px 7px 7px; }
 .chemical-swatch.is-solid { height: 16px; border-radius: 3px; transform: rotate(-12deg); }
+
+/* Lab materials hierarchy; keep card padding, drawings and scrolling unchanged. */
+.lab-palette .palette-section > h3 { font-size: 15px; line-height: 1.5; color: var(--color-accent); }
+.lab-palette .palette-section + .palette-section { margin-top: var(--space-1); }
+.lab-palette .equipment-palette-item > span { font-size: 12px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.lab-palette .chemical-palette-item > span:last-child { gap: var(--space-1); }
+.lab-palette .chemical-palette-item strong { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.lab-palette .chemical-palette-item span span { font-size: 13px; font-weight: 500; line-height: 1.5; }
+.lab-palette .chemical-palette-item small { font-size: 11px; line-height: 1.4; }
+
 .container-details { padding-top: var(--space-5); }
 .contents-list { list-style: none; padding: 0; margin: var(--space-4) 0; display: grid; gap: var(--space-3); }
 .contents-list li { display: grid; gap: 5px; padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }

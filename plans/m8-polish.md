@@ -12,6 +12,18 @@ all registered Mix/Heat behavior.
 
 ## Scope
 
+Repository CI follow-up: add one minimal GitHub Actions validation workflow for
+M* pushes, pull requests and manual dispatch. Use official actions, Ubuntu,
+Node.js 24/npm cache, npm ci and the existing validation commands; cancel older
+runs by workflow/ref and bound the job to ten minutes. No application changes,
+dependencies, deployments or browser E2E. Record local versus hosted results.
+
+Lab materials readability polish: scope modest Equipment/Chemicals heading,
+equipment-label and formula/name/metadata typography refinements to lab-palette.
+Improve local text rhythm/section separation without new controls, columns,
+wrappers or scrolling/state changes. Preserve drawings, card padding, layout,
+all palette interactions and the rest of the UI; no new dependencies.
+
 Experiment readability polish: modestly increase important sample/lamp state,
 chemical entries and educational result text using scoped plain CSS. Keep
 secondary operational guidance quieter and reduce only local excess spacing.
@@ -192,6 +204,14 @@ remain intact. Optional sound is excluded; multi-engine QA is limited by availab
 
 ## Progress
 
+- [x] Verify M8, existing scripts/lockfile/Node engine and absence of equivalent CI.
+- [x] Add minimal CI workflow and a short README note; preserve prior UI work.
+- [x] Validate YAML/local commands and record CI follow-up outcomes.
+
+- [x] Verify clean M8 branch and inspect palette structure, CSS, stack and tests.
+- [x] Apply scoped Lab materials typography/spacing refinements.
+- [x] Validate palette interactions/scrolling, desktop/narrow QA and final outcome.
+
 - [x] Verify clean M8 branch and inspect Experiment components/shared CSS/dialog.
 - [x] Apply scoped panel typography hierarchy and local spacing refinements.
 - [x] Validate existing panel flows, responsive browser QA and final outcomes.
@@ -267,6 +287,80 @@ timeouts or omit tests.
   keep focus-visible independent and preserve interaction geometry/renderer data.
 
 ## Outcomes and retrospective
+
+### Minimal GitHub CI — 2026-10-14
+
+Verified active/required/current M8 at HEAD 7423b9a; no prior workflow exists.
+Preserved the already-authorized uncommitted Lab materials work. Added only
+.github/workflows/ci.yml, a four-line README note and this plan update. Source
+hashes are unchanged since CI task start; package/lockfile/test configuration
+remain untouched. Engine >=24 agrees in package.json and lockfile version 3.
+
+CI uses official checkout@v7/setup-node@v7 stable majors verified against their
+official releases, ubuntu-latest, Node 24, npm caching keyed to package-lock.json
+and npm ci. M* pushes, pull_request and workflow_dispatch trigger one validation
+job, bounded to ten minutes. Workflow/ref concurrency cancels an older run for
+the same ref. Permissions are contents:read; no deployment/E2E/artifacts added.
+
+YAML syntax/unique keys and workflow structure were checked with the existing
+system PyYAML parser (BaseLoader preserves the on key), asserting triggers,
+runtime/cache, commands, concurrency and timeout. No parser dependency was added.
+Local npm run typecheck, npm run lint, npm test -- --maxWorkers=2 (269 tests/18
+files, 41.03s), npm run build and git diff --check all PASS. Local environment:
+Windows, Node 25.2.1/npm 11.6.2; CI is configured for Ubuntu/Node 24.
+
+GitHub-hosted CI has NOT executed and is not reported as passing. Actual
+clean-environment npm ci/action execution still requires a pushed workflow and
+a GitHub Actions run. No commits, pushes, merges or milestone advancement.
+
+### Lab materials readability polish — 2026-10-14
+
+Verified clean active/required/current M8 branch at HEAD 7423b9a. Preserved
+React/TypeScript/Vite, npm, plain CSS/tokens, native pointer interactions and
+Vitest/RTL. Updated only global.css, UI_UX and this plan. Source-file hash
+comparison confirmed all components, hooks, state, domain, simulation and tests
+unchanged. No new dependencies or competing systems.
+
+Scoped every new selector to lab-palette: 12px medium equipment labels, 14px
+semibold formulas, 13px medium names and 11px muted metadata. Text gaps use 4px
+with explicit readable line heights. Section headings use 15px accent text;
+add only 4px before Chemicals while retaining the original thin divider.
+Preserve card padding, drawings/swatches, card-list gaps, current columns,
+responsive tools, focus/disabled styles and scroll-region dimensions/behavior.
+Equipment labels can wrap safely at narrow widths. No markup, accessible labels,
+wording, action handlers or state changes; no brittle style tests added.
+
+In-app desktop QA confirmed click-to-add Beaker, native palette drag of Test tube
+onto the bench, and click-to-add Sodium chloride into the selected test tube.
+The existing status/sample feedback reported the correct placement/contents.
+Headings remain Equipment/Chemicals; all 11 cards are reachable through the
+existing bounded scroll region. Formula/name/metadata have distinct visual
+weight and long names wrap inside the card. Desktop equipment cards remained
+compact (about 107px high); chemical cards about 79px, 98px for the longest name.
+Panel client/scroll width stayed 238/238, page 1265/1265; panel height stayed 590px.
+
+At 320x700 the existing collapsible toolbar, four-column equipment grid and
+single chemical column remain unchanged. Labels fit on one/two lines and every
+card's scroll width fits its client width. Page widths were 305/305, palette
+271/271 and scroll region 256/256. Scrolling reached both equipment and the last
+chemical, with the same bounded height; no responsive exception was needed.
+No console warnings/errors; viewport reset and temporary QA tab closed.
+
+| Validation | Result |
+| --- | --- |
+| npm run typecheck | PASS, exit 0 |
+| npm run lint | PASS, exit 0, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 269 tests in 18 files, 53.11s |
+| npm run build | PASS, 48 modules; CSS 24.31 kB / JS 267.34 kB |
+| git diff --check | PASS |
+
+Existing equipment/chemical interaction, accessibility, heating and reaction
+regressions all pass. Proof images m8-materials-readability-desktop.jpg and
+m8-materials-readability-mobile.jpg are outside the repository in the task
+visualization directory. Additional browser engines, physical touch/projector
+hardware were not exercised. Experiment, workspace, actions, header/help/footer,
+global typography and chemistry are unchanged. No commits, pushes, merges or
+milestone advancement occurred.
 
 ### Experiment readability polish — 2026-10-14
 

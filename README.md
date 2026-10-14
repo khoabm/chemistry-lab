@@ -200,6 +200,10 @@ Open the local URL printed by Vite (normally `http://localhost:5173`).
 | `npm test` | Run the Vitest test suite once |
 | `npm run test:watch` | Run Vitest in watch mode |
 
+GitHub Actions CI runs on pushes to `M*` milestone branches, pull requests and
+manual dispatch. It uses Ubuntu, Node.js 24 and `npm ci`, then runs typecheck,
+lint, `npm test -- --maxWorkers=2` and build.
+
 ## Source and styling conventions
 
 - `src/main.tsx`: browser entry and global styles.
