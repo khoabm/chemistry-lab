@@ -17,7 +17,7 @@ export function LabHelp() {
           <li>Add an alcohol lamp, select it and press Ignite lamp.</li>
           <li>Move the container center into the marked zone above the lit lamp. Wait for the heat result.</li>
         </ol>
-        <p>Move the sample away or extinguish the lamp to stop heating. The dropper can be placed and moved; reagent delivery is not available.</p>
+        <p>Move the sample away or extinguish the lamp to stop heating.</p>
       </section>
       <section aria-labelledby="help-controls-title">
         <h3 id="help-controls-title">Controls and sample labels</h3>

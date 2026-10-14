@@ -47,6 +47,18 @@ Retain flame, the existing dashed/tinted zone and one container Heating label;
 keep Off for extinguished lamps. Preserve hidden aria-describedby lamp/heating
 state, all SVG/effect visuals and all geometry/state/heat timing/interaction code.
 
+Workspace-guidance cleanup: visually hide the existing movement-hint paragraph
+while retaining its ID/text and equipment aria-describedby references. Keep the
+dynamic role=status message and its existing stable minimum height visible.
+Remove stale Dropper placement copy from Help; retain Controls keyboard guidance.
+No timers, state, interaction logic, geometry or other presentation changes.
+
+Selected-equipment refinement: replace whole-button selection fill/border with
+a restrained CSS halo following only the placed SVG silhouette. Keep a weaker
+hover halo, existing keyboard focus outline, selected stacking and moving opacity.
+Preserve button footprint, SVG scale, labels, pointer/keyboard geometry, state,
+heating and reactions. No renderer, interaction or application-state changes.
+
 Implement a bounded M8 polish pass: accessible equation scrolling and chemical
 metadata, derived live contents feedback, consistent control/focus/pressed states,
 reduced-motion-aware transitions, short-screen responsive bench sizing, memoized
@@ -199,6 +211,14 @@ remain intact. Optional sound is excluded; multi-engine QA is limited by availab
 - [x] Inspect M8 branch, heating presentation/state tests and accessible descriptions.
 - [x] Remove redundant visible heating labels and update label-specific assertions.
 - [x] Validate heating-cue simplification and record browser/results.
+- [x] Inspect M8 branch, Help/movement hint references and dynamic status flow.
+- [x] Hide persistent instruction, correct Help and update existing accessibility tests.
+- [x] Validate workspace-guidance cleanup and record results.
+- [x] Verify M8 branch, selected/hover/focus/moving CSS and geometry usage.
+- [x] Replace selection card with SVG halo; strengthen existing selection assertions.
+- [x] Validate selection refinement and record browser observations/outcome.
+- [x] Recheck the reported outer selection rectangle against pointer/keyboard focus.
+- [x] Record follow-up validation and document focus-visible versus selection.
 
 ## Surprises and discoveries
 
@@ -229,8 +249,135 @@ timeouts or omit tests.
   quantities without a second state/announcement system.
 - Extend cancellation rather than implement a second drag system.
 - Memoize only the shared SVG hot path; keep existing components/state architecture.
+- Use a static, workspace-only SVG halo for selection rather than a button fill;
+  keep focus-visible independent and preserve interaction geometry/renderer data.
 
 ## Outcomes and retrospective
+
+### Selection versus focus follow-up verification — 2026-10-14
+
+Re-read AGENTS, milestone, architecture/UX and current source/stack; active,
+required and current branch remain M8 at HEAD 494fac9. Preserved all previously
+authorized uncommitted work. The requested SVG-only selection treatment is
+already implemented: the selected button has transparent border/background and
+only its SVG receives a halo. The visible outer rectangle is the independent
+focus-visible outline, which the user explicitly requires preserving.
+No further CSS, component, hook, renderer, state, test or dependency changes were
+needed. Updated UI_UX and this plan to clarify that distinction.
+
+In-app desktop QA used beaker, test tube, lit lamp and its visible zone. Pointer
+selection showed a clear beaker halo with no outer rectangle and readable label.
+The unselected test tube continued heating. Pointer dragging and Arrow movement
+kept the beaker selected and its 88x126 footprint/scale(1.2) unchanged. Tab then
+focused the unselected test tube: its outline appeared while the beaker remained
+the sole aria-pressed=true equipment, proving focus is independent of selection.
+Hover remains weaker; moving opacity and preview styles remain unchanged. Preview
+does not carry workspace-equipment/is-selected classes and cannot inherit the
+scoped workspace halo. Existing preview/movement/heating tests pass. Console had
+no warnings/errors. No new brittle style tests were added.
+
+| Validation | Result |
+| --- | --- |
+| npm run typecheck | PASS, exit 0 |
+| npm run lint | PASS, exit 0, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 269 tests in 18 files, 58.10s |
+| npm run build | PASS, 48 modules; CSS 21.98 kB / JS 267.34 kB |
+| git diff --check | PASS |
+
+Proof images m8-selection-pointer-recheck.jpg and m8-focus-unselected-recheck.jpg
+are outside the repository in the task visualization directory. Additional
+browser engines and physical touch hardware were not exercised. All interaction
+geometry/state/heat/reaction behavior remains unchanged. No commits, pushes,
+merges or milestone advancement occurred.
+
+### Selected-equipment silhouette polish — 2026-10-14
+
+Verified active/required/current milestone branch M8/M8/M8 at HEAD 494fac9.
+The working tree already contained the authorized workspace-guidance cleanup;
+preserved it. This task changes global.css, existing LabPage selection assertions,
+UI_UX and this plan only. No new dependencies or architecture/state changes.
+
+Removed whole-button hover fill and selected border/fill. A weak static hover
+halo and a stronger selected halo now follow only the placed SVG silhouette.
+Selected stacking remains unchanged; keyboard focus retains its independent
+outline, and moving opacity/preview behavior are unchanged. Existing 88x126
+button/hitbox, scale(1.2), labels, normalized positions, pointer grab offset,
+keyboard steps, heating geometry/timing and reaction renderers remain intact.
+No extra animation or reduced-motion exception was introduced.
+
+Extended existing interaction assertions to check selection switching, exactly
+one pressed equipment button, selection retained after keyboard movement and
+pointer release. No CSS color/pixel tests were added. Existing heating, reaction,
+keyboard/pointer/cancellation and geometry tests all pass.
+
+| Validation | Result |
+| --- | --- |
+| npm run typecheck | PASS, exit 0 |
+| npm run lint | PASS, exit 0, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 269 tests in 18 files, 76.91s |
+| npm run build | PASS, 48 modules; CSS 21.98 kB / JS 267.34 kB |
+| git diff --check | PASS |
+
+Available in-app desktop browser QA confirmed selected beaker, unselected test
+tube and alcohol lamp are readable without selection-card fill. Then ignited the
+lamp and moved CuCO3 into its zone using existing keyboard controls: heating and
+the delayed registered reaction completed, automatically opening Result. Selected
+the other, blue beaker while the test tube continued heating; its green halo
+remained distinct from the warm zone/Heating cue and the Experiment panel showed
+the blue sample. Pointer dragging retained beaker selection and reported movement;
+subsequent Arrow movement retained selection plus clear focus-visible. DOM checks
+confirmed one pressed button, unchanged 88x126 footprint/scale and no horizontal
+overflow (client/scroll width 1265/1265). Console had no warnings/errors.
+
+Proof images m8-object-selection.jpg and m8-object-selection-focus.jpg are saved
+outside the repository in the task visualization directory. Additional browser
+engines, physical touch hardware and OS reduced-motion toggling were not tested.
+No commits, pushes, merges or milestone advancement occurred.
+
+### Workspace instruction/Help cleanup — 2026-10-14
+
+LabWorkspace now applies the existing visually-hidden utility to the static
+equipment-movement-hint paragraph. Its ID, full text and every equipment
+aria-describedby reference are unchanged; no hidden/aria-hidden attribute was
+added. Removed the unused workspace-footnote style. The dynamic workspace-message
+remains visible with role=status, unchanged text/lifecycle/styles and its 32px
+minimum height to stabilize feedback. No timers, fades or extra state.
+
+LabHelp retains Controls instructions for drag, Arrow keys, Shift and Escape.
+Removed only the stale sentence claiming Dropper can currently be placed/moved;
+the sample-away/extinguish heating guidance remains. Palette visibility/internal
+Dropper support are unchanged. UI_UX and this plan reflect this cleanup.
+
+Updated existing LabPage tests for utility-hidden movement text, linked accessible
+description, visible placement/pointer movement/keyboard feedback, and retained
+movement behavior. Existing cancellation/invalid-drop/reset tests continue to
+pass. TeachingUx checks visible keyboard Help, no Dropper offering in Help and
+retained equipment descriptions when Help closes. No new pixel/color tests.
+
+| Validation | Result |
+| --- | --- |
+| npm run typecheck | PASS, exit 0 |
+| npm run lint | PASS, exit 0, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 269 tests in 18 files, 71.64s |
+| npm run build | PASS, 48 modules; CSS 21.87 kB / JS 267.34 kB |
+| git diff --check | PASS |
+| Active/required/current branch | M8/M8/M8 |
+
+In-app desktop browser QA confirmed only the status paragraph remains in normal
+flow under the bench; movement text is absolutely positioned/clipped but still
+included by equipment descriptions. Placement -> Shift/keyboard movement keeps
+the bench height/vertical anchor and 32px feedback row stable. Page client/scroll
+width is 1265/1265. Help exposes keyboard controls, has no Dropper text, and
+closing it preserves equipment positions and status. No console warnings/errors.
+Proof image m8-workspace-feedback.jpg is saved outside the repository in the
+task visualization directory. Temporary tab closed; no viewport override or
+development server change. Additional engines/physical touch were not exercised.
+
+Verified clean M8 baseline 494fac9. Hash comparison confirms source changes only
+in LabWorkspace.tsx, LabHelp.tsx, global.css and their two existing test files.
+useEquipmentInteraction, state/simulation/heat/geometry, keyboard amounts, tabs,
+actions, palette, equipment scale/grid/selection and reaction visuals are intact.
+No dependency, commit, push, merge or milestone advancement occurred.
 
 ### Workspace heating-cue simplification — 2026-10-13
 

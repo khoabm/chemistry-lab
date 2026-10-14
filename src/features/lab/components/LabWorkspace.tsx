@@ -91,7 +91,7 @@ export function LabWorkspace({
         ))}
         <span className="bench-caption" aria-hidden="true">VIRTUAL LABORATORY</span>
       </div>
-      <p id="equipment-movement-hint" className="workspace-footnote">
+      <p id="equipment-movement-hint" className="visually-hidden">
         Drag to move. Arrow keys move focused equipment; Shift moves farther. Escape cancels a drag.
       </p>
       <p className="workspace-message" role="status">{message}</p>

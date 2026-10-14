@@ -561,6 +561,7 @@ describe('laboratory equipment interactions', () => {
     expect(items()[0]).toHaveStyle({ left: 'calc(50% + 0px)', top: 'calc(50% + 0px)' })
     expect(screen.queryByText('Release to place equipment')).not.toBeInTheDocument()
     expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Beaker placed on the bench.')
+    expect(screen.getByRole('status', { name: '' })).toBeVisible()
   })
 
   it('rejects invalid palette drops without accidentally adding equipment', () => {
@@ -588,6 +589,9 @@ describe('laboratory equipment interactions', () => {
     expect(instance).toHaveAttribute('data-equipment-id', id)
     expect(instance).toHaveStyle({ left: 'calc(50% + 0px)', top: 'calc(50% + 0px)' })
     expect(instance).not.toHaveClass('is-moving')
+    expect(instance).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Beaker moved across the bench.')
+    expect(screen.getByRole('status', { name: '' })).toBeVisible()
   })
 
   it('leaves an existing instance in place after an invalid drop', () => {
@@ -659,12 +663,26 @@ describe('laboratory equipment interactions', () => {
   it('supports selection and keyboard movement bounded at the edges', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }), { detail: 0 })
     const first = screen.getByRole('button', { name: 'Beaker 1' })
+    const instructions = screen.getByText('Drag to move. Arrow keys move focused equipment; Shift moves farther. Escape cancels a drag.', { exact: true })
+    expect(instructions).toHaveClass('visually-hidden')
+    expect(instructions).not.toHaveAttribute('aria-hidden', 'true')
+    expect(first.getAttribute('aria-describedby')?.split(' ')).toContain(instructions.id)
+    expect(first).toHaveAccessibleDescription(expect.stringContaining(instructions.textContent ?? ''))
     fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    const second = screen.getByRole('button', { name: 'Test tube 1' })
+    expect(second).toHaveAttribute('aria-pressed', 'true')
+    expect(first).toHaveAttribute('aria-pressed', 'false')
     fireEvent.click(first)
     expect(first).toHaveAttribute('aria-pressed', 'true')
+    expect(second).toHaveAttribute('aria-pressed', 'false')
+    expect(items().filter((item) => item.getAttribute('aria-pressed') === 'true')).toHaveLength(1)
     const before = first.getAttribute('style')
     fireEvent.keyDown(first, { key: 'ArrowRight' })
     expect(first.getAttribute('style')).not.toBe(before)
+    expect(first).toHaveAttribute('aria-pressed', 'true')
+    expect(second).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByRole('status', { name: '' })).toHaveTextContent('Beaker moved. Use arrow keys to adjust its position.')
+    expect(screen.getByRole('status', { name: '' })).toBeVisible()
     for (let count = 0; count < 10; count++) {
       fireEvent.keyDown(first, { key: 'ArrowRight', shiftKey: true })
       fireEvent.keyDown(first, { key: 'ArrowUp', shiftKey: true })

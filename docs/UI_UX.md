@@ -87,6 +87,20 @@ opacity from 12% to 6%, preserving its spacing and bench background. This visual
 scale is not an animation or a larger logical interaction area; existing desktop,
 narrow and short-landscape layouts/breakpoints remain unchanged.
 
+M8 workspace guidance: keep equipment-movement-hint visually hidden with its
+existing text/ID referenced by equipment aria-describedby. Document drag, Arrow
+keys, Shift and Escape in Help. Only the existing live/status workspace message
+occupies the feedback row below the bench; preserve its stable minimum height,
+text and lifecycle. Do not add auto-dismiss, fading or toast behavior.
+
+M8 equipment selection: use a restrained halo following the placed SVG rather
+than a filled/bordered whole-button card. Hover has a weaker halo; keyboard focus
+retains its visible outline and moving equipment retains its existing opacity.
+Keep the button/hitbox, SVG scale, labels, positioning and all interactions intact.
+The outer rectangular outline belongs only to focus-visible, including on an
+unselected item reached by Tab; it is not a selection border. Preserve it for
+keyboard orientation rather than replacing it with the selected SVG halo.
+
 ---
 
 ## 4. Header
@@ -567,8 +581,9 @@ A short non-blocking hint may explain the first interaction.
 Avoid long onboarding flows.
 
 M7 adds a reopenable How to use this lab disclosure below the header. It contains
-short Mix/Heat steps, movement controls, solution/solid label meanings, simplified
-unit limits and the placement-only dropper limitation. It does not block the
+short Mix/Heat steps, movement controls, solution/solid label meanings and simplified
+unit limits. M8 removes the stale Help sentence offering Dropper placement because
+Dropper is hidden from the normal palette. It does not block the
 bench or persist onboarding state. Empty containers explain chemical addition;
 filled unevaluated containers offer Mix/Heat next steps.
 When a Heat check is pending, replace the ready hint with wait guidance and explain
