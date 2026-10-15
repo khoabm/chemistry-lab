@@ -22,8 +22,10 @@ export function LabHeader({ canReset, onReset }: LabHeaderProps) {
         </div>
       </div>
       <div className="header-actions">
-        <span className="preview-label">{t('app.interactive')}</span>
-        <LanguageSelect />
+        <div className="header-preferences">
+          <span className="preview-label">{t('app.interactive')}</span>
+          <LanguageSelect />
+        </div>
         <div className="reset-action">
           <button
             className="action-button action-button--secondary"

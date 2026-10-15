@@ -209,6 +209,8 @@ No:
 - [x] Add locale switching and lifecycle-preservation tests.
 - [x] Validate and browser-QA both locale/fallback paths.
 - [x] Record terminology still awaiting teacher review.
+- [x] Refine shared language utility styling and header grouping; preserve native semantics.
+- [x] Validate focused selector accessibility, lifecycle regressions and responsive browser QA.
 - [ ] User review and milestone approval.
 
 ## Decision log
@@ -227,6 +229,11 @@ No:
   defer broader i18n infrastructure until a concrete need exists.
 - Native modal inertness requires the same global preference control in its header;
   use one shared component/context, not a second preference store.
+- Selector review fix: retain native select/autonyms and its localized label as
+  visually hidden text. Use one compact, transparent utility treatment with a
+  decorative globe/chevron, 44px target and existing focus indication. Group header
+  metadata with the selector; keep dialog Close first in DOM/focus order and more
+  prominent than language. No localization logic or lifecycle changes are needed.
 
 ## Surprises and discoveries
 
@@ -300,3 +307,65 @@ consumption/stoichiometry decisions remain deferred. Work remains uncommitted on
 M10 for user review; no push, merge, pull request or milestone advancement was
 performed. No known blocking validation failure remains; milestone approval is
 the user's decision.
+
+### Language selector UX refinement — 2026-10-15
+
+Starting branch M10, clean tree, HEAD
+`cb66683f8daa0af6f90096eb8143e8f7b8ba503e` (`feat: localization foundation`).
+The foundation has since been published by the user; GitHub push CI run
+`38757496423` completed successfully for that SHA (verified through GitHub's runs
+API). This supersedes the earlier uncommitted-publication status above without
+claiming CI for this new refinement. Publication/merge remains a user decision.
+
+Inspection confirms the stacked label/native field creates unnecessary height and
+visual separation. The refinement changes shared selector markup and scoped CSS,
+plus header utility grouping only. Close/reset semantics, strings, resources,
+provider and reaction/replay/heat ownership remain unchanged. Add focused native
+label/options and shared-header/dialog coverage; retain all existing preservation
+tests.
+
+Delivered one shared transparent native selector with autonyms, decorative SVG
+globe/chevron and visually hidden localized label. The label still names the native
+combobox; SVGs are hidden from accessibility and do not intercept input. Existing
+focus outline remains, contained within the 44px target. Header preference metadata
+and locale now form one utility group aligned with Reset; at mobile width that
+group stacks internally beside Reset and its unchanged hint. The dialog reuses
+the exact selector without changing its component, Close ordering, layout or
+focus/dismissal effect. Close retains its outline while language is visually quieter.
+No package, localization resource, provider, chemistry, timer or replay logic changed.
+The UI specification now records this compact utility treatment.
+
+Added one regression covering both named native selects, autonym option language,
+modal availability, initial Close focus, selector focus through locale switching,
+shared preference/document language and Escape-equivalent cancel/focus restoration.
+All existing localization state/live/replay/Auto/heat regressions remain unchanged.
+
+Final local validation:
+
+- `npm run typecheck`: PASS.
+- `npm run lint`: PASS.
+- `npm test -- --maxWorkers=2 src/localization/localization.test.tsx`: PASS,
+  10 tests / 1 file.
+- `npm test -- --maxWorkers=2`: PASS, 321 tests / 24 files, including all existing
+  320 tests. Existing TEMP/TMP workaround only; no timeout/configuration changes.
+- `npm run build`: PASS, 60 modules transformed.
+- `git diff --check`: PASS (same command-local safecrlf override as above).
+
+Browser QA: the available Codex in-app browser at 1440×960, 980×800, 390×844 and
+844×390. Inspected EN/VI header/dialog, selector weight relative to Reset/Close,
+native ArrowUp selection, contained focus ring, initial Close focus and Escape
+restoration to the actual Result opener. R5 remained active through switching and
+subsequently finished. Manual replay remained running after switching; Auto stayed
+enabled and progressed to final observation hold through further locale changes.
+Workspace gas remained finished during replay. Closing/reopening returned Auto to
+off. No horizontal overflow or control overlap was observed; narrow dialog utility
+controls wrap beside the title and short landscape retains existing vertical scroll.
+The 390px VI header reduced from the first draft's separate reset row to a compact
+two-group arrangement. Desktop screenshots are saved under ignored
+`node_modules/.cache/m10-language-selector-{header,dialog}.png`.
+
+Native option popup styling remains browser/OS-controlled by design. No broad
+multi-browser, physical touch-device, screen-reader or projector QA is claimed;
+the previous reduced-motion verification limits remain. This focused refinement is
+uncommitted and has no new hosted CI result. Branch and active milestone remain
+M10; no commit, push, merge, PR or milestone advancement was performed.

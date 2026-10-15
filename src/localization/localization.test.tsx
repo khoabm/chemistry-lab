@@ -89,6 +89,33 @@ describe('M10 canonical resources and explicit fallback', () => {
 })
 
 describe('runtime localization without laboratory changes', () => {
+  it('keeps named native language controls synchronized in the header and modal, without taking Close focus', () => {
+    render(<LabPage />)
+    const header = screen.getByRole('banner')
+    const headerLanguage = within(header).getByRole('combobox', { name: 'Language' })
+    expect(headerLanguage.tagName).toBe('SELECT')
+    expect(within(headerLanguage).getByRole('option', { name: 'English' })).toHaveAttribute('lang', 'en')
+    expect(within(headerLanguage).getByRole('option', { name: 'Tiếng Việt' })).toHaveAttribute('lang', 'vi')
+    click('Add Beaker'); click('Add Sodium chloride')
+    const opener = screen.getByRole('button', { name: 'Enlarge selected sample' })
+    opener.focus(); fireEvent.click(opener)
+    const dialog = screen.getByRole('dialog', { name: 'Selected sample detail' })
+    const dialogLanguage = within(dialog).getByRole('combobox', { name: 'Language' })
+    expect(dialogLanguage.tagName).toBe('SELECT')
+    expect(dialogLanguage).toBeEnabled()
+    expect(within(dialog).getByRole('button', { name: 'Close' })).toHaveFocus()
+    dialogLanguage.focus()
+    switchTo('vi', dialog)
+    expect(dialogLanguage).toHaveFocus()
+    expect(dialogLanguage).toHaveAccessibleName('Ngôn ngữ')
+    expect(headerLanguage).toHaveValue('vi')
+    expect(headerLanguage).toHaveAccessibleName('Ngôn ngữ')
+    expect(document.documentElement).toHaveAttribute('lang', 'vi')
+    fireEvent(dialog, new Event('cancel', { cancelable: true }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(opener).toHaveFocus()
+  })
+
   it('defaults to English, translates generic VI, retains English chemistry and notation, and updates old feedback without repeating actions', () => {
     render(<StrictMode><LabPage /></StrictMode>)
     expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue('en')

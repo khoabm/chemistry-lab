@@ -690,6 +690,12 @@ remains keyboard-accessible while the background is inert. Keep Close first in
 focus order and restore the actual opener on dismissal. Do not place language
 among Mix/Empty/Replay/Auto controls or create a locale-specific layout.
 
+The shared selector is a compact native utility with a decorative globe/chevron
+and visible language autonym. Keep its localized label visually hidden, its 44px
+target and visible keyboard focus. Header metadata groups with the preference;
+Reset and dialog Close retain their stronger outlined treatment. Narrow layouts
+may wrap the utility group without changing dialog focus order or lifecycle.
+
 English is complete/default; Vietnamese generic UI is incremental. Missing or
 unapproved Vietnamese terminology appears as English, preserving meaningful
 labels rather than raw keys/blank controls. Chemistry notation is unchanged.
