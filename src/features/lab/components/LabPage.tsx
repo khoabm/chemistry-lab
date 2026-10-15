@@ -1,3 +1,4 @@
+import { useLocalization } from '../../../localization/useLocalization'
 import { useReducer } from 'react'
 import { createLabWorkspaceState, labWorkspaceReducer } from '../../../store/labWorkspace'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
@@ -9,8 +10,14 @@ import { LabWorkspace } from './LabWorkspace'
 import { useHeatReactions } from '../hooks/useHeatReactions'
 import { LabHelp } from './LabHelp'
 import { useReactionDynamics } from '../hooks/useReactionDynamics'
+import { LocalizationProvider } from '../../../localization/LocalizationProvider'
 
 export function LabPage() {
+  return <LocalizationProvider><Laboratory /></LocalizationProvider>
+}
+
+function Laboratory() {
+  const { t } = useLocalization()
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
   useHeatReactions(state.containers, dispatch, !!interaction.preview)
@@ -33,7 +40,7 @@ export function LabPage() {
         }
       }}
     >
-      <a className="skip-link" href="#laboratory">Skip to laboratory</a>
+      <a className="skip-link" href="#laboratory">{t('app.skip')}</a>
       <LabHeader canReset={state.equipment.length > 0} onReset={interaction.resetWorkspace} />
       <LabHelp />
       <main id="laboratory" className="lab-layout" tabIndex={-1}>
@@ -54,8 +61,8 @@ export function LabPage() {
         presentation={draggingContainer ? presentations.get(draggingContainer.id) : undefined}
         lampStatus={draggingLamp?.status ?? 'extinguished'} heating={draggingContainer?.heatingState.status === 'heating'} />}
       <footer className="lab-footer">
-        <p>Explore chemistry, one observation at a time.</p>
-        <p>Virtual demonstrations <span aria-hidden="true">·</span> Introductory chemistry</p>
+        <p>{t('app.footer')}</p>
+        <p>{t('app.demonstrations')} <span aria-hidden="true">·</span> {t('app.introductory')}</p>
       </footer>
     </div>
   )

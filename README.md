@@ -99,7 +99,7 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M9 reaction dynamics, extending M8: place and move beakers, test tubes and alcohol lamps.
+M10 localization extends the delivered M9 reaction dynamics: place and move beakers, test tubes and alcohol lamps.
 These three types are exposed by the explicit paletteEquipmentTypes list;
 Dropper remains supported internally but is hidden from the normal 2D palette.
 Drag equipment from the palette onto the bench or click to add it.
@@ -305,6 +305,23 @@ The M6 implementation and validation record live in `plans/m6-heat-reactions.md`
 The M7 implementation and validation record live in `plans/m7-teaching-ux.md`.
 The M8 implementation, acceptance and browser-verification limits live in `plans/m8-polish.md`.
 The M9 design, implementation and validation record live in `plans/m9-reaction-dynamics.md`.
+
+M10 provides English (complete/default) and Vietnamese (incremental) through the
+global Language selector. The same preference is available in Enlarged View's
+header while its native modal makes the outer header inert. Switching changes
+copy and document language only: equipment, contents, selection, results, heating
+waits, live ages and manual/Auto replay continue. Reset lab also preserves language;
+reloading the page defaults to English. Locale is not persisted.
+
+Resources live in `src/localization/en.ts` and `vi.ts`; missing/empty Vietnamese
+values immediately use English. Canonical English chemistry metadata is indexed
+by stable IDs in `src/localization/chemistry.ts`, and recorded result metadata
+remains the English fallback when rendered. Formulas/equations never pass through
+translation. Chemical/product names, R1–R8 names/explanations, phenomenon prose and
+scientific captions remain English pending teacher/SGK review. See
+`docs/LOCALIZATION.md` for the review queue and contribution rules, and
+`plans/m10-localization.md` for implementation/validation. No localization package,
+service, new chemistry behavior or lifecycle system was added.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

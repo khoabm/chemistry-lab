@@ -681,3 +681,20 @@ Place sample
 
 If these actions require extensive explanation, the interaction design should
 be improved before adding more features.
+
+## M10 localization behavior
+
+Use the labeled Language selector in the global header for English/Tiếng Việt.
+Reuse the same preference control beside Close in Enlarged View's header so it
+remains keyboard-accessible while the background is inert. Keep Close first in
+focus order and restore the actual opener on dismissal. Do not place language
+among Mix/Empty/Replay/Auto controls or create a locale-specific layout.
+
+English is complete/default; Vietnamese generic UI is incremental. Missing or
+unapproved Vietnamese terminology appears as English, preserving meaningful
+labels rather than raw keys/blank controls. Chemistry notation is unchanged.
+Switching language preserves equipment/selection/sample/result, current tab,
+heat waits, finite live age and manual/Auto replay sessions. Only copy changes.
+Existing status regions suppress locale-only announcements until a semantic state
+change. Native focus, equation scrolling and responsive dialog/tool scrolling
+remain in place. See `LOCALIZATION.md` for resources and teacher-review terms.

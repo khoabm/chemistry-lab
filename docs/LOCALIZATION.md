@@ -212,3 +212,46 @@ M10 does not introduce:
 
 The objective is a reliable localization foundation with complete English content
 and safe Vietnamese fallback.
+
+## 16. Implemented M10 resources and terminology review
+
+`src/localization/en.ts` is the complete typed UI resource; `vi.ts` supplies partial
+Vietnamese UI overrides and optional chemistry-name/prose dictionaries keyed by
+stable IDs. Omit a Vietnamese entry when it is unapproved; empty/whitespace values
+also fall back to English. Keep interpolation tokens such as `{name}` unchanged.
+Tests validate English completeness, VI placeholder compatibility and registered
+chemistry override IDs. Do not add a UI key without an English value.
+
+`chemistry.ts` reads canonical English chemical/reaction/product metadata into
+presentation indexes. For a recorded result, its supplied name/explanation/product
+name remains the English fallback; localization does not reconstruct chemistry
+from an ID or overwrite stored metadata. Formulas/equations and model IDs stay
+unchanged. `translation.ts` performs bounded lookup/interpolation; the React
+provider owns only the session locale. No package or global mutable locale is used.
+
+Language is a labeled native select in the global header, reused in the enlarged
+dialog header because native modal inertness blocks the outer control. It remains
+separate from experiment/replay actions. Both selects share one preference;
+changing it preserves all mounted state/timer owners. Language autonyms (English,
+Tiếng Việt) and the Web Chemistry Lab brand retain their names. Document `lang`
+follows the preference. Reset preserves it; page reload starts in English.
+Locale-only status updates are quiet; next semantic changes restore polite
+announcements, without timers or remounting status regions.
+
+Intentionally pending teacher/SGK review (English fallback in VI):
+
+- Names for all 11 chemicals in the current catalog, from silver nitrate through
+  copper(II) sulfate pentahydrate; edit `viChemicalNames` by chemical ID.
+- All R1–R8 reaction names and educational explanations; edit `viReactionNames`
+  and `viReactionExplanations` by reaction ID.
+- All registered product names; edit `viProductNames` by product ID.
+- Effect observations (`effect.*`), precipitate/gas/warming/heating legends and
+  scientific captions (`result.*Legend`, `sample.transformedHint`,
+  `sample.quantityHint`, `materials.quantityHint`, `lamp.waitHint`, `help.quantities`,
+  `help.limits`), and Solution/Solid state metadata. Add reviewed values in `vi`.
+- Unsupported-result educational guidance (`result.unsupported`, `result.retry`).
+
+Generic buttons, tabs, equipment labels, instructions, status feedback and replay
+copy are translated. This is not a claim that the pending chemistry vocabulary
+has been approved. Limiting/excess reactants, consumption, post-reaction composition
+and reaction chaining remain deferred; no related behavior was introduced.

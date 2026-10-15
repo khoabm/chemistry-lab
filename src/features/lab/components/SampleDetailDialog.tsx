@@ -1,7 +1,8 @@
+import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { LanguageSelect } from '../../../localization/LanguageSelect'
 import { useEffect, useId, useRef } from 'react'
 import type { ContainerState } from '../../../types/container'
 import type { EquipmentType } from '../../../types/equipment'
-import { equipmentLabels } from '../equipment'
 import { EquipmentVisual } from './EquipmentVisual'
 import { ReactionObservation } from './ReactionObservation'
 import { HeatingStatus } from './HeatingStatus'
@@ -14,9 +15,11 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
   onDismiss: () => void
   presentation?: ReactionPresentation | undefined
 }) {
+  const { t } = useLocalization()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   const replay = useReactionReplay(container, presentation)
+  const replayLive = useStatusLive(replay.autoReplay ? 'auto' : replay.running ? 'playing' : replay.stage === 'final' ? 'complete' : 'idle')
   const hasReplay = container.reactionResult?.status === 'reaction' && container.reactionResult.effects.length > 0
 
   useEffect(() => {
@@ -34,9 +37,12 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
     onClick={(event) => { if (event.target === event.currentTarget) onDismiss() }}>
     <div className="sample-detail-body">
       <header className="sample-detail-header">
-        <div><p className="eyebrow">{equipmentLabels[equipmentType]} · enlarged view</p>
-          <h2 id={titleId}>Selected sample detail</h2></div>
-        <button type="button" className="action-button action-button--secondary" onClick={onDismiss}>Close</button>
+        <div><p className="eyebrow">{t('dialog.enlarged', { equipment: t(`equipment.${equipmentType}`) })}</p>
+          <h2 id={titleId}>{t('dialog.title')}</h2></div>
+        <div className="sample-detail-preferences">
+          <button type="button" className="action-button action-button--secondary" onClick={onDismiss}>{t('action.close')}</button>
+          <LanguageSelect />
+        </div>
       </header>
       <div className="sample-detail-content">
         <div className="sample-detail-demonstration">
@@ -49,30 +55,28 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
             <div className="sample-replay-controls">
               <button type="button" className="action-button action-button--secondary" disabled={!replay.canReplay}
                 aria-describedby={`${titleId}-replay-description`} onClick={() => replay.running ? replay.stop() : replay.start()}>
-                {replay.running ? 'Stop replay' : 'Replay reaction'}
+                {replay.running ? t('replay.stop') : t('replay.start')}
               </button>
               <label><input type="checkbox" checked={replay.autoReplay} disabled={!replay.canReplay}
-                onChange={(event) => event.target.checked ? replay.start(true) : replay.stop()} />Auto replay</label>
+                onChange={(event) => event.target.checked ? replay.start(true) : replay.stop()} />{t('replay.auto')}</label>
             </div>
             <p id={`${titleId}-replay-description`} className="empty-caption">
-              {!replay.canReplay ? 'Live reaction visualization. Replay is available when it finishes.'
-                : replay.stage === 'final' ? replay.autoReplay ? 'Final recorded state — observation hold.' : 'Replay complete — final recorded state.'
-                  : replay.stage ? 'Teaching replay — visual explanation only. The live sample is unchanged.'
-                    : 'Replay the recorded visualization. The live sample stays unchanged.'}
+              {!replay.canReplay ? t('replay.liveHint')
+                : replay.stage === 'final' ? replay.autoReplay ? t('replay.holdHint') : t('replay.completeHint')
+                  : replay.stage ? t('replay.playingHint')
+                    : t('replay.readyHint')}
             </p>
-            {replay.stage && container.reactionResult?.trigger === 'heat' && <p className="empty-caption">
-              This illustrates the recorded heating reaction; it does not heat the live sample.
-            </p>}
-            <p className="visually-hidden" role="status" aria-label="Replay status" aria-live="polite" aria-atomic="true">
-              {replay.autoReplay ? 'Auto replay enabled. Stop replay or turn off Auto replay to finish.'
-                : replay.running ? 'Playing the recorded reaction visualization.' : replay.stage === 'final' ? 'Replay complete.' : ''}
+            {replay.stage && container.reactionResult?.trigger === 'heat' && <p className="empty-caption">{t('replay.heatHint')}</p>}
+            <p className="visually-hidden" role="status" aria-label={t('replay.status')} aria-live={replayLive} aria-atomic="true">
+              {replay.autoReplay ? t('replay.autoAnnouncement')
+                : replay.running ? t('replay.playingAnnouncement') : replay.stage === 'final' ? t('replay.completeAnnouncement') : ''}
             </p>
           </div>}
         </div>
         <div>
           <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
-            : <p className="empty-caption">Starting sample. No reaction result yet; use Mix or heat the container over a lit lamp to check a supported demonstration.</p>}
+            : <p className="empty-caption">{t('dialog.starting')}</p>}
         </div>
       </div>
     </div>

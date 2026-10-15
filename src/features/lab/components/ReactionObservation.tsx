@@ -1,34 +1,37 @@
+import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
 import type { ReactionResult } from '../../../simulation/reactions/types'
 import { describeReactionEffects } from '../renderers/reactionPresentation'
 
 export function ReactionObservation({ result }: { result: ReactionResult | null }) {
+  const { t, reactionName, reactionExplanation, productName } = useLocalization()
+  const resultLive = useStatusLive(result)
   return <div className="reaction-observation">
-    <div className="mix-result" role="status" aria-label={result?.trigger === 'heat' ? 'Heat result' : 'Mix result'} aria-atomic="true">
-      {result?.status === 'reaction' ? <><span>Reaction identified: </span><h3 className="reaction-name">{result.name}.</h3></> : result?.observation}
+    <div className="mix-result" role="status" aria-label={result?.trigger === 'heat' ? t('result.heat') : t('result.mix')} aria-live={resultLive} aria-atomic="true">
+      {result?.status === 'reaction' ? <><span>{t('result.identified')} </span><h3 className="reaction-name">{reactionName(result.reactionId, result.name)}.</h3></> : result ? t('result.noReaction') : null}
     </div>
     {result?.status === 'no-reaction' && <div className="no-reaction-guidance">
-      <p>No registered {result.trigger === 'heat' ? 'Heat' : 'Mix'} demonstration matches this sample. This result does not establish what happens in a real laboratory.</p>
-      <p>Empty this container to try a different sample, or use the other supported trigger. Only predefined reactions are available.</p>
+      <p>{t('result.unsupported', { trigger: result.trigger === 'heat' ? t('action.heat') : t('action.mix') })}</p>
+      <p>{t('result.retry')}</p>
     </div>}
-    {result?.status === 'reaction' && <dl className="reaction-details" aria-label="Reaction details">
-      <div><dt>Observation</dt><dd>{describeReactionEffects(result.effects)}</dd></div>
-      <div><dt>Equation</dt><dd className="reaction-equation" role="region" aria-label="Reaction equation" tabIndex={0}>{result.equation}</dd></div>
-      <div><dt>Explanation</dt><dd>{result.observation}</dd></div>
-      {result.products.length > 0 && <div><dt>Products</dt><dd>{result.products.map((product) => `${product.name} (${product.formula})`).join(' · ')}</dd></div>}
+    {result?.status === 'reaction' && <dl className="reaction-details" aria-label={t('result.details')}>
+      <div><dt>{t('result.observation')}</dt><dd>{describeReactionEffects(result.effects, t)}</dd></div>
+      <div><dt>{t('result.equation')}</dt><dd className="reaction-equation" role="region" aria-label={t('result.equationRegion')} tabIndex={0}>{result.equation}</dd></div>
+      <div><dt>{t('result.explanation')}</dt><dd>{reactionExplanation(result.reactionId, result.observation)}</dd></div>
+      {result.products.length > 0 && <div><dt>{t('result.products')}</dt><dd>{result.products.map((product) => `${productName(product)} (${product.formula})`).join(' · ')}</dd></div>}
       {result.effects.some((effect) => effect.type === 'precipitate') && <div>
-        <dt>Reading the equation</dt><dd>↓ marks a precipitate: an insoluble solid that forms in the solution.</dd>
+        <dt>{t('result.readingEquation')}</dt><dd>{t('result.precipitateLegend')}</dd>
       </div>}
       {result.effects.some((effect) => effect.type === 'gas') && <div>
-        <dt>Reading the equation</dt><dd>↑ marks gas released by the reaction.</dd>
+        <dt>{t('result.readingEquation')}</dt><dd>{t('result.gasLegend')}</dd>
       </div>}
       {result.effects.some((effect) => effect.type === 'temperature-rise') && <div>
-        <dt>Visual cue</dt><dd>The thermometer symbol indicates warming; the solution remains clear. It is not a temperature measurement.</dd>
+        <dt>{t('result.visualCue')}</dt><dd>{t('result.warmingLegend')}</dd>
       </div>}
       {result.effects.some((effect) => effect.type === 'solid-color-change') && <div>
-        <dt>Heating note</dt><dd>Heating time and colors are illustrative; no exact temperature is calculated.</dd>
+        <dt>{t('result.heatingNote')}</dt><dd>{t('result.heatLegend')}</dd>
       </div>}
       {result.effects.some((effect) => effect.type === 'gas' && effect.context === 'heated-solid') && <div>
-        <dt>Visual cue</dt><dd>Outlined particles illustrate gas release; carbon dioxide itself is colorless.</dd>
+        <dt>{t('result.visualCue')}</dt><dd>{t('result.solidGasLegend')}</dd>
       </div>}
     </dl>}
   </div>

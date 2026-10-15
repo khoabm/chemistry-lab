@@ -1,9 +1,12 @@
+import { useLocalization } from '../../../localization/useLocalization'
+import { LanguageSelect } from '../../../localization/LanguageSelect'
 interface LabHeaderProps {
   canReset: boolean
   onReset: () => void
 }
 
 export function LabHeader({ canReset, onReset }: LabHeaderProps) {
+  const { t } = useLocalization()
   return (
     <header className="lab-header">
       <div className="lab-brand">
@@ -14,12 +17,13 @@ export function LabHeader({ canReset, onReset }: LabHeaderProps) {
           </svg>
         </span>
         <div>
-          <p className="eyebrow">A space for discovery</p>
-          <h1>Web Chemistry Lab</h1>
+          <p className="eyebrow">{t('app.tagline')}</p>
+          <h1>{t('app.title')}</h1>
         </div>
       </div>
       <div className="header-actions">
-        <span className="preview-label">Interactive laboratory</span>
+        <span className="preview-label">{t('app.interactive')}</span>
+        <LanguageSelect />
         <div className="reset-action">
           <button
             className="action-button action-button--secondary"
@@ -27,14 +31,12 @@ export function LabHeader({ canReset, onReset }: LabHeaderProps) {
             disabled={!canReset}
             onClick={onReset}
             aria-describedby="reset-lab-hint"
-            title="Remove all equipment, contents, lamps and results."
+            title={t('action.resetTitle')}
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M4 8a6 6 0 1 1 0 5M4 3v5h5" />
-            </svg>
-            Reset lab
-          </button>
-          <p id="reset-lab-hint">Removes all equipment, contents, lamps and results.</p>
+            </svg>{t('action.reset')}</button>
+          <p id="reset-lab-hint">{t('action.resetHint')}</p>
         </div>
       </div>
     </header>

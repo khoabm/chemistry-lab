@@ -1,4 +1,5 @@
 import type { ReactionEffect } from '../../../simulation/reactions/types'
+import { translator, type Translate } from '../../../localization/translation'
 
 // Display colors and wording belong to presentation, never to reaction matching.
 export const precipitateColors = {
@@ -9,13 +10,13 @@ export const precipitateColors = {
 
 export const solidProductColors = { black: '#303330', 'pale-white': '#f2eee4' } as const
 
-export function describeReactionEffects(effects: readonly ReactionEffect[]): string {
+export function describeReactionEffects(effects: readonly ReactionEffect[], t: Translate = translator('en')): string {
   return effects.map((effect) => {
     switch (effect.type) {
-      case 'precipitate': return `A ${effect.color} precipitate forms.`
-      case 'gas': return effect.context === 'heated-solid' ? 'Gas is released from the heated solid.' : 'Gas bubbles are produced.'
-      case 'solid-color-change': return effect.color === 'black' ? 'The solid changes toward black.' : 'The solid becomes much paler or white.'
-      case 'temperature-rise': return 'A subtle temperature rise is indicated; no precipitate or gas forms.'
+      case 'precipitate': return t(`effect.precipitate.${effect.color}`)
+      case 'gas': return t(effect.context === 'heated-solid' ? 'effect.gas.solid' : 'effect.gas.liquid')
+      case 'solid-color-change': return t(`effect.solid.${effect.color}`)
+      case 'temperature-rise': return t('effect.warming')
     }
   }).join(' ')
 }

@@ -1,6 +1,6 @@
+import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
 import type { LabWorkspaceState } from '../../../store/labWorkspace'
 import type { EquipmentType } from '../../../types/equipment'
-import { equipmentLabels } from '../equipment'
 import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { equipmentPositionStyle } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
@@ -19,6 +19,8 @@ export function LabWorkspace({
   presentations,
   interaction: { attachBench, preview, message, getEquipmentHandlers },
 }: LabWorkspaceProps) {
+  const { t, reactionName } = useLocalization()
+  const messageLive = useStatusLive(message)
   // Display ordinals are per type on the current bench, independent of stable IDs.
   const counts = new Map<EquipmentType, number>()
   const labeledEquipment = state.equipment.map((instance) => {
@@ -26,29 +28,29 @@ export function LabWorkspace({
     counts.set(instance.equipmentType, number)
     const container = state.containers.find((item) => item.equipmentInstanceId === instance.id)
     const lamp = state.lamps.find((item) => item.equipmentInstanceId === instance.id)
-    return { instance, container, lamp, label: `${equipmentLabels[instance.equipmentType]} ${number}` }
+    return { instance, container, lamp, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
   })
 
   return (
     <section className="lab-workspace" aria-labelledby="workspace-title">
       <div className="workspace-heading">
         <div>
-          <p className="eyebrow">Explore &amp; observe</p>
-          <h2 id="workspace-title">Laboratory workspace</h2>
+          <p className="eyebrow">{t('workspace.eyebrow')}</p>
+          <h2 id="workspace-title">{t('workspace.title')}</h2>
         </div>
         <span className="workspace-status">
-          {state.equipment.length === 0 ? 'Empty workspace' : `${state.equipment.length} equipment ${state.equipment.length === 1 ? 'item' : 'items'}`}
+          {state.equipment.length === 0 ? t('workspace.empty') : t(state.equipment.length === 1 ? 'workspace.countOne' : 'workspace.countMany', { count: state.equipment.length })}
         </span>
       </div>
       <div
         ref={attachBench}
         className={`workbench${preview ? preview.valid ? ' is-drop-valid' : ' is-drop-invalid' : ''}`}
         role="group"
-        aria-label="Laboratory bench"
+        aria-label={t('workspace.bench')}
       >
         {preview && (
           <p className="bench-drop-feedback">
-            {preview.valid ? 'Release to place equipment' : 'Move onto the bench'}
+            {preview.valid ? t('workspace.release') : t('workspace.moveOnto')}
           </p>
         )}
         {state.equipment.length === 0 && <div className="workspace-empty">
@@ -57,11 +59,9 @@ export function LabWorkspace({
             <span />
             <span />
           </div>
-          <h3>Room for discovery.</h3>
-          <p>Your virtual lab starts with a clear bench.</p>
-          <p className="empty-detail">
-            Drag equipment here, or click an item in the palette to begin.
-          </p>
+          <h3>{t('workspace.emptyTitle')}</h3>
+          <p>{t('workspace.emptyBody')}</p>
+          <p className="empty-detail">{t('workspace.emptyHint')}</p>
         </div>}
         {labeledEquipment.filter(({ lamp }) => lamp?.status === 'lit').map(({ instance }) =>
           <HeatingZone key={`zone-${instance.id}`} position={instance.position} />)}
@@ -83,22 +83,22 @@ export function LabWorkspace({
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
             <span>{label}</span>
             {(lamp?.status === 'extinguished' || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">
-              {lamp ? 'Off' : 'Heating'}
+              {lamp ? t('workspace.off') : t('workspace.heating')}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
-              {lamp ? `Lamp ${lamp.status}. Select to ignite or extinguish.` : container?.heatingState.status === 'heating' ? 'Heating over a lit alcohol lamp. ' : ''}
+              {lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : container?.heatingState.status === 'heating' ? `${t('heat.heating')} ` : ''}
               {container?.reactionResult?.status === 'reaction'
-                ? `${container.reactionResult.name}. ${describeReactionEffects(container.reactionResult.effects)}`
-                : container?.reactionResult?.observation}
+                ? `${reactionName(container.reactionResult.reactionId, container.reactionResult.name)}. ${describeReactionEffects(container.reactionResult.effects, t)}`
+                : container?.reactionResult ? t('result.noReaction') : null}
             </span>
           </button>
         ))}
-        <span className="bench-caption" aria-hidden="true">VIRTUAL LABORATORY</span>
+        <span className="bench-caption" aria-hidden="true">{t('workspace.caption')}</span>
       </div>
-      <p id="equipment-movement-hint" className="visually-hidden">
-        Drag to move. Arrow keys move focused equipment; Shift moves farther. Escape cancels a drag.
+      <p id="equipment-movement-hint" className="visually-hidden">{t('workspace.movementHint')}</p>
+      <p className="workspace-message" role="status" aria-live={messageLive}>
+        {t(message.key, { equipment: message.equipmentType ? t(`equipment.${message.equipmentType}`) : '' })}
       </p>
-      <p className="workspace-message" role="status">{message}</p>
     </section>
   )
 }

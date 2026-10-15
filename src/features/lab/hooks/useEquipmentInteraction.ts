@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, Dispatch } from 'react'
 import type { LabWorkspaceAction, LabWorkspaceState } from '../../../store/labWorkspace'
 import { nextEquipmentPosition } from '../../../store/labWorkspace'
 import type { EquipmentType, Point } from '../../../types/equipment'
-import { equipmentLabels } from '../equipment'
+import type { MessageKey } from '../../../localization/en'
 import { benchPosition, isInsideBench } from '../interactions/workspaceGeometry'
 
 export type EquipmentDragSource =
@@ -23,6 +23,11 @@ interface PointerSession {
   start: Point
   offset: Point
   dragging: boolean
+}
+
+interface WorkspaceMessage {
+  key: Extract<MessageKey, `workspace.feedback.${string}`>
+  equipmentType?: EquipmentType
 }
 
 type EquipmentHandlers = Pick<ButtonHTMLAttributes<HTMLButtonElement>,
@@ -46,7 +51,7 @@ export function useEquipmentInteraction(
   const sessionRef = useRef<PointerSession | null>(null)
   const suppressPointerClickRef = useRef(false)
   const [preview, setPreview] = useState<EquipmentDragPreview | null>(null)
-  const [message, setMessage] = useState('Drag equipment onto the bench, or click to add it.')
+  const [message, setMessage] = useState<WorkspaceMessage>({ key: 'workspace.feedback.initial' })
 
   const attachBench = useCallback((element: HTMLDivElement | null) => {
     benchRef.current = element
@@ -64,7 +69,7 @@ export function useEquipmentInteraction(
   const cancelDrag = useCallback(() => {
     if (sessionRef.current) {
       suppressPointerClickRef.current = true
-      setMessage('Placement cancelled. Equipment is unchanged.')
+      setMessage({ key: 'workspace.feedback.cancelled' })
     }
     clearSession()
   }, [clearSession])
@@ -85,7 +90,7 @@ export function useEquipmentInteraction(
   function resetWorkspace() {
     cancelDrag()
     dispatch({ type: 'reset' })
-    setMessage('Bench cleared. Choose equipment to start again.')
+    setMessage({ key: 'workspace.feedback.reset' })
   }
 
   function getEquipmentHandlers(source: EquipmentDragSource): EquipmentHandlers {
@@ -135,9 +140,9 @@ export function useEquipmentInteraction(
             dispatch(session.source.kind === 'palette'
               ? { type: 'add', equipmentType: session.source.equipmentType, position }
               : { type: 'move', id: session.source.id, position })
-            setMessage(`${equipmentLabels[session.source.equipmentType]} ${session.source.kind === 'palette' ? 'placed on' : 'moved across'} the bench.`)
+            setMessage({ key: session.source.kind === 'palette' ? 'workspace.feedback.placed' : 'workspace.feedback.moved', equipmentType: session.source.equipmentType })
           } else {
-            setMessage('Drop inside the bench. Equipment is unchanged.')
+            setMessage({ key: 'workspace.feedback.invalid' })
           }
         }
         clearSession()
@@ -157,7 +162,7 @@ export function useEquipmentInteraction(
         if (source.kind === 'palette') {
           dispatch({ type: 'add', equipmentType: source.equipmentType,
             position: nextEquipmentPosition(state.equipment.length) })
-          setMessage(`${equipmentLabels[source.equipmentType]} added to the bench.`)
+          setMessage({ key: 'workspace.feedback.added', equipmentType: source.equipmentType })
         } else {
           dispatch({ type: 'select', id: source.id })
         }
@@ -186,7 +191,7 @@ export function useEquipmentInteraction(
           x: instance.position.x + direction.x * step,
           y: instance.position.y + direction.y * step,
         } })
-        setMessage(`${equipmentLabels[instance.equipmentType]} moved. Use arrow keys to adjust its position.`)
+        setMessage({ key: 'workspace.feedback.keyboardMoved', equipmentType: instance.equipmentType })
       },
     }
   }

@@ -1,3 +1,4 @@
+import { useLocalization } from '../../../localization/useLocalization'
 import { chemicals } from '../../../simulation/chemicals/catalog'
 import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 
@@ -7,20 +8,21 @@ interface ChemicalPaletteProps {
 }
 
 export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
+  const { t, chemicalName } = useLocalization()
   return (
     <section className="palette-section" aria-labelledby="chemicals-title">
-      <h3 id="chemicals-title">Chemicals</h3>
+      <h3 id="chemicals-title">{t('materials.chemicals')}</h3>
       <p id="chemical-palette-hint" className="empty-caption">
-        {canAdd ? 'Click a chemical to add 1 unit to the selected container.' : 'Select a beaker or test tube on the bench to add chemicals.'}
+        {canAdd ? t('materials.addChemical') : t('materials.selectContainer')}
       </p>
-      <p className="empty-caption">Solution = liquid sample. Solid = solid sample. Units are illustrative, not mL or mol.</p>
+      <p className="empty-caption">{t('materials.quantityHint')}</p>
       <div className="chemical-palette">
         {chemicals.map((chemical) => (
           <button key={chemical.id} className="chemical-palette-item" type="button"
-            disabled={!canAdd} aria-label={`Add ${chemical.name}`} aria-describedby={`chemical-palette-hint chemical-${chemical.id}-details`}
+            disabled={!canAdd} aria-label={t('action.add', { name: chemicalName(chemical.id) })} aria-describedby={`chemical-palette-hint chemical-${chemical.id}-details`}
             onClick={() => onAdd(chemical.id)}>
             <span className={`chemical-swatch is-${chemical.state}`} style={{ backgroundColor: chemical.color }} aria-hidden="true" />
-            <span id={`chemical-${chemical.id}-details`}><strong>{chemical.formula}</strong><span>{chemical.name}</span><small>{chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample'}</small></span>
+            <span id={`chemical-${chemical.id}-details`}><strong>{chemical.formula}</strong><span>{chemicalName(chemical.id)}</span><small>{chemical.state === 'liquid' ? t('sample.liquidMetadata') : t('sample.solidMetadata')}</small></span>
           </button>
         ))}
       </div>

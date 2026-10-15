@@ -1,5 +1,5 @@
+import { useLocalization } from '../../../localization/useLocalization'
 import type { EquipmentDragPreview as DragPreview } from '../hooks/useEquipmentInteraction'
-import { equipmentLabels } from '../equipment'
 import { equipmentFootprint } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
 import type { ChemicalPortion } from '../../../types/container'
@@ -15,6 +15,7 @@ export function EquipmentDragPreview({ preview, contents, reactionResult = null,
   heating?: boolean
   presentation?: ReactionPresentation | undefined
 }) {
+  const { t } = useLocalization()
   return (
     <div
       className={`equipment-drag-preview ${preview.valid ? 'is-valid' : 'is-invalid'}`}
@@ -24,8 +25,8 @@ export function EquipmentDragPreview({ preview, contents, reactionResult = null,
       <EquipmentVisual equipmentType={preview.source.equipmentType} contents={contents} reactionResult={reactionResult}
         presentation={presentation}
         lampStatus={lampStatus} heating={heating} />
-      <span>{equipmentLabels[preview.source.equipmentType]}</span>
-      <span className="equipment-drag-feedback">{preview.valid ? 'Release to place' : 'Move onto bench'}</span>
+      <span>{t(`equipment.${preview.source.equipmentType}`)}</span>
+      <span className="equipment-drag-feedback">{preview.valid ? t('preview.release') : t('preview.moveOnto')}</span>
     </div>
   )
 }
