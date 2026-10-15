@@ -362,7 +362,7 @@ h3 { font-size: 14px; font-weight: 600; }
   line-height: 1.6;
 }
 .lab-observations > .experiment-tabpanel .heating-status > .is-heating { font-weight: 600; }
-.lab-observations > .experiment-tabpanel .heating-status > [aria-label='Heat evaluation'] {
+.lab-observations > .experiment-tabpanel .heating-status > .heat-evaluation {
   margin-top: var(--space-1);
   font-size: 14px;
   color: var(--color-muted);

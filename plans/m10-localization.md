@@ -211,6 +211,7 @@ No:
 - [x] Record terminology still awaiting teacher review.
 - [x] Refine shared language utility styling and header grouping; preserve native semantics.
 - [x] Validate focused selector accessibility, lifecycle regressions and responsive browser QA.
+- [x] Review M10 boundaries and regressions; fix locale-dependent heat status styling and stale inherited M9 outcome wording.
 - [ ] User review and milestone approval.
 
 ## Decision log
@@ -369,3 +370,44 @@ multi-browser, physical touch-device, screen-reader or projector QA is claimed;
 the previous reduced-motion verification limits remain. This focused refinement is
 uncommitted and has no new hosted CI result. Branch and active milestone remain
 M10; no commit, push, merge, PR or milestone advancement was performed.
+
+### M10 review — 2026-10-15
+
+Started with a clean working tree on M10 at
+`3e3cacf947c8b97104272f8ce43c0ab74f7d2bd9`. Reviewed localization, presentation
+integration and the existing reducer/chemistry/heat/live/replay boundaries.
+
+Confirmed one current defect: the Experiment panel's heat-evaluation typography
+was selected by English `aria-label` text. Browser computed styles changed from
+14px/muted/4px top margin in EN to 13px/body color/no margin in VI. Replace that
+selector with a stable presentation class on the same status element. Accessible
+label/live behavior and heating logic remain unchanged. No new abstraction,
+dependency, translation or unrelated refactor is needed. Use browser style parity
+and existing localization/heating regressions; avoid pixel-value component tests
+for this isolated styling correction.
+
+Also found stale inherited M9 outcome wording claiming replay was still uncommitted
+on baseline f77fa48. Git confirms completed replay commit ff317ee is inherited by
+M10; the M9 branch has a later documentation correction. Correct only the stale
+M9 outcome paragraph locally, without merging branches or rewriting history.
+
+Post-fix browser computed styles match between EN and VI (the existing English
+14px/muted/4px treatment is retained). Accessible status names still translate;
+there is no change to status/live semantics or heat transitions. Screenshot saved
+in ignored `node_modules/.cache/m10-review-heat-style.png`. Browser QA was limited
+to this desktop style regression; no new device, multi-browser, screen-reader or
+reduced-motion verification is claimed.
+
+Validation: `npm run typecheck` PASS; `npm run lint` PASS;
+`npm test -- --maxWorkers=2` PASS (321 tests / 24 files, existing tests unchanged);
+`npm run build` PASS (60 modules); `git diff --check` PASS with the same
+command-local safecrlf override. Existing TEMP/TMP cache workaround only; no test
+configuration or timeout changes. No new CSS-value/class-only component tests were
+added; actual browser parity verifies this styling defect while existing tests
+protect localization, matching, heat, live dynamics and replay.
+
+No further actionable scope, architecture, state-ownership, dependency, technology
+or debug-code defect was confirmed in this review. Teacher/SGK terminology review
+and broader browser/touch/screen-reader/projector QA remain non-blocking follow-up
+work, not grounds for new features/refactoring. The two source-line fixes and two
+plan updates remain uncommitted on M10; no publication or milestone action was taken.

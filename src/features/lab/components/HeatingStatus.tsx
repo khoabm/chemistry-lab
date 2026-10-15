@@ -9,7 +9,7 @@ export function HeatingStatus({ state, evaluation }: { state: HeatingState; eval
     <p role="status" aria-label={t('heat.containerStatus')} aria-live={heatingLive} className={state.status === 'heating' ? 'is-heating' : ''}>
       {state.status === 'heating' ? t('heat.heating') : t('heat.off')}
     </p>
-    <p role="status" aria-label={t('heat.evaluationStatus')} aria-live={evaluationLive}>
+    <p className="heat-evaluation" role="status" aria-label={t('heat.evaluationStatus')} aria-live={evaluationLive}>
       {evaluation.status === 'pending' ? t('heat.pending')
         : evaluation.status === 'evaluated' ? t('heat.evaluated')
           : evaluation.status === 'cancelled' ? t('heat.cancelled') : t('heat.idle')}

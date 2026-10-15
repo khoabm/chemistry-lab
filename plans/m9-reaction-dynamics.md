@@ -216,7 +216,9 @@ that path was verified through component tests and scoped CSS inspection, not
 claimed as browser-tested. Source invalidation and stale callbacks were exercised
 by automated tests; the native modal correctly prevents normal background actions.
 
-No known blocking validation failure remains for this extension. Current branch
-is M9, baseline HEAD remains f77fa48; these replay changes are local and uncommitted.
-No new hosted CI result, commit, push, merge or PR is claimed. Publication,
-milestone approval and advancement remain user decisions.
+No known blocking validation failure remained for this extension. Its implementation
+was subsequently committed on M9 as `ff317ee1bb46ec5dc446cc6970d63d84017d8a70`
+(`feat: add replay mode for enlarged modal`) and is inherited by M10. This records
+repository history, not a commit, push, merge or PR performed by this review.
+The verification limits above remain; milestone approval and advancement are user
+decisions.
