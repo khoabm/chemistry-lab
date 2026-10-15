@@ -13,13 +13,13 @@ Implement `docs/REACTION_DYNAMICS.md`: finite precipitate formation/settling, me
 
 ## Non-goals
 
-No new chemicals, reactions, triggers, dropper delivery, pouring, transfer, quantitative stoichiometry/concentration/yield/gas/temperature/kinetics, thermodynamics, fluid/molecular simulation, 3D, video, sound, backend, persistence or unrelated UI redesign. No general timeline framework or new dependency. Do not advance M9 or commit/push/merge.
+No new chemicals, reactions, triggers, dropper delivery, pouring, transfer, quantitative stoichiometry/concentration/yield/gas/temperature/kinetics, thermodynamics, fluid/molecular simulation, 3D, video, sound, backend, persistence or unrelated UI redesign. No general timeline framework or new dependency. Codex must not autonomously commit/push/merge or advance milestones; publication/merge and milestone approval remain user decisions. Prior user-authorized publication may be recorded as repository history.
 
 ## Existing system
 
 `src/simulation/reactions/{types,mixReactions,heatReactions}.ts` registers semantic effects. `src/simulation/engine/evaluateReaction.ts` returns deterministic detached results. `src/store/labWorkspace.ts` owns equipment, container contents/results and heating transitions through a page-local React reducer. Evaluation creates a new result reference; selection/movement preserve it; clear/add/reset invalidate it. `src/features/lab/hooks/useHeatReactions.ts` maintains the existing illustrative 2,000 ms wait and cancellation guards.
 
-`EquipmentVisual`, `ContainerContentsVisual` and `renderers/ReactionEffectsVisual` are reused by `LabWorkspace`, `ContainerDetails`, `SampleDetailDialog` and `EquipmentDragPreview`. Current CSS loops gas forever, leaves warming symbols, and starts animations independently when views mount. Sample panels are hidden rather than unmounted. Reduced motion currently leaves static transient cues indefinitely. Simulation has additional instructions in `src/simulation/AGENTS.md`.
+`EquipmentVisual`, `ContainerContentsVisual` and `renderers/ReactionEffectsVisual` are reused by `LabWorkspace`, `ContainerDetails`, `SampleDetailDialog` and `EquipmentDragPreview`. Before M9, CSS looped gas forever, left warming symbols, and started animations independently when views mounted; reduced motion left static transient cues indefinitely. M9 now uses finite shared presentation lifecycles. Sample panels are hidden rather than unmounted. Simulation has additional instructions in `src/simulation/AGENTS.md`.
 
 ## Proposed design
 
@@ -45,6 +45,8 @@ Gas effect gains `context: 'liquid' | 'heated-solid'` (R5 liquid/medium, R7 heat
 
 Active milestone: M9 — Reaction Dynamics Foundation. Required/current branch: M9. Initial HEAD: `0ec775af57a314276d8108a54f8b3ff6f83774d4`; prior delivered milestone: M8, followed by user-approved M9 specification commits. Initial working tree clean. No existing work needs preservation beyond the committed baseline.
 
+Focused review on 2026-10-15: local HEAD, origin/M9 and the live GitHub M9 branch all identify published implementation commit `683426a1f09006b593268a37fd5806de233a180c` (`feat: reaction dynamics`). Working tree was clean before this review. Preserve this implementation and history; this pass changes only presentation reference stability, regression coverage and this plan.
+
 ### Existing technology stack
 
 React 19, strict TypeScript 5.9, Vite 8, npm/package-lock, Node >=24. State: React useReducer/local hooks. Styling/animation: plain CSS and SVG. Drag/drop: existing native Pointer Events and keyboard handlers. Unit/component tests: Vitest 4, React Testing Library, jsdom. No installed browser E2E stack. No new dependency is required.
@@ -59,10 +61,12 @@ Keep R1–R8 matching/order/trigger/determinism/product tests. Assert gas contex
 - [x] Create ExecPlan before implementation.
 - [x] Add gas context and shared presentation lifecycle.
 - [x] Extend shared visuals and finite CSS progression.
-- [x] Add/update regression and lifecycle tests (full validation still pending).
+- [x] Add/update regression and lifecycle tests; full local validation and subsequent hosted implementation CI passed.
 - [x] Synchronize current-product documentation.
 - [x] Run full validation and available browser QA (limits recorded below).
 - [x] Record final outcomes and limitations.
+- [x] Confirm reference-instability finding against current source and reproduce it with a failing public-hook regression assertion.
+- [x] Memoize derived presentation snapshots, preserve reheat synchronization and validate the focused review fix.
 
 ## Surprises and discoveries
 
@@ -71,6 +75,10 @@ Existing CSS gas loops and reduced-motion static bubbles conflict with M9. `isCo
 The React purity rule rejects reading performance.now during render reconciliation. Bind occurrence clocks in a layout effect before paint instead; ownership remains presentation-only. Initial Vitest execution failed before collecting tests because the sandbox temp cache could not rename files (EPERM); retry with an allowed temporary cache directory, without changing repository test settings/timeouts.
 
 An R7 test advancing across solid and gas deadlines together exposed dependence on a render between deadlines. Schedule the few distinct effect completion checkpoints together, so transient completion does not depend on intermediate React commits. The layout-effect clock binding uses one narrowly documented lint exception; reconciliation returns unchanged records on unrelated state updates.
+
+The 2026-10-15 review confirmed that the returned Map and presentation objects were still allocated on every render despite stable occurrence reconciliation. A reference-equality regression assertion fails on the published implementation. Memoize only this derivation using occurrences and the existing clock value; do not alter lifecycle ownership or timing. GitHub CLI was unauthenticated, so live branch, CI job steps and logs were verified through the connected GitHub API instead.
+
+Preservation testing exposed one dependency on the old unstable references: R7 gas is unmounted when heating stops and mounted again if heating resumes during the active window. With stable snapshots, animation synchronization did not rerun for that new gas DOM. A focused test reproduced age 0 instead of the shared age 3500 ms. Pass the existing heating flag to the synchronization hook and include it as an explicit effect dependency; unrelated renders still do not seek. This small preservation fix changes no heating state, chemistry or lifecycle duration.
 
 ## Decision log
 
@@ -81,6 +89,8 @@ An R7 test advancing across solid and gas deadlines together exposed dependence 
 - Use existing SVG/CSS and native animation seeking only for synchronization: avoid a new library or general timeline engine.
 - An isolated renderer without an occurrence snapshot shows the final result, preventing accidental replay outside the page-owned lifecycle. Renderer unit fixtures explicitly provide active snapshots.
 - Preserve existing geometry and all reducer/engine/heat-wait behavior. R5/R7 differ through context, visual density, cadence and opacity; these display choices do not represent measured gas yield.
+- Memoize the derived presentation map with `[occurrences, now]`: unchanged lifecycle inputs retain map/entry references for React.memo and animation synchronization; actual lifecycle changes produce updated snapshots without a new cache/store or occurrence strategy.
+- Explicitly resynchronize on heating-visibility changes, since they can mount gas inside an existing SVG. This preserves the previous shared-age behavior without relying on incidental presentation allocations.
 
 ## Outcomes and retrospective
 
@@ -97,6 +107,14 @@ Validation on 2026-10-14:
 - `npm run build`: PASS (includes typecheck); 51 modules transformed.
 - `git diff --check`: PASS.
 
+Published implementation validation, verified on 2026-10-15 from the live GitHub API and job logs: commit `683426a1f09006b593268a37fd5806de233a180c` is on branch M9. [CI run 38736392518](https://github.com/khoabm/chemistry-lab/actions/runs/38736392518), triggered by push, completed successfully. Job `validate` (`116426658168`) passed Checkout, Node setup, `npm ci`, typecheck, lint, `npm test -- --maxWorkers=2` and build on Ubuntu 24.04.5 with Node v24.21.0. Hosted Vitest: 283 tests passed in 21 files. This supersedes the original pre-publication statement that no hosted CI had run, while retaining the earlier local validation record.
+
 Browser QA used only Codex In-app Browser at 1440×960, plus a 390×844 viewport check. Observed R1–R4 active clouds and settled deposits with correct colors; R5 active liquid bubbling and its disappearance in bench/dialog; R6 finite warming with no gas/precipitate; R7 green-to-black with low solid-context gas, gas completion, no replay after extinguish/reignite and a newly opened final-state dialog; R8 blue-to-pale/white without gas. Dialogs were opened during and after activity, tabs/selection changed, and Empty/add/reset used across experiments. Native pointer drag of a completed R8 sample retained selection/final color and movement feedback. Narrow final-state dialog remained usable. Browser error/warning log was empty. A local screenshot lives in ignored node_modules/.cache/m9-final-solid.png, not in source control.
 
-Verification limits: no broad multi-browser automation, physical touch device or projector verification. The browser tool exposes no reduced-motion emulation, so that path was checked by component tests and CSS inspection, not claimed as browser-tested. Holding an active drag preview for browser inspection was not performed; active/completed preview consistency is protected by integration tests. No hosted CI run is claimed for this uncommitted work. All M9 completion behaviors are implemented and local validation has no known blocking failure; milestone approval/advancement remains the user's decision.
+Verification limits: no broad multi-browser automation, physical touch device or projector verification. The browser tool exposes no reduced-motion emulation, so that path was checked by component tests and CSS inspection, not claimed as browser-tested. Holding an active drag preview for browser inspection was not performed; active/completed preview consistency is protected by integration tests. All M9 completion behaviors are implemented; milestone approval/advancement remains the user's decision.
+
+Focused reference-stability review fix, 2026-10-15: memoized the presentation derivation with `[occurrences, now]`. Map/entry references remain stable through unrelated rerenders and immutable container updates retaining the same result, while deadline/new-evaluation changes create updated snapshots. Explicit heating dependency preserves synchronization of gas revealed again during an active R7 occurrence; unrelated renders do not seek. Both regressions were reproduced with failing assertions before their fixes. Existing lifecycle, cleanup, cross-view and heat behavior remain covered without weakening tests.
+
+Review validation: `npm run typecheck` PASS; `npm run lint` PASS; targeted lifecycle/synchronization/integration tests PASS (14 tests, 3 files); `npm test -- --maxWorkers=2` PASS (284 tests, 21 files); `npm run build` PASS; `git diff --check` PASS. Local runtime was Node v25.2.1, satisfying the existing >=24 engine; TEMP/TMP used the ignored local cache described above. Final diff is limited to useReactionDynamics, useReactionAnimationSync, their tests, the existing EquipmentVisual hook call and this plan. No dependencies, chemistry, state model, durations or UI design changed. No new browser/device QA was performed for this focused pass; the recorded QA limitations remain.
+
+This review fix is separate from the already-published implementation above; no new commit, push or hosted CI run is claimed for these local review changes. No known blocking local validation failure remains. Repository publication/merge and milestone approval/advancement remain user decisions.

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import type { ContainerState } from '../../../types/container'
 import type { ReactionResult } from '../../../simulation/reactions/types'
 import { effectDurationMs, type ReactionPresentation } from '../renderers/reactionDynamics'
@@ -43,8 +43,8 @@ export function useReactionDynamics(containers: readonly ContainerState[]): Read
     }
   }, [occurrences, now])
 
-  return new Map([...occurrences].map(([id, occurrence]) => [id, {
+  return useMemo(() => new Map([...occurrences].map(([id, occurrence]) => [id, {
     startedAt: occurrence.startedAt,
     elapsedMs: Math.max(0, now - occurrence.startedAt),
-  }]))
+  }])), [occurrences, now])
 }

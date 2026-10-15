@@ -20,13 +20,27 @@ describe('shared reaction occurrences', () => {
     const { result, rerender, unmount } = renderHook(({ containers }) => useReactionDynamics(containers), {
       initialProps: { containers: [first] as readonly ContainerState[] }, wrapper: StrictMode,
     })
-    const start = result.current.get('first')?.startedAt
+    const initialMap = result.current
+    const initialPresentation = initialMap.get('first')
+    expect(initialPresentation).toBeDefined()
+    const start = initialPresentation?.startedAt
+    rerender({ containers: [first] })
+    expect(result.current).toBe(initialMap)
+    expect(result.current.get('first')).toBe(initialPresentation)
     tick(2000)
     rerender({ containers: [{ ...first, heatingState: { status: 'heating', lampId: 'lamp' } }] })
+    expect(result.current).toBe(initialMap)
+    expect(result.current.get('first')).toBe(initialPresentation)
     expect(result.current.get('first')?.startedAt).toBe(start)
     tick(effectDurationMs.gas - 2000)
+    expect(result.current).not.toBe(initialMap)
+    expect(result.current.get('first')).not.toBe(initialPresentation)
     expect(result.current.get('first')?.elapsedMs).toBeGreaterThanOrEqual(effectDurationMs.gas)
+    const completedMap = result.current
+    const completedPresentation = completedMap.get('first')
     rerender({ containers: [sample('first')] })
+    expect(result.current).not.toBe(completedMap)
+    expect(result.current.get('first')).not.toBe(completedPresentation)
     expect(result.current.get('first')?.startedAt).not.toBe(start)
     expect(result.current.get('first')?.elapsedMs).toBe(0)
     unmount()

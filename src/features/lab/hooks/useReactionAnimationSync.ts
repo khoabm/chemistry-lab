@@ -7,8 +7,9 @@ const reactionAnimationNames = new Set([
 ])
 
 // Browser API access is isolated: seek existing CSS animations, never evaluate chemistry.
-export function useReactionAnimationSync(presentation: ReactionPresentation, visible: boolean) {
+export function useReactionAnimationSync(presentation: ReactionPresentation, visible: boolean, heating: boolean) {
   const svgRef = useRef<SVGSVGElement>(null)
+  // Heating changes can reveal gated gas nodes inside an already-mounted SVG.
   useLayoutEffect(() => {
     const svg = svgRef.current
     const startedAt = presentation.startedAt
@@ -29,6 +30,6 @@ export function useReactionAnimationSync(presentation: ReactionPresentation, vis
       motion?.removeEventListener('change', synchronize)
       document.removeEventListener('visibilitychange', synchronize)
     }
-  }, [presentation, visible])
+  }, [presentation, visible, heating])
   return svgRef
 }

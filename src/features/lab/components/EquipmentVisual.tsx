@@ -21,7 +21,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
   visible?: boolean
 }) {
   const clipId = useId()
-  const svgRef = useReactionAnimationSync(presentation, visible)
+  const svgRef = useReactionAnimationSync(presentation, visible, heating)
   const layout = getContentsLayout(contents, equipmentType)
   const resultEffects = reactionResult?.status === 'reaction' ? reactionResult.effects : []
   const solidEffect = resultEffects.find((effect) => effect.type === 'solid-color-change')
