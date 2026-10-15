@@ -216,7 +216,28 @@ that path was verified through component tests and scoped CSS inspection, not
 claimed as browser-tested. Source invalidation and stale callbacks were exercised
 by automated tests; the native modal correctly prevents normal background actions.
 
-No known blocking validation failure remains for this extension. Current branch
-is M9, baseline HEAD remains f77fa48; these replay changes are local and uncommitted.
-No new hosted CI result, commit, push, merge or PR is claimed. Publication,
-milestone approval and advancement remain user decisions.
+No known blocking validation failure remained at the end of that implementation
+pass. Its baseline was f77fa48 and the replay changes were then local/uncommitted.
+The subsequent review found them committed as
+`ff317ee1bb46ec5dc446cc6970d63d84017d8a70`
+(`feat: add replay mode for enlarged modal`) on M9. Publication, milestone approval
+and advancement remain user decisions; this records existing repository history,
+not a commit or push performed by the review.
+
+Post-replay implementation review, 2026-10-15: active/required/current branch M9,
+HEAD ff317ee, working tree clean before review. Inspected application/reducer,
+simulation/domain boundaries, interaction/heat orchestration, shared live
+presentation, dialog-local replay, SVG/CSS synchronization, dependencies, typing
+and existing regression coverage. No actionable application defect, unapproved
+milestone expansion, competing technology or unnecessary dependency was confirmed.
+Corrected only the stale uncommitted-status wording above; no source, test,
+package, workflow or milestone-state changes were needed.
+
+Review validation: `npm run typecheck` PASS; `npm run lint` PASS;
+`npm test -- --maxWorkers=2` PASS (311 tests, 23 files); `npm run build` PASS;
+`git diff --check` PASS. TEMP/TMP used the previously documented ignored local
+cache; test settings/timeouts were unchanged. No new browser/device QA or hosted
+CI execution is claimed for this review. Broader browser, physical touch-device,
+projector and screen-reader checks remain optional verification work, with the
+earlier reduced-motion browser-tool limitation retained. No commit, push, merge,
+PR or milestone advancement was performed.
