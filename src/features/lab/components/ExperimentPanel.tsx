@@ -30,7 +30,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
   const [view, setView] = useState<{ result: typeof result; contents: typeof contents; tab: ExperimentTab }>(
     () => ({ result, contents, tab: result ? 'result' : 'sample' }),
   )
-  const [isDetailOpen, setDetailOpen] = useState(false)
+  const [detailTab, setDetailTab] = useState<ExperimentTab | null>(null)
   // Observe immutable props only; rendered outcome data always comes from the container.
   if (view.result !== result || view.contents !== contents) {
     setView({ result, contents, tab: result ? 'result' : 'sample' })
@@ -72,11 +72,15 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
           presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}
-          onClear={() => { setDetailOpen(false); selectTab('sample'); onClear() }}
-          onEnlarge={() => setDetailOpen(true)} />
+          onClear={() => { setDetailTab(null); selectTab('sample'); onClear() }}
+          onEnlarge={() => setDetailTab('sample')} />
       </div>
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-result-panel`} aria-labelledby={`${id}-result-tab`}
         tabIndex={0} hidden={activeTab !== 'result'}>
+        {result?.status === 'reaction' && <button type="button" className="action-button action-button--secondary view-reaction"
+          aria-haspopup="dialog" disabled={disabled} onClick={() => setDetailTab('result')}>
+          View reaction <span aria-hidden="true">↗</span>
+        </button>}
         {result ? <ReactionObservation result={result} /> : <p className="empty-caption">No experiment result yet. Select a sample and use Mix or heat to evaluate it.</p>}
       </div>
       </> : lamp ? <LampDetails lamp={lamp} disabled={disabled} onToggle={onToggleLamp} />
@@ -92,11 +96,11 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
         <p>No observations yet. Add a beaker or test tube from Equipment, select it on the bench and add chemicals. Press Mix, or use a lit alcohol lamp to heat a sample.</p>
         <p>Open “How to use this lab” for the steps. Results appear here when you select a sample.</p>
       </div>}
-      {isDetailOpen && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
+      {detailTab && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
         presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {
-          setDetailOpen(false)
-          selectTab('sample')
+          selectTab(detailTab)
+          setDetailTab(null)
         }} />}
       <div className="observation-note">
         <span className="note-rule" aria-hidden="true" />

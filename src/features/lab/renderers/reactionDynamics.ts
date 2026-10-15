@@ -13,6 +13,12 @@ export interface ReactionPresentation {
   readonly elapsedMs: number
 }
 
+export type ReplayStage = 'initial' | 'developing' | 'final'
+
+export function reactionPresentationDuration(effects: readonly ReactionEffect[]): number {
+  return Math.max(0, ...effects.map((effect) => effectDurationMs[effect.type]))
+}
+
 // A renderer without an occurrence owner safely shows an existing final result.
 export const completedPresentation: ReactionPresentation = { startedAt: null, elapsedMs: Infinity }
 

@@ -275,12 +275,23 @@ without a new vapor effect. The final transformed solids remain after cooling.
 Presentation deadlines (3.5–8 seconds depending on effect) are teaching choices,
 not kinetics, yields or temperatures. All views share the same occurrence age:
 movement, tabs, dialog and drag preview continue the current stage or final state.
-Only a genuinely new evaluation starts a new demonstration. R7 gas is hidden
+Only a genuinely new evaluation starts a new live demonstration. R7 gas is hidden
 while not heating and never restarts after its presentation window has ended.
 Reduced-motion preferences retain static intermediate cues only during their
 finite windows, persistent deposits/solids and textual observations. Each equipment
 instance exposes its result through an accessible description. Clear/add/reset
 remove the corresponding effects and educational result.
+
+Enlarged View also offers explicit teaching Replay after the live presentation
+finishes. Open it from the Sample close-up or Result's `View reaction` action;
+opening normally follows the live/final state. Replay and optional Auto replay
+controls sit below the large drawing. Auto defaults off and separates finite
+cycles with a final-state observation hold. These are visual explanations of the
+recorded result, never chemistry re-evaluation or continuous activity in the live
+sample. Cooled R7 can replay its historical green-to-black/low solid-gas sequence
+without changing the real black sample or heating state. Reduced motion retains
+static progression and finite completion. Stop, close or source invalidation ends
+replay; reopening returns to normal viewing with Auto off.
 
 The M0 ExecPlan and validation record live in `plans/m0-project-foundation.md`.
 The M1 implementation and validation record live in

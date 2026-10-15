@@ -288,6 +288,28 @@ must not semantically imply that a new chemical reaction occurred.
 The implementation approach for keeping multiple views consistent belongs in the
 M9 ExecPlan after Codex inspects the existing component/state structure.
 
+### Teaching replay in Enlarged View
+
+Normal live activity remains finite and every normal view continues the shared
+live age or final state. After all live effects finish, an explicit Replay action
+may reconstruct the recorded visual explanation inside Enlarged View only. It
+reads the existing semantic result and retained starting portions, without
+evaluating chemistry, changing the result/contents/heating state, or restarting
+the live sample. Replayed R7 may illustrate its historical heated-solid gas and
+green-to-black transformation after cooling; the actual sample remains black.
+
+Replay is finite and leaves the final state. Auto replay is explicitly enabled,
+defaults off, and repeats finite demonstrations separated by a final-state
+observation hold. Neither its cycle nor hold represents kinetics or continuous
+chemical activity. Stop, closing the dialog or source invalidation cancels replay;
+reopening returns to normal viewing with Auto off. No playback history persists.
+
+Controls belong below the enlarged drawing, not in the scientific information
+column. Reduced motion uses static initial/developing/final checkpoints, retaining
+formation before deposit, gas/warming before completion, and starting before
+transformed solids. Transient cues still finish. All registered context,
+intensity and no-invented-phenomena constraints apply equally to replay.
+
 ---
 
 ## 8. Time compression

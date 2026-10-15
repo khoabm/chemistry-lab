@@ -455,7 +455,23 @@ invalidation removes both stale content and the indicator.
 Use tablist/tab/tabpanel with matching IDs, aria-selected, roving tabindex,
 Left/Right and Home/End navigation and visible focus. Keep panels mounted with
 native hidden semantics. Keep the dialog outside hidden panels so delayed Heat
-can update it; dismissal returns to Sample to restore focus to its close-up opener.
+can update it; dismissal returns to the opener's tab and restores focus to the
+actual opener (Sample close-up or Result's lightweight `View reaction` action).
+
+Teaching replay keeps the existing two-column enlarged dialog. Its large left
+drawing remains primary, with compact secondary Replay/Stop and Auto replay
+controls beneath it; the right scientific information is unchanged. Opening is
+always normal live/final viewing. Replay is enabled only after every live effect
+finishes, is explicitly labeled as a recorded visual explanation, and changes
+only the enlarged drawing. The real sample, result and heating state remain
+unchanged. Replay finishes at the final state; optional Auto replay defaults off
+and holds that final state before each next finite cycle. Its timings are teaching
+choices, not kinetics. Stop or unchecking Auto returns to normal final viewing.
+Close/Escape/backdrop and source invalidation cancel pending work, and reopening
+starts in normal viewing with Auto off. Keep native focus behavior, wrapping
+controls, existing narrow/short landscape scrolling, and a concise status that
+does not repeatedly announce every Auto cycle. Reduced motion retains static
+initial/developing/final stages rather than showing only the final solid/deposit.
 
 Possible structure:
 
