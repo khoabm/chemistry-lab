@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M9 — Reaction Dynamics Foundation`
+`M10 — Localization Foundation`
 
 ## Active milestone branch
 
-`M9`
+`M10`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
@@ -446,6 +446,7 @@ The approved product and scientific behavior is defined in:
 - time-compressed presentation without claiming measured reaction duration
 - reduced-motion behavior that preserves the same chemistry meaning
 - synchronized presentation of an existing reaction result without implying a new reaction when another view is opened
+- explicit teaching replay inside the existing Enlarged View without re-evaluating chemistry
 - tests and documentation for the approved behavior
 
 ## User-visible result
@@ -460,6 +461,7 @@ Examples include:
 - a warming cue is temporary
 - solid transformations reach and retain their final appearance
 - R7 gas release remains less vigorous and visually distinct from R5 bubbling
+- after the live presentation finishes, the Enlarged View can explicitly replay the recorded visualization for teaching while the live sample remains unchanged
 
 ## Scientific requirement
 
@@ -478,9 +480,8 @@ that the current simulation model does not support.
 Preserve the existing dependency direction and the separation between chemistry
 semantics and presentation.
 
-This milestone specification intentionally does not prescribe the implementation
-architecture or affected source files. Codex must inspect the current repository
-and create an ExecPlan following `.agent/PLANS.md` before implementation.
+Teaching replay is presentation-only and must not create a second chemistry
+occurrence, mutate the stored result or restart the live workspace lifecycle.
 
 ## Non-goals
 
@@ -512,6 +513,112 @@ M9 is complete when:
 - R8 shows gradual persistent blue-to-pale/white transformation without adding a new M9 gas/vapor effect
 - transient reaction activity no longer loops indefinitely after completion
 - reopening or re-rendering an existing result does not semantically restart the reaction
-- reduced-motion behavior retains the same educational meaning
+- explicit teaching replay remains isolated to Enlarged View and does not re-evaluate or rewind the live sample
+- manual replay is finite; Auto replay is explicit, finite per cycle and separated by a final-state observation hold
+- reduced-motion behavior retains the same educational meaning for live and replay presentation
 - relevant tests, type checking, linting and build validation pass
 - the M9 ExecPlan and documentation match the delivered implementation
+
+M9 was user-reviewed complete on branch `M9` at commit
+`ff317ee1bb46ec5dc446cc6970d63d84017d8a70`; hosted CI passed typecheck, lint,
+311 tests across 23 files and production build. Wording/label polish is intentionally
+left to later text/UI work and is not a blocker for M9 completion.
+
+---
+
+# M10 — Localization Foundation
+
+## Goal
+
+Introduce maintainable English/Vietnamese localization without changing chemistry,
+reaction behavior, layout architecture or laboratory state.
+
+The complete English copy is the canonical fallback. Vietnamese may be introduced
+incrementally, but missing Vietnamese translations must always resolve to the
+corresponding English text rather than rendering blank, missing or technical keys.
+
+The detailed localization contract is defined in:
+
+`docs/LOCALIZATION.md`
+
+## Deliverables
+
+- localization infrastructure appropriate to the existing React/TypeScript stack
+- complete English resource coverage for user-visible application text in M10 scope
+- Vietnamese resource support with English fallback for every missing entry
+- locale switching without resetting laboratory, reaction dynamics or teaching replay
+- semantic/stable localization keys rather than translated text as domain identity
+- separation between translatable presentation copy and non-translatable chemistry notation such as formulas/equations
+- initial Vietnamese translation for generic UI where wording is unambiguous
+- explicit glossary/review boundary for chemistry terminology that still requires teacher validation
+- tests for fallback, switching, important visible copy and lifecycle preservation
+- documentation of translation ownership and future terminology review
+
+## User-visible result
+
+The application can display English and Vietnamese interface text. English remains
+complete and authoritative as fallback, so selecting Vietnamese never causes text
+to disappear when a Vietnamese translation has not yet been approved or supplied.
+
+Changing language updates presentation text only. Existing samples, selection,
+heating, reaction results, live dynamics and teaching replay continue from their
+current state.
+
+## Architectural requirement
+
+Localization belongs to presentation and content delivery. It must not change
+simulation/domain IDs, reaction matching, effects, container state or lifecycle
+identity.
+
+Chemical formulas and equations remain chemistry notation and are not translated.
+Human-readable names, labels, observations and educational prose may be localized.
+
+Do not use translated strings as keys for chemistry, equipment, reaction or state
+logic.
+
+## Translation policy
+
+- English is the canonical complete locale and fallback source.
+- Vietnamese may be incomplete during development.
+- A missing Vietnamese translation must display English immediately.
+- Missing translations must never produce empty text, raw localization keys or a broken control.
+- Generic UI wording may be translated during M10 when meaning is clear.
+- Chemistry terminology intended for Vietnamese students must be reviewed against teacher/SGK usage before being treated as authoritative.
+- Codex must not invent or silently finalize uncertain Vietnamese chemistry terminology.
+- Educational Vietnamese prose may be natural rather than literal, but must preserve the same scientific meaning.
+
+## Open product decisions outside M10
+
+Reaction consumption, limiting reactant and excess-reactant behavior remain open
+pending teacher/user consultation. M10 must not introduce stoichiometric
+consumption, limiting-reagent logic or post-reaction composition changes merely
+because related wording may eventually require translation.
+
+## Non-goals
+
+Do not use M10 to introduce:
+
+- new chemistry rules or reactions
+- limiting/excess reactant simulation
+- reaction consumption/chaining
+- quantitative chemistry
+- new reaction dynamics
+- redesign of the right panel or Enlarged View
+- broad label/layout redesign that belongs to dedicated UI/text work
+- backend translation management
+- automatic machine translation as authoritative chemistry copy
+- persistence/account systems
+
+## Completion criteria
+
+M10 is complete when:
+
+- every user-visible string migrated into M10 localization scope has a complete English value
+- Vietnamese selection falls back to English for every missing Vietnamese value
+- no migrated UI renders blank text or raw localization keys due to a missing Vietnamese entry
+- locale switching preserves current laboratory/reaction/replay state
+- chemistry/domain logic remains independent of localized strings
+- formulas/equations are not incorrectly translated
+- Vietnamese chemistry terminology not yet teacher-approved is clearly left for review rather than guessed
+- relevant tests, typecheck, lint and build validation pass
+- M10 ExecPlan and localization documentation match the delivered implementation
