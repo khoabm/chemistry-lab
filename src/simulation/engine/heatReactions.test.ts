@@ -28,7 +28,7 @@ describe('M6 registered heat reactions', () => {
     expect(result.products.map((product) => product.formula)).toEqual(products)
     expect(result.effects).toContainEqual(expect.objectContaining({ type: 'solid-color-change', color }))
     expect(result.effects.filter((effect) => effect.type === 'gas')).toEqual(id === 'R7'
-      ? [{ id: 'r7-gas', type: 'gas', intensity: 'low' }] : [])
+      ? [{ id: 'r7-gas', type: 'gas', intensity: 'low', context: 'heated-solid' }] : [])
     expect(result.observation).toBe(heatReactions.find((reaction) => reaction.id === id)?.observation)
   })
 

@@ -11,7 +11,7 @@ export const heatReactions: readonly ReactionDefinition[] = [
     ],
     effects: [
       { id: 'r7-solid-color', type: 'solid-color-change', color: 'black' },
-      { id: 'r7-gas', type: 'gas', intensity: 'low' },
+      { id: 'r7-gas', type: 'gas', intensity: 'low', context: 'heated-solid' },
     ],
     observation: 'Heating copper(II) carbonate decomposes it into copper(II) oxide and carbon dioxide.',
   },

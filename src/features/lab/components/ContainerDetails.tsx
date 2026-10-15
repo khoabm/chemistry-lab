@@ -4,6 +4,7 @@ import type { EquipmentType } from '../../../types/equipment'
 import { EquipmentVisual } from './EquipmentVisual'
 import { HeatingStatus } from './HeatingStatus'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
+import type { ReactionPresentation } from '../renderers/reactionDynamics'
 
 interface ContainerDetailsProps {
   container: ContainerState
@@ -12,9 +13,11 @@ interface ContainerDetailsProps {
   onMix: () => void
   onEnlarge: () => void
   disabled: boolean
+  presentation?: ReactionPresentation | undefined
+  visible?: boolean
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, presentation, visible = true }: ContainerDetailsProps) {
   const contentsSummary = container.contents.map(({ chemicalId, quantity }) =>
     `${findChemical(chemicalId)?.name ?? chemicalId}, ${quantity} ${quantity === 1 ? 'unit' : 'units'}`).join('; ')
   return (
@@ -50,6 +53,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
         <button type="button" disabled={disabled} aria-label="Enlarge selected sample" aria-haspopup="dialog"
           onClick={onEnlarge}>
           <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
+            presentation={presentation} visible={visible}
             heating={container.heatingState.status === 'heating'} />
           <span className="sample-closeup-label">Selected sample · close-up <span aria-hidden="true">↗</span></span>
         </button>

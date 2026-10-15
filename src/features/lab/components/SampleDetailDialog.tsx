@@ -5,11 +5,13 @@ import { equipmentLabels } from '../equipment'
 import { EquipmentVisual } from './EquipmentVisual'
 import { ReactionObservation } from './ReactionObservation'
 import { HeatingStatus } from './HeatingStatus'
+import type { ReactionPresentation } from '../renderers/reactionDynamics'
 
-export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
+export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation }: {
   container: ContainerState
   equipmentType: EquipmentType
   onDismiss: () => void
+  presentation?: ReactionPresentation | undefined
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
@@ -36,6 +38,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss }: {
       <div className="sample-detail-content">
         <div className="sample-detail-visual">
           <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
+            presentation={presentation}
             heating={container.heatingState.status === 'heating'} />
         </div>
         <div>

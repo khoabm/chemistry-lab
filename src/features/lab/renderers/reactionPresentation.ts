@@ -13,7 +13,7 @@ export function describeReactionEffects(effects: readonly ReactionEffect[]): str
   return effects.map((effect) => {
     switch (effect.type) {
       case 'precipitate': return `A ${effect.color} precipitate forms.`
-      case 'gas': return effect.intensity === 'low' ? 'Gas is released from the heated solid.' : 'Gas bubbles are produced.'
+      case 'gas': return effect.context === 'heated-solid' ? 'Gas is released from the heated solid.' : 'Gas bubbles are produced.'
       case 'solid-color-change': return effect.color === 'black' ? 'The solid changes toward black.' : 'The solid becomes much paler or white.'
       case 'temperature-rise': return 'A subtle temperature rise is indicated; no precipitate or gas forms.'
     }

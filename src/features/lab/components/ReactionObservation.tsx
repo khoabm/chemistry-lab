@@ -27,7 +27,7 @@ export function ReactionObservation({ result }: { result: ReactionResult | null 
       {result.effects.some((effect) => effect.type === 'solid-color-change') && <div>
         <dt>Heating note</dt><dd>Heating time and colors are illustrative; no exact temperature is calculated.</dd>
       </div>}
-      {result.effects.some((effect) => effect.type === 'gas' && effect.intensity === 'low') && <div>
+      {result.effects.some((effect) => effect.type === 'gas' && effect.context === 'heated-solid') && <div>
         <dt>Visual cue</dt><dd>Outlined particles illustrate gas release; carbon dioxide itself is colorless.</dd>
       </div>}
     </dl>}

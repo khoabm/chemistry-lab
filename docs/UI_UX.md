@@ -354,7 +354,9 @@ panel and update an already-open close-up modal.
 
 Cancel pending evaluation on source exit/extinction, source change, clear/add/reset.
 Pause waits during drag previews; unrelated selection/updates retain each deadline.
-Keep successful solid color after cooling, with gas motion only while heated.
+Keep successful solid color after cooling, with gas motion only while heated
+and within the finite M9 reaction-presentation window. Reheating an already
+completed result does not replay its activity.
 Completed heat samples cannot Mix their retained starting portions as fresh
 reactants; clear/add begins another simplified experiment. Unsupported heat sets
 show No observable reaction. Do not calculate temperature, kinetics or yields.
@@ -391,8 +393,12 @@ Should appear as bubbles rising through the material or leaving the container.
 
 M4 acceptance: stagger bubble sizes, paths and timing; bubbles rise to the drawn
 liquid surface and fade with small surface rings. Do not imply boiling, smoke or
-an opaque gas. A repeating gas illustration denotes the stored reaction result,
-not an unlimited gas supply or a calculated reaction duration.
+an opaque gas. M9 supersedes the earlier repeating illustration: registered gas
+activity develops, declines and ends, while its educational result remains stored.
+R5 medium liquid bubbling must be more vigorous than R7 low gas release from a
+heated solid. Explicit semantic context, rather than intensity, determines whether
+gas originates in liquid or solid. Neither illustration represents measured yield
+or kinetics.
 
 ### Color change
 
@@ -556,7 +562,12 @@ The M4 visual standard also applies to future registered effects within their
 own milestones. Prefer the existing SVG/CSS renderer; never add chemical matching
 or animation state to simulation. Motion must remain non-blocking, deterministic
 in presentation and contained within the appropriate material geometry. Honor
-`prefers-reduced-motion` with static bubbles, settled solids and textual results.
+`prefers-reduced-motion` with finite static gas/warming cues, settled solids and
+textual results. In M9, R1–R4 formation/settling ends with a persistent deposit;
+R6 warming ends; R7/R8 retain their transformed solids. Bench, Sample close-up,
+dialog and drag preview share one presentation age per evaluated result. Revealing
+a hidden Sample tab or opening a dialog continues that age instead of replaying
+the reaction. CSS animation completion is not the source of lifecycle truth.
 
 ---
 

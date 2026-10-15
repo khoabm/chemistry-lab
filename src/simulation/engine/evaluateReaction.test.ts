@@ -9,7 +9,7 @@ const cases = [
   { id: 'R2', reactants: ['copper-sulfate', 'sodium-hydroxide'], products: ['Cu(OH)2', 'Na2SO4'], effect: { type: 'precipitate', color: 'blue' } },
   { id: 'R3', reactants: ['iron-chloride', 'sodium-hydroxide'], products: ['Fe(OH)3', 'NaCl'], effect: { type: 'precipitate', color: 'reddish-brown' } },
   { id: 'R4', reactants: ['calcium-chloride', 'sodium-carbonate'], products: ['CaCO3', 'NaCl'], effect: { type: 'precipitate', color: 'white' } },
-  { id: 'R5', reactants: ['hydrochloric-acid', 'sodium-bicarbonate'], products: ['NaCl', 'H2O', 'CO2'], effect: { type: 'gas', intensity: 'medium' } },
+  { id: 'R5', reactants: ['hydrochloric-acid', 'sodium-bicarbonate'], products: ['NaCl', 'H2O', 'CO2'], effect: { type: 'gas', intensity: 'medium', context: 'liquid' } },
   { id: 'R6', reactants: ['hydrochloric-acid', 'sodium-hydroxide'], products: ['NaCl', 'H2O'], effect: { type: 'temperature-rise', intensity: 'low' } },
 ] as const
 

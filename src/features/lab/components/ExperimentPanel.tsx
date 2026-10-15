@@ -6,6 +6,7 @@ import { ContainerDetails } from './ContainerDetails'
 import { LampDetails } from './LampDetails'
 import { ReactionObservation } from './ReactionObservation'
 import { SampleDetailDialog } from './SampleDetailDialog'
+import type { ReactionPresentation } from '../renderers/reactionDynamics'
 
 type ExperimentTab = 'sample' | 'result'
 
@@ -17,9 +18,10 @@ interface ExperimentPanelProps {
   onMix: () => void
   onClear: () => void
   onToggleLamp: () => void
+  presentation?: ReactionPresentation | undefined
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation }: ExperimentPanelProps) {
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
   const resultTab = useRef<HTMLButtonElement>(null)
@@ -68,6 +70,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-sample-panel`} aria-labelledby={`${id}-sample-tab`}
         tabIndex={0} hidden={activeTab !== 'sample'}>
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
+          presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}
           onClear={() => { setDetailOpen(false); selectTab('sample'); onClear() }}
           onEnlarge={() => setDetailOpen(true)} />
@@ -90,6 +93,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
         <p>Open “How to use this lab” for the steps. Results appear here when you select a sample.</p>
       </div>}
       {isDetailOpen && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
+        presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {
           setDetailOpen(false)
           selectTab('sample')

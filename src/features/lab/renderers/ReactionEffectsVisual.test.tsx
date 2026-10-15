@@ -1,11 +1,20 @@
+import type { ComponentProps } from 'react'
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { ReactionEffect, ReactionResult } from '../../../simulation/reactions/types'
-import { EquipmentVisual } from '../components/EquipmentVisual'
-import { ReactionEffectsVisual } from './ReactionEffectsVisual'
+import { EquipmentVisual as SharedEquipmentVisual } from '../components/EquipmentVisual'
+import { ReactionEffectsVisual as SharedReactionEffectsVisual } from './ReactionEffectsVisual'
 import { describeReactionEffects } from './reactionPresentation'
 import { getContentsLayout } from './contentsPresentation'
 import { chemicals } from '../../../simulation/chemicals/catalog'
+
+const activePresentation = { startedAt: 0, elapsedMs: 0 }
+function EquipmentVisual(props: ComponentProps<typeof SharedEquipmentVisual>) {
+  return <SharedEquipmentVisual presentation={activePresentation} {...props} />
+}
+function ReactionEffectsVisual(props: ComponentProps<typeof SharedReactionEffectsVisual>) {
+  return <SharedReactionEffectsVisual presentation={activePresentation} {...props} />
+}
 
 const layout = getContentsLayout([{ chemicalId: 'silver-nitrate', quantity: 1 }], 'beaker')
 
@@ -14,13 +23,27 @@ function result(effects: readonly ReactionEffect[]): ReactionResult {
 }
 
 describe('semantic reaction presentation', () => {
+  it('uses explicit gas context independently of intensity and gives medium activity greater visual density', () => {
+    const lowLiquid = { id: 'low-liquid', type: 'gas', intensity: 'low', context: 'liquid' } as const
+    const mediumSolid = { id: 'medium-solid', type: 'gas', intensity: 'medium', context: 'heated-solid' } as const
+    const { container, rerender } = render(<svg><ReactionEffectsVisual effects={[lowLiquid]} layout={layout} /></svg>)
+    expect(container.querySelector('.bubble-surface-ring')).toBeInTheDocument()
+    expect(describeReactionEffects([lowLiquid])).toBe('Gas bubbles are produced.')
+    const lowDensity = container.querySelectorAll('.reaction-bubble').length
+    rerender(<svg><ReactionEffectsVisual effects={[mediumSolid]} layout={layout} /></svg>)
+    expect(container.querySelector('.bubble-surface-ring')).not.toBeInTheDocument()
+    expect(container.querySelector('.reaction-bubble circle')).toHaveAttribute('fill', 'none')
+    expect(describeReactionEffects([mediumSolid])).toBe('Gas is released from the heated solid.')
+    // Particle density is an illustrative intensity distinction, never a yield assertion.
+    expect(container.querySelectorAll('.reaction-bubble').length).toBeGreaterThan(lowDensity)
+  })
   for (const equipmentType of ['beaker', 'test-tube'] as const) {
     it.each([
       ['copper-carbonate', 'black', '#303330', true],
       ['copper-sulfate-pentahydrate', 'pale-white', '#f2eee4', false],
     ] as const)(`shows a transformed %s solid in ${equipmentType}, retaining color after cooling`, (chemicalId, color, fill, gas) => {
       const effects: ReactionEffect[] = [{ id: 'sample-solid', type: 'solid-color-change', color }]
-      if (gas) effects.push({ id: 'sample-gas', type: 'gas', intensity: 'low' })
+      if (gas) effects.push({ id: 'sample-gas', type: 'gas', intensity: 'low', context: 'heated-solid' })
       // Deliberately use unrelated reaction metadata: rendering follows semantic effects only.
       const reactionResult = { ...result(effects), trigger: 'heat' } as const
       const contents = [{ chemicalId, quantity: 1 }]
@@ -58,7 +81,7 @@ describe('semantic reaction presentation', () => {
   })
 
   it('renders gas bubbles with a textual observation, without a precipitate or warmth', () => {
-    const effects = [{ id: 'sample-gas', type: 'gas', intensity: 'medium' }] as const
+    const effects = [{ id: 'sample-gas', type: 'gas', intensity: 'medium', context: 'liquid' }] as const
     const { container } = render(<svg><ReactionEffectsVisual effects={effects} layout={layout} /></svg>)
     expect(container.querySelectorAll('.reaction-bubble').length).toBeGreaterThan(1)
     expect(container.querySelector('.bubble-surface-ring')).toBeInTheDocument()
@@ -94,7 +117,7 @@ describe('semantic reaction presentation', () => {
 
   it.each(['dropper', 'alcohol-lamp'] as const)('does not render container effects inside %s', (equipmentType) => {
     const { container } = render(<EquipmentVisual equipmentType={equipmentType}
-      reactionResult={result([{ id: 'effect', type: 'gas', intensity: 'medium' }])} />)
+      reactionResult={result([{ id: 'effect', type: 'gas', intensity: 'medium', context: 'liquid' }])} />)
     expect(container.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
   })
 
@@ -116,7 +139,7 @@ describe('semantic reaction presentation', () => {
     it.each([1, 1000])(`keeps bubbles and precipitate within the drawn liquid in a ${equipmentType} at quantity %s`, (quantity) => {
       const contents = [{ chemicalId: 'hydrochloric-acid', quantity }] as const
       const { container, rerender } = render(<EquipmentVisual equipmentType={equipmentType} contents={contents}
-        reactionResult={result([{ id: 'gas', type: 'gas', intensity: 'medium' }])} />)
+        reactionResult={result([{ id: 'gas', type: 'gas', intensity: 'medium', context: 'liquid' }])} />)
       const liquid = container.querySelector('.reacted-liquid')
       const top = Number(liquid?.getAttribute('y'))
       const bottom = top + Number(liquid?.getAttribute('height'))

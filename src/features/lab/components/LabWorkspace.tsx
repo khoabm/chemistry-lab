@@ -6,14 +6,17 @@ import { equipmentPositionStyle } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
 import { describeReactionEffects } from '../renderers/reactionPresentation'
 import { HeatingZone } from './HeatingZone'
+import type { ReactionPresentation } from '../renderers/reactionDynamics'
 
 interface LabWorkspaceProps {
   state: LabWorkspaceState
   interaction: EquipmentInteraction
+  presentations: ReadonlyMap<string, ReactionPresentation>
 }
 
 export function LabWorkspace({
   state,
+  presentations,
   interaction: { attachBench, preview, message, getEquipmentHandlers },
 }: LabWorkspaceProps) {
   // Display ordinals are per type on the current bench, independent of stable IDs.
@@ -76,6 +79,7 @@ export function LabWorkspace({
           >
             <EquipmentVisual equipmentType={instance.equipmentType}
               contents={container?.contents} reactionResult={container?.reactionResult ?? null}
+              presentation={container ? presentations.get(container.id) : undefined}
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
             <span>{label}</span>
             {(lamp?.status === 'extinguished' || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">

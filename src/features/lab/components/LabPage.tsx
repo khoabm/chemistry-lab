@@ -8,11 +8,13 @@ import { LabPalette } from './LabPalette'
 import { LabWorkspace } from './LabWorkspace'
 import { useHeatReactions } from '../hooks/useHeatReactions'
 import { LabHelp } from './LabHelp'
+import { useReactionDynamics } from '../hooks/useReactionDynamics'
 
 export function LabPage() {
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
   useHeatReactions(state.containers, dispatch, !!interaction.preview)
+  const presentations = useReactionDynamics(state.containers)
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
   const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
   const selectedLamp = state.lamps.find((lamp) => lamp.equipmentInstanceId === state.selectedEquipmentId)
@@ -39,15 +41,17 @@ export function LabPage() {
           onAddChemical={(chemicalId) => {
             if (selectedContainer && !interaction.preview) dispatch({ type: 'add-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId, quantity: 1 })
           }} />
-        <LabWorkspace state={state} interaction={interaction} />
+        <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={!!interaction.preview}
+          presentation={selectedContainer ? presentations.get(selectedContainer.id) : undefined}
           onMix={() => { if (selectedContainer) dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onClear={() => { if (selectedContainer) dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onToggleLamp={() => { if (selectedLamp) dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId }) }} />
       </main>
       {interaction.preview && <EquipmentDragPreview preview={interaction.preview}
         contents={draggingContainer?.contents} reactionResult={draggingContainer?.reactionResult ?? null}
+        presentation={draggingContainer ? presentations.get(draggingContainer.id) : undefined}
         lampStatus={draggingLamp?.status ?? 'extinguished'} heating={draggingContainer?.heatingState.status === 'heating'} />}
       <footer className="lab-footer">
         <p>Explore chemistry, one observation at a time.</p>

@@ -11,7 +11,7 @@ export interface ProductDefinition {
 
 export type ReactionEffect =
   | { readonly id: string; readonly type: 'precipitate'; readonly color: 'white' | 'blue' | 'reddish-brown' }
-  | { readonly id: string; readonly type: 'gas'; readonly intensity: 'low' | 'medium' }
+  | { readonly id: string; readonly type: 'gas'; readonly intensity: 'low' | 'medium'; readonly context: 'liquid' | 'heated-solid' }
   | { readonly id: string; readonly type: 'solid-color-change'; readonly color: 'black' | 'pale-white' }
   | { readonly id: string; readonly type: 'temperature-rise'; readonly intensity: 'low' }
 

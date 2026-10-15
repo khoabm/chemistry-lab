@@ -99,7 +99,7 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M8 polish, extending M7: place and move beakers, test tubes and alcohol lamps.
+M9 reaction dynamics, extending M8: place and move beakers, test tubes and alcohol lamps.
 These three types are exposed by the explicit paletteEquipmentTypes list;
 Dropper remains supported internally but is hidden from the normal 2D palette.
 Drag equipment from the palette onto the bench or click to add it.
@@ -266,9 +266,19 @@ to the actual drawn liquid surface and fade with small rings. R6 keeps clear liq
 and uses an explicitly explained thermometer symbol, without a measured temperature,
 steam or solution color change. Motion and geometry illustrate the registered
 observation rather than physical settling times or individual product morphology.
-Gas bubbles repeat while that result is displayed, and persist when moving a
-container or showing its drag preview. Reduced-motion preferences disable effect
-animation while retaining static shapes and textual observations. Each equipment
+M9 uses compressed, qualitative demonstrations, not measured reaction times:
+R1–R4 form and settle their precipitates, retaining the colored deposit; R5 medium
+liquid gas develops and declines over a finite window; R6's restrained warming
+cue ends. R7 gradually transforms green solid to black with finite, weaker low
+gas release from the heated solid; R8 gradually transforms blue solid to pale/white
+without a new vapor effect. The final transformed solids remain after cooling.
+Presentation deadlines (3.5–8 seconds depending on effect) are teaching choices,
+not kinetics, yields or temperatures. All views share the same occurrence age:
+movement, tabs, dialog and drag preview continue the current stage or final state.
+Only a genuinely new evaluation starts a new demonstration. R7 gas is hidden
+while not heating and never restarts after its presentation window has ended.
+Reduced-motion preferences retain static intermediate cues only during their
+finite windows, persistent deposits/solids and textual observations. Each equipment
 instance exposes its result through an accessible description. Clear/add/reset
 remove the corresponding effects and educational result.
 
@@ -283,6 +293,7 @@ The M5 implementation and validation record live in `plans/m5-alcohol-lamp-and-h
 The M6 implementation and validation record live in `plans/m6-heat-reactions.md`.
 The M7 implementation and validation record live in `plans/m7-teaching-ux.md`.
 The M8 implementation, acceptance and browser-verification limits live in `plans/m8-polish.md`.
+The M9 design, implementation and validation record live in `plans/m9-reaction-dynamics.md`.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

@@ -5,13 +5,15 @@ import { EquipmentVisual } from './EquipmentVisual'
 import type { ChemicalPortion } from '../../../types/container'
 import type { ReactionResult } from '../../../simulation/reactions/types'
 import type { AlcoholLampState } from '../../../types/heating'
+import type { ReactionPresentation } from '../renderers/reactionDynamics'
 
-export function EquipmentDragPreview({ preview, contents, reactionResult = null, lampStatus = 'extinguished', heating = false }: {
+export function EquipmentDragPreview({ preview, contents, reactionResult = null, lampStatus = 'extinguished', heating = false, presentation }: {
   preview: DragPreview
   contents?: readonly ChemicalPortion[] | undefined
   reactionResult?: ReactionResult | null
   lampStatus?: AlcoholLampState['status']
   heating?: boolean
+  presentation?: ReactionPresentation | undefined
 }) {
   return (
     <div
@@ -20,6 +22,7 @@ export function EquipmentDragPreview({ preview, contents, reactionResult = null,
       aria-hidden="true"
     >
       <EquipmentVisual equipmentType={preview.source.equipmentType} contents={contents} reactionResult={reactionResult}
+        presentation={presentation}
         lampStatus={lampStatus} heating={heating} />
       <span>{equipmentLabels[preview.source.equipmentType]}</span>
       <span className="equipment-drag-feedback">{preview.valid ? 'Release to place' : 'Move onto bench'}</span>

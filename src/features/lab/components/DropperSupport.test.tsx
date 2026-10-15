@@ -18,7 +18,7 @@ function ExistingDropperBench() {
     return labWorkspaceReducer(lamp, { type: 'toggle-lamp', equipmentId: lamp.selectedEquipmentId! })
   })
   const interaction = useEquipmentInteraction(state, dispatch)
-  return <LabWorkspace state={state} interaction={interaction} />
+  return <LabWorkspace presentations={new Map()} state={state} interaction={interaction} />
 }
 
 describe('retained internal Dropper support', () => {

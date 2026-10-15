@@ -1,7 +1,8 @@
-import { useId } from 'react'
+import { useId, type CSSProperties } from 'react'
 import type { ContentsLayout } from '../renderers/contentsPresentation'
+import { completedPresentation, effectDurationMs, effectIsActive, type ReactionPresentation } from '../renderers/reactionDynamics'
 
-export function ContainerContentsVisual({ layout, reacted = false, solidColor }: { layout: ContentsLayout; reacted?: boolean; solidColor?: string | undefined }) {
+export function ContainerContentsVisual({ layout, reacted = false, solidColor, presentation = completedPresentation }: { layout: ContentsLayout; reacted?: boolean; solidColor?: string | undefined; presentation?: ReactionPresentation }) {
   const sheenId = useId()
   const { liquids, solids, total, height, surface, bottom, x, width } = layout
   if (!reacted && liquids.length === 0 && solids.length === 0) return null
@@ -34,7 +35,9 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor }:
       {(!reacted || solidColor) && solids.map((sample, index) => {
         const base = bottom - index * 7
         return <g key={sample.chemicalId} data-content-state="solid" data-reaction-effect={solidColor ? 'solid-color-change' : undefined}
-          className={solidColor ? 'reacted-solid' : undefined} fill={solidColor ?? sample.chemical.color} stroke="#62736b" strokeWidth="0.4">
+          className={solidColor ? `reacted-solid${effectIsActive('solid-color-change', presentation) ? ' is-transforming' : ''}` : undefined}
+          style={solidColor ? { '--initial-solid-color': sample.chemical.color, '--final-solid-color': solidColor, '--effect-duration': `${effectDurationMs['solid-color-change']}ms` } as CSSProperties : undefined}
+          fill={solidColor ?? sample.chemical.color} stroke="#62736b" strokeWidth="0.4">
           <path d={`M${x} ${base}l${width * 0.15}-5 ${width * 0.15} 1 ${width * 0.2}-4 ${width * 0.2} 3 ${width * 0.15}-1 ${width * 0.15} 6Z`} />
           {[0.2, 0.4, 0.58, 0.76].map((offset, grain) => <path key={offset}
             d={`M${x + width * offset} ${base - 3 - grain % 2}l1-2 2 1-1 2Z`} />)}

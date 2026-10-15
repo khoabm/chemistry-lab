@@ -44,7 +44,8 @@ describe('M6 laboratory heat flow', () => {
     expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('Simplified acid-base neutralization')
     tick(heatReactionDelayMs * 2)
     expect(screen.getByRole('status', { name: 'Mix result' })).toHaveTextContent('Simplified acid-base neutralization')
-    expect(sample.querySelector('[data-reaction-effect="temperature-rise"]')).toBeInTheDocument()
+    // The committed Mix result survives, but its M9 warming activity has ended.
+    expect(sample.querySelector('[data-reaction-effect="temperature-rise"]')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
     expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('cancelled by Mix')
   })

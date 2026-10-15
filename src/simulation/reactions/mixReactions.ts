@@ -55,7 +55,7 @@ export const mixReactions: readonly ReactionDefinition[] = [
       { id: 'water', name: 'Water', formula: 'H2O' },
       { id: 'carbon-dioxide', name: 'Carbon dioxide', formula: 'CO2' },
     ],
-    effects: [{ id: 'r5-gas', type: 'gas', intensity: 'medium' }],
+    effects: [{ id: 'r5-gas', type: 'gas', intensity: 'medium', context: 'liquid' }],
     observation: 'The reaction releases carbon dioxide gas, which appears as bubbles.',
   },
   {
