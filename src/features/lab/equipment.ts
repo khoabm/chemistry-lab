@@ -8,10 +8,3 @@ export const equipmentTypes: readonly EquipmentType[] = [
 export const paletteEquipmentTypes: readonly EquipmentType[] = [
   'beaker', 'test-tube', 'alcohol-lamp',
 ]
-
-export const equipmentLabels: Record<EquipmentType, string> = {
-  beaker: 'Beaker',
-  'test-tube': 'Test tube',
-  dropper: 'Dropper',
-  'alcohol-lamp': 'Alcohol lamp',
-}

@@ -219,6 +219,7 @@ No:
 - [x] Preserve and extend fallback, stable-ID and lifecycle regression coverage.
 - [x] Add editorial guide/glossary and synchronize architecture documentation.
 - [x] Validate migration and perform focused browser QA.
+- [x] Review migrated M10 boundaries and remove the unused pre-JSON equipment-label catalog; synchronize publication/CI history.
 - [ ] User review and milestone approval.
 
 ## Decision log
@@ -266,7 +267,7 @@ them with registry data. Canonical English indexes still prove catalog completen
 
 ## Outcomes and retrospective
 
-### Architecture correction in progress — 2026-10-16
+### Architecture correction — 2026-10-16
 
 Baseline: active/required/current branch M10, clean tree, HEAD
 `de8c5c6ede06717c46133f278fadea87714f399e`; completed M9 ff317ee is an ancestor.
@@ -278,9 +279,10 @@ effect-description default translator, interaction message-key type, JSON resour
 localization tests, package/lock and TypeScript JSON imports. Simulation, reducer,
 live/replay/heat hooks and styling are not migration targets.
 The baseline's hosted CI run `38765411908` succeeded for de8c5c6 (verified using
-GitHub's public runs API). That historical result does not validate this unpushed
-migration. Current local validation: typecheck/lint PASS, targeted localization
-tests PASS (12), full suite PASS (323 tests / 24 files), build PASS (86 modules).
+GitHub's public runs API). That baseline result does not validate the migration;
+the later published migration result is recorded below. Local validation:
+typecheck/lint PASS, targeted localization tests PASS (12), full suite PASS
+(323 tests / 24 files), build PASS (86 modules).
 Final diff review confirms no simulation, domain, reducer, M9 live/replay/heat hook,
 CSS or CI-workflow changes. Interaction-hook changes are a type-import path only.
 
@@ -331,9 +333,13 @@ dialog retained its existing vertical scroll. Screenshots are saved under ignore
 Limits remain: no broad multi-browser, physical touch-device, projector or screen-
 reader verification, and no available reduced-motion browser emulation. Existing
 M9 reduced-motion tests pass unchanged. Chemistry terminology in the new table is
-pending teacher/SGK review, not newly approved. This migration is uncommitted and
-has no new hosted CI result. No commit, push, merge, PR or milestone advancement
-was performed; approval remains the user's decision.
+pending teacher/SGK review, not newly approved. At delivery this migration was
+uncommitted; the user subsequently published commit
+`7d469bcd54b80e8345042729d4313d8f82983b6c`. GitHub Actions run `38894814624`
+completed successfully for that exact SHA (verified through GitHub's runs API).
+This records repository history, not authorization for Codex to publish review
+fixes. Codex has not committed, pushed, merged, created a PR or advanced the
+milestone; approval remains the user's decision.
 
 ### Initial custom-runtime delivery (historical, superseded above)
 
@@ -498,3 +504,35 @@ or debug-code defect was confirmed in this review. Teacher/SGK terminology revie
 and broader browser/touch/screen-reader/projector QA remain non-blocking follow-up
 work, not grounds for new features/refactoring. The two source-line fixes and two
 plan updates remain uncommitted on M10; no publication or milestone action was taken.
+
+### Post-migration review — 2026-10-16
+
+Started on the required active branch M10 with a clean tree at
+`7d469bcd54b80e8345042729d4313d8f82983b6c`. Reviewed the localization resources,
+provider/selectors, application state, interaction/heat orchestration, M9 live and
+replay ownership, semantic rendering, dependencies and regression coverage.
+
+Confirmed one unused source artifact: `equipmentLabels` in
+`src/features/lab/equipment.ts` has no remaining consumers after JSON migration.
+Remove that obsolete duplicate English label table. Keep supported/palette type
+catalogs, JSON labels (including internal Dropper), renderer and interactions intact.
+No new behavior or abstraction is needed; existing label/palette/Dropper and
+localization regressions are appropriate coverage, with no tests weakened.
+Also correct the migration outcome's stale in-progress/uncommitted/no-hosted-CI
+wording using the published SHA and successful run recorded above.
+
+Validation: `npm run typecheck` PASS; `npm run lint` PASS;
+`npm test -- --maxWorkers=2` PASS (323 tests / 24 files); post-cleanup targeted
+`npm test -- --maxWorkers=2 src/localization/localization.test.tsx src/features/lab/components/DropperSupport.test.tsx`
+PASS (13 tests / 2 files); `npm run build` PASS (86 modules);
+`git diff --check` PASS with the existing command-local safecrlf override.
+Existing ignored TEMP/TMP cache workaround only; dependencies, test configuration
+and timeouts are unchanged. No new browser QA was required for unused-constant
+removal; earlier browser limits remain unchanged.
+
+No further actionable scope, Git-workflow, architecture, chemistry/UI boundary,
+state-ownership, technology or typing defect was confirmed. Teacher/SGK terminology
+review and broader browser/touch/screen-reader/projector verification remain optional
+follow-up work. Only the unused table and this living plan changed in this review.
+These review fixes are uncommitted and have no new hosted CI result; no commit,
+push, merge, PR or milestone advancement was performed.
