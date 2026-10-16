@@ -17,7 +17,9 @@ export function LampDetails({ lamp, disabled, onToggle }: {
     <button type="button" className={`action-button action-button--${lamp.status === 'lit' ? 'secondary' : 'primary'}`} disabled={disabled} onClick={onToggle}>
       {lamp.status === 'lit' ? t('action.extinguish') : t('action.ignite')}
     </button>
-    <p className="empty-caption">{t('lamp.moveHint')}</p>
-    <p className="empty-caption">{t('lamp.waitHint')}</p>
+    {lamp.status === 'lit' && <>
+      <p className="empty-caption">{t('lamp.moveHint')}</p>
+      <p className="empty-caption">{t('lamp.waitHint')}</p>
+    </>}
   </section>
 }

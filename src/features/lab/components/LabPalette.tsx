@@ -71,7 +71,6 @@ export function LabPalette({ interaction, canAddChemical, onAddChemical }: {
           </p>
         </section>
         <ChemicalPalette canAdd={canAddChemical} onAdd={onAddChemical} />
-        <p className="palette-note">{t('materials.note')}</p>
       </div>
     </aside>
   )

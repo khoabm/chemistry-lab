@@ -266,7 +266,7 @@ Intentionally pending teacher/SGK review (English fallback in VI):
 - All registered product names; use `product.<id>` in that chemistry resource.
 - Effect observations (`effect.*`), precipitate/gas/warming/heating legends and
   scientific captions (`result.*Legend`, `sample.transformedHint`,
-  `sample.quantityHint`, `materials.quantityHint`, `lamp.waitHint`, `help.quantities`,
+  `sample.quantityHint`, `lamp.waitHint`, `help.quantities`,
   `help.limits`), and Solution/Solid state metadata. Add reviewed values in `vi/ui.json`.
 - Unsupported-result educational guidance (`result.unsupported`, `result.retry`).
 

@@ -43,7 +43,7 @@ wording, reviewer/reference and approval date here. See `TRANSLATION_GUIDE.md`.
 
 Also pending in `vi/ui.json`: `effect.*` phenomenon descriptions, `sample.solution`,
 `sample.solid`, state metadata, scientific legends/captions (`result.*Legend`,
-`sample.transformedHint`, `sample.quantityHint`, `materials.quantityHint`,
+`sample.transformedHint`, `sample.quantityHint`,
 `lamp.waitHint`, `help.quantities`, `help.limits`) and unsupported-result guidance
 (`result.unsupported`, `result.retry`). Copy keys from `en/ui.json` only after review.
 Formulas/equations never belong in translation overrides. Limiting/excess reactants,

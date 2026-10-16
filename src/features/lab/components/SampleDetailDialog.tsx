@@ -9,6 +9,7 @@ import { ReactionObservation } from './ReactionObservation'
 import { HeatingStatus } from './HeatingStatus'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { useReactionReplay } from '../hooks/useReactionReplay'
+import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 
 export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation }: {
   container: ContainerState
@@ -75,7 +76,8 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
           </div>}
         </div>
         <div>
-          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} />
+          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation}
+            showInactive={isCompletedHeatReaction(container.reactionResult)} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
             : <p className="empty-caption">{t('dialog.starting')}</p>}
         </div>

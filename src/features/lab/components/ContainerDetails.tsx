@@ -33,7 +33,8 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
       <p className="visually-hidden" role="status" aria-label={t('sample.contentsStatus')} aria-live={contentsLive} aria-atomic="true">
         {contentsSummary ? t('sample.selectedSummary', { contents: contentsSummary }) : t('sample.emptySummary')}
       </p>
-      <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} />
+      <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation}
+        showInactive={isCompletedHeatReaction(container.reactionResult)} />
       {container.contents.length === 0 ? <p className="empty-caption">{t('sample.empty')}</p> : (
         <ul className="contents-list" aria-label={t('sample.contentsList')}>
           {container.contents.map((portion) => {
@@ -48,17 +49,16 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
           })}
         </ul>
       )}
-      {!container.reactionResult && <p className="empty-caption">{container.contents.length === 0
-        ? t('sample.nextEmpty')
-        : container.heatEvaluation.status === 'pending'
-          ? t('sample.nextPending')
-          : t('sample.nextReady')}</p>}
+      {container.contents.length > 0 && (container.heatEvaluation.status === 'pending'
+        ? <p className="empty-caption">{t('sample.nextPending')}</p>
+        : !container.reactionResult && <p className="empty-caption">{t('sample.nextReady')}</p>)}
       <div className="container-actions">
         <button type="button" className="action-button action-button--primary" disabled={disabled || container.contents.length === 0 || isCompletedHeatReaction(container.reactionResult)} onClick={onMix}>{t('action.mix')}</button>
         <button type="button" className="action-button action-button--secondary" disabled={disabled || container.contents.length === 0}
+          aria-describedby={container.contents.length > 0 ? 'empty-container-hint' : undefined}
           onClick={onClear}>{t('action.empty')}</button>
       </div>
-      <p className="empty-caption">{t('sample.emptyHint')}</p>
+      {container.contents.length > 0 && <p id="empty-container-hint" className="empty-caption">{t('sample.emptyHint')}</p>}
       {container.contents.length > 0 && <figure className="sample-closeup" aria-label={t('sample.closeup')}>
         <button type="button" disabled={disabled} aria-label={t('sample.enlarge')} aria-haspopup="dialog"
           onClick={onEnlarge}>
@@ -69,8 +69,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
         </button>
       </figure>}
       {isCompletedHeatReaction(container.reactionResult) && <p className="empty-caption">{t('sample.transformedHint')}</p>}
-      <p className="empty-caption">{!isCompletedHeatReaction(container.reactionResult) && container.heatEvaluation.status !== 'pending' && <>{t('sample.mixHint')} </>}
-        {t('sample.quantityHint')}</p>
+      {container.contents.length > 0 && <p className="empty-caption">{t('sample.quantityHint')}</p>}
     </section>
   )
 }

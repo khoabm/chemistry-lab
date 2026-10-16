@@ -10,7 +10,7 @@ export function ReactionObservation({ result }: { result: ReactionResult | null 
   const resultLive = useStatusLive(result)
   return <div className="reaction-observation">
     <div className="mix-result" role="status" aria-label={result?.trigger === 'heat' ? t('result.heat') : t('result.mix')} aria-live={resultLive} aria-atomic="true">
-      {result?.status === 'reaction' ? <><span>{t('result.identified')} </span><h3 className="reaction-name">{reactionName(result.reactionId, result.name)}.</h3></> : result ? t('result.noReaction') : null}
+      {result?.status === 'reaction' ? <h3 className="reaction-name">{reactionName(result.reactionId, result.name)}.</h3> : result ? t('result.noReaction') : null}
     </div>
     {result?.status === 'no-reaction' && <div className="no-reaction-guidance">
       <p>{t('result.unsupported', { trigger: result.trigger === 'heat' ? t('action.heat') : t('action.mix') })}</p>

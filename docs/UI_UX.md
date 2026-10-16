@@ -149,8 +149,26 @@ formula/name, quantity and existing state text; decorative cues are aria-hidden.
 Contents use a narrow cue column without changing panel widths or palette density.
 These cues always represent recorded starting substances, including after Mix or
 Heat; they do not depict products, post-reaction composition, quantity or yield.
-See `plans/m10-chemical-identity-pass2.md`. Broad copy cleanup and alcohol-lamp
-tripod/gauze refinement remain pending separate passes.
+See `plans/m10-chemical-identity-pass2.md`. Alcohol-lamp tripod/gauze refinement
+remains pending Pass 4.
+
+M10 Pass 3 supersedes only repeated persistent instructions: Materials keeps one
+chemical availability/add hint, with unit/state explanations in optional Help
+and no decorative closing note. Empty Sample combines its state and one next step;
+ready samples offer one Mix/Heat choice, replaced by keep-position/wait/Mix-cancels
+guidance during a pending Heat check, even with an earlier result. Filled samples
+retain the starting-substances/model caption and a shorter accessible Empty
+explanation; transformed Heat samples retain the full product-reaction limitation.
+Heating/evaluation status regions stay mounted with existing live behavior; idle
+feedback is visually hidden, while active/pending/cancelled/completed feedback is
+visible. Not heating remains visible after cancellation/completion and for cooled
+transformed samples even when evaluation returns to idle. Cancellation retains
+retry guidance. Lamp positioning/wait instructions
+appear only while lit. Results omit only the Reaction identified prefix; names,
+observations, equations, explanations, products, legends and unsupported guidance
+remain. Shared dialog components receive the same copy treatment without changing
+layout or replay. No chemistry/state/interaction semantics change. See
+`plans/m10-contextual-copy-pass3.md`.
 
 The chemical palette should display available chemicals in an easily
 recognizable manner.

@@ -41,7 +41,6 @@ export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
       <p id="chemical-palette-hint" className="empty-caption">
         {canAdd ? t('materials.addChemical') : t('materials.selectContainer')}
       </p>
-      <p className="empty-caption">{t('materials.quantityHint')}</p>
       <div id={catalogId} className="chemical-palette">
         {visibleChemicals.map((chemical) => (
           <button key={chemical.id} className="chemical-palette-item" type="button"
