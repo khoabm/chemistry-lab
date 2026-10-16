@@ -2,8 +2,8 @@ import { chemicals, type ChemicalId } from '../simulation/chemicals/catalog'
 import { mixReactions } from '../simulation/reactions/mixReactions'
 import { heatReactions } from '../simulation/reactions/heatReactions'
 import type { ReactionId, ProductDefinition } from '../simulation/reactions/types'
-import { viChemicalNames, viReactionNames, viReactionExplanations, viProductNames } from './vi'
-import { resolveText, type Locale } from './translation'
+import type { i18n } from 'i18next'
+import { useTranslation } from 'react-i18next'
 
 // Canonical English metadata is read upward by presentation; simulation never imports i18n.
 const reactions = [...mixReactions, ...heatReactions]
@@ -12,11 +12,17 @@ export const enReactionNames = Object.fromEntries(reactions.map((reaction) => [r
 export const enReactionExplanations = Object.fromEntries(reactions.map((reaction) => [reaction.id, reaction.observation])) as Record<ReactionId, string>
 export const enProductNames: Readonly<Record<string, string>> = Object.fromEntries(reactions.flatMap((reaction) => reaction.products.map((product) => [product.id, product.name])))
 
-export function chemistryCopy(locale: Locale) {
+export function chemistryCopy(instance: i18n) {
+  const t = instance.getFixedT(instance.language, 'chemistry')
   return {
-    chemicalName: (id: ChemicalId) => resolveText(enChemicalNames[id], locale === 'vi' ? viChemicalNames[id] : undefined),
-    reactionName: (id: ReactionId, english = enReactionNames[id]) => resolveText(english, locale === 'vi' ? viReactionNames[id] : undefined),
-    reactionExplanation: (id: ReactionId, english = enReactionExplanations[id]) => resolveText(english, locale === 'vi' ? viReactionExplanations[id] : undefined),
-    productName: (product: ProductDefinition) => resolveText(product.name, locale === 'vi' ? viProductNames[product.id] : undefined),
+    chemicalName: (id: ChemicalId) => t(`chemical.${id}`, { defaultValue: enChemicalNames[id] }),
+    reactionName: (id: ReactionId, english = enReactionNames[id]) => t(`reaction.${id}.name`, { defaultValue: english }),
+    reactionExplanation: (id: ReactionId, english = enReactionExplanations[id]) => t(`reaction.${id}.explanation`, { defaultValue: english }),
+    productName: (product: ProductDefinition) => t(`product.${product.id}`, { defaultValue: product.name }),
   }
+}
+
+export function useChemistryCopy() {
+  const { i18n } = useTranslation('chemistry')
+  return chemistryCopy(i18n)
 }

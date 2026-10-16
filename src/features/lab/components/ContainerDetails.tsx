@@ -1,4 +1,6 @@
-import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { useChemistryCopy } from '../../../localization/chemistry'
+import { useTranslation } from 'react-i18next'
+import { useStatusLive } from '../../../localization/useStatusLive'
 import { findChemical } from '../../../simulation/chemicals/catalog'
 import type { ContainerState } from '../../../types/container'
 import type { EquipmentType } from '../../../types/equipment'
@@ -19,10 +21,11 @@ interface ContainerDetailsProps {
 }
 
 export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, presentation, visible = true }: ContainerDetailsProps) {
-  const { t, chemicalName } = useLocalization()
+  const { t } = useTranslation()
+  const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
   const contentsSummary = container.contents.map(({ chemicalId, quantity }) =>
-    `${chemicalName(chemicalId)}, ${quantity} ${quantity === 1 ? t('sample.unit') : t('sample.units')}`).join('; ')
+    `${chemicalName(chemicalId)}, ${quantity} ${t('sample.unit', { count: quantity })}`).join('; ')
   return (
     <section className="container-details" aria-labelledby="contents-title">
       <h3 id="contents-title">{t('sample.contentsTitle')}</h3>
@@ -36,7 +39,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
             const chemical = findChemical(portion.chemicalId)
             return chemical && <li key={portion.chemicalId}>
               <strong>{chemical.formula} · {chemicalName(chemical.id)}</strong>
-              <span>{portion.quantity} {portion.quantity === 1 ? t('sample.unit') : t('sample.units')} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
+              <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
             </li>
           })}
         </ul>

@@ -1,4 +1,4 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
 import { useRef, useState } from 'react'
 import { paletteEquipmentTypes } from '../equipment'
 import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
@@ -11,7 +11,7 @@ export function LabPalette({ interaction, canAddChemical, onAddChemical }: {
   canAddChemical: boolean
   onAddChemical: (chemicalId: ChemicalId) => void
 }) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   const [isExpanded, setExpanded] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
 

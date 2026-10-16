@@ -1,4 +1,4 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
 import { LanguageSelect } from '../../../localization/LanguageSelect'
 interface LabHeaderProps {
   canReset: boolean
@@ -6,7 +6,7 @@ interface LabHeaderProps {
 }
 
 export function LabHeader({ canReset, onReset }: LabHeaderProps) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   return (
     <header className="lab-header">
       <div className="lab-brand">

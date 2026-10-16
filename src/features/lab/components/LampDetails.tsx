@@ -1,4 +1,5 @@
-import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
+import { useStatusLive } from '../../../localization/useStatusLive'
 import type { AlcoholLampState } from '../../../types/heating'
 import { EquipmentVisual } from './EquipmentVisual'
 
@@ -7,7 +8,7 @@ export function LampDetails({ lamp, disabled, onToggle }: {
   disabled: boolean
   onToggle: () => void
 }) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   const lampLive = useStatusLive(lamp.status)
   return <section className="lamp-details" aria-labelledby="lamp-details-title">
     <h3 id="lamp-details-title">{t('lamp.title')}</h3>

@@ -16,8 +16,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "i18next": "^26.4.7",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "react-i18next": "^17.0.19"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

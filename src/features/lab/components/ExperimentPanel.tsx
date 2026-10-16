@@ -1,4 +1,4 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
 import { useId, useRef, useState } from 'react'
 import { isContainerEquipment, type ContainerState } from '../../../types/container'
 import type { EquipmentInstance } from '../../../types/equipment'
@@ -23,7 +23,7 @@ interface ExperimentPanelProps {
 }
 
 export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation }: ExperimentPanelProps) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
   const resultTab = useRef<HTMLButtonElement>(null)

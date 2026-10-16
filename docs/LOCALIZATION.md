@@ -215,19 +215,38 @@ and safe Vietnamese fallback.
 
 ## 16. Implemented M10 resources and terminology review
 
-`src/localization/en.ts` is the complete typed UI resource; `vi.ts` supplies partial
-Vietnamese UI overrides and optional chemistry-name/prose dictionaries keyed by
-stable IDs. Omit a Vietnamese entry when it is unapproved; empty/whitespace values
-also fall back to English. Keep interpolation tokens such as `{name}` unchanged.
-Tests validate English completeness, VI placeholder compatibility and registered
-chemistry override IDs. Do not add a UI key without an English value.
+`src/i18n/index.ts` configures i18next and react-i18next. Eager plain JSON resources
+under `src/i18n/locales/en/ui.json` and `vi/ui.json` contain UI, Help, observations
+and captions. Semantic dotted keys are literal keys (`keySeparator: false`), not
+JavaScript code. English keys also provide the TypeScript UI-key contract.
+`vi/chemistry.json` contains optional flat chemistry-name/prose overrides keyed by
+stable IDs. It is initially empty pending teacher review.
+
+Omit an unapproved Vietnamese entry. Blank/whitespace entries are treated as absent
+at resource ingestion; i18next handles English fallback (`fallbackLng: en`), empty/
+null fallback, interpolation and language-appropriate plurals. Keep tokens such as
+`{{name}}` unchanged; `_one`/`_other` forms use i18next's `count` option. React escapes
+the rendered text. No custom translator, fallback lookup or interpolation parser
+remains. Tests cover JSON loading, English completeness, VI placeholder compatibility,
+plural forms and registered chemistry override IDs. Do not add a UI key without English.
 
 `chemistry.ts` reads canonical English chemical/reaction/product metadata into
 presentation indexes. For a recorded result, its supplied name/explanation/product
 name remains the English fallback; localization does not reconstruct chemistry
 from an ID or overwrite stored metadata. Formulas/equations and model IDs stay
-unchanged. `translation.ts` performs bounded lookup/interpolation; the React
-provider owns only the session locale. No package or global mutable locale is used.
+unchanged. `chemistry.ts` requests i18next's `chemistry` namespace using keys such as
+`chemical.sodium-chloride`, `reaction.R7.name`, `reaction.R7.explanation` and
+`product.copper-oxide`. English chemistry resources are deliberately not duplicated:
+the registered/recorded English text is supplied through i18next `defaultValue`.
+This preserves a recorded result's own metadata even when it differs from catalog
+wording under the same ID. Localization/content may read domain metadata; simulation
+and domain never import i18next, react-i18next or translation resources.
+
+`LocalizationProvider` owns one stable, session-local instance through
+`I18nextProvider`; React components use `useTranslation` directly. The library's
+standalone English default instance is separate from the mutable session instance.
+There is no custom locale Context, second locale store, backend or language detection.
+Mounted lab, heat and M9 live/replay owners survive language changes unchanged.
 
 Language is a labeled native select in the global header, reused in the enlarged
 dialog header because native modal inertness blocks the outer control. It remains
@@ -241,17 +260,21 @@ announcements, without timers or remounting status regions.
 Intentionally pending teacher/SGK review (English fallback in VI):
 
 - Names for all 11 chemicals in the current catalog, from silver nitrate through
-  copper(II) sulfate pentahydrate; edit `viChemicalNames` by chemical ID.
-- All R1–R8 reaction names and educational explanations; edit `viReactionNames`
-  and `viReactionExplanations` by reaction ID.
-- All registered product names; edit `viProductNames` by product ID.
+  copper(II) sulfate pentahydrate; use `chemical.<id>` in `vi/chemistry.json`.
+- All R1–R8 reaction names and educational explanations; use `reaction.<id>.name`
+  and `reaction.<id>.explanation` in that chemistry resource.
+- All registered product names; use `product.<id>` in that chemistry resource.
 - Effect observations (`effect.*`), precipitate/gas/warming/heating legends and
   scientific captions (`result.*Legend`, `sample.transformedHint`,
   `sample.quantityHint`, `materials.quantityHint`, `lamp.waitHint`, `help.quantities`,
-  `help.limits`), and Solution/Solid state metadata. Add reviewed values in `vi`.
+  `help.limits`), and Solution/Solid state metadata. Add reviewed values in `vi/ui.json`.
 - Unsupported-result educational guidance (`result.unsupported`, `result.retry`).
 
 Generic buttons, tabs, equipment labels, instructions, status feedback and replay
 copy are translated. This is not a claim that the pending chemistry vocabulary
 has been approved. Limiting/excess reactants, consumption, post-reaction composition
 and reaction chaining remain deferred; no related behavior was introduced.
+
+Non-developers should follow `TRANSLATION_GUIDE.md`; `VI_CHEMISTRY_TERMS.md` records
+the pending curriculum review table and stable keys. Content editing requires no
+React, reducer, simulation or TypeScript-source edit.

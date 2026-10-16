@@ -38,11 +38,9 @@ Expected product capabilities:
 - no use of localized strings as domain/simulation identity
 - tests that protect fallback and preservation of active lab/reaction/replay state
 
-The exact library, resource structure and component integration must be decided
-after inspecting the repository and current dependency set. A standard maintained
-React i18n solution is preferred over ad-hoc translation logic when it materially
-reduces custom infrastructure, but no dependency choice is mandated before source
-inspection.
+The current user-approved architecture correction requires i18next/react-i18next
+and editor-friendly JSON resources. Source inspection determines the smallest
+integration while preserving all behavior of the earlier foundation.
 
 ## Translation policy
 
@@ -95,19 +93,21 @@ responsive/scrolling patterns.
 
 `LabPage` owns a page-local reducer; chemistry remains under `src/simulation`,
 and stable result references drive `useReactionDynamics`. `useReactionReplay`
-owns a separate dialog-local clock. Existing text is inline JSX, equipment labels,
-interaction feedback and semantic-effect descriptions. There is no localization
-package or content service. SVG renderers contain no localized copy.
+owns a separate dialog-local clock. At the migration baseline, text uses typed
+EN/VI TypeScript resources through a custom Context/lookup/interpolator under
+`src/localization`. Existing tests already protect fallback, selectors, live/replay
+identity and heat deadlines. SVG renderers contain no localized copy.
 
 ## Proposed design
 
-Use a small presentation-only React Context provider above the existing lab page,
-without keying/remounting it on locale. Eager EN/VI TypeScript resources use semantic
-keys, complete English values, partial Vietnamese and explicit non-empty fallback.
-Lookup/interpolation is the only translation infrastructure: no plural framework,
-locale detection, persistence, async loading or external dependency is needed for
-two small locales. Preserve the existing React/TypeScript/Vite, npm, plain CSS/SVG,
-native pointer interaction and Vitest/RTL stack.
+Use i18next and react-i18next as presentation/content infrastructure. A stable,
+session-local i18next instance is provided above the existing lab tree without
+keying/remounting it on language changes. Eager JSON resources under
+`src/i18n/locales/{en,vi}` retain semantic keys; the small UI catalog includes Help,
+and a separate chemistry namespace contains optional stable-ID overrides.
+i18next owns lookup, English fallback, interpolation and pluralization. No locale
+detection, persistence, backend or asynchronous loading is needed. Preserve the
+existing React/TypeScript/Vite, npm, plain CSS/SVG, pointer and Vitest/RTL stack.
 
 A shared labeled native Language select lives with global header preferences.
 Reuse it in the native dialog header because the outer header is inert while
@@ -132,13 +132,14 @@ ReactionResult, chemical model, reducer action or heat/lifecycle model changes.
 
 ## Implementation steps
 
-1. Add resources, typed lookup/fallback, context, shared Language selector and tests.
-2. Migrate visible/accessibility copy across existing components and feedback while
-   preserving React identity, focus and live-region semantics.
-3. Add complete-English, missing-VI, state/identity, active live/replay/Auto, heat,
-   notation and accessibility regressions. Keep all M9 tests unchanged.
-4. Validate full suite/build, browser-QA desktop/narrow/landscape and both locales;
-   update README/localization docs and this plan with results/terminology limits.
+1. Install i18next/react-i18next through npm; migrate existing wording into JSON,
+   retaining keys except standard i18next interpolation/plural suffix conversion.
+2. Replace custom Context/translator with I18nextProvider/useTranslation; retain
+   project-specific chemistry-ID/defaultValue and locale-only live suppression.
+3. Adapt complete-English/fallback tests and add plural, ID-override and instance
+   isolation coverage. Preserve all identity/live/replay/Auto/heat and M9 tests.
+4. Add the translation guide/review table, update current architecture docs and
+   validate full suite/build plus focused EN/VI browser QA.
 
 ## Git and technology validation
 
@@ -147,9 +148,10 @@ Active/required/current milestone and branch: M10. Initial HEAD
 completed M9 `ff317ee1bb46ec5dc446cc6970d63d84017d8a70` is an ancestor. Preserve all
 existing work; no commit/push/merge or milestone advancement is authorized.
 React 19.3, strict TypeScript 5.9, Vite 8, npm/package-lock, Node >=24, page reducer
-and local hooks, plain CSS/SVG, native Pointer Events, Vitest/RTL/jsdom. No new
-dependency: the bounded lookup/context implementation is smaller than integrating
-a library and its instance/event lifecycle for this two-locale plain-text scope.
+and local hooks, plain CSS/SVG, native Pointer Events, Vitest/RTL/jsdom. The initial
+foundation used no localization package. The user-approved architecture correction
+adds i18next/react-i18next to replace that custom responsibility with maintained
+fallback/interpolation/plural/React integration; there is no competing i18n package.
 
 ## Testing and validation
 
@@ -212,9 +214,23 @@ No:
 - [x] Refine shared language utility styling and header grouping; preserve native semantics.
 - [x] Validate focused selector accessibility, lifecycle regressions and responsive browser QA.
 - [x] Review M10 boundaries and regressions; fix locale-dependent heat status styling and stale inherited M9 outcome wording.
+- [x] Inspect architecture migration baseline: clean M10 at de8c5c6; read resources, localization and M9 regression tests.
+- [x] Replace custom runtime with i18next/react-i18next and editable JSON resources.
+- [x] Preserve and extend fallback, stable-ID and lifecycle regression coverage.
+- [x] Add editorial guide/glossary and synchronize architecture documentation.
+- [x] Validate migration and perform focused browser QA.
 - [ ] User review and milestone approval.
 
 ## Decision log
+
+- Architecture correction, 2026-10-16: the user explicitly requires i18next and
+  react-i18next, superseding the initial custom-runtime choice below. Registry
+  stable versions are i18next 26.4.7 and react-i18next 17.0.19; peer requirements
+  support React 19 and TypeScript 5. Eager JSON avoids loading/remount boundaries.
+  Keep chemistry English defaults from recorded/domain metadata, with optional
+  VI overrides resolved through i18next by stable ID, not duplicated definitions.
+  Only blank resource ingestion and chemistry-ID helpers remain project-specific;
+  no custom translation parser, fallback lookup or localization Context remains.
 
 - M10 starts only after M9 code/replay review passed.
 - English is mandatory complete fallback; Vietnamese incompleteness is preferable to
@@ -226,10 +242,10 @@ No:
   redesign those surfaces.
 - Keep locale out of lab state and never use it as a React key, timer dependency or
   occurrence identity. Reuse the same mounted live/replay owners through switching.
-- Use typed eager resources and no new package for the current bounded scope;
-  defer broader i18n infrastructure until a concrete need exists.
+- Initial foundation used typed eager resources and no package; superseded by the
+  user-approved i18next/JSON architecture correction recorded above.
 - Native modal inertness requires the same global preference control in its header;
-  use one shared component/context, not a second preference store.
+  use one shared component/provider, not a second preference store.
 - Selector review fix: retain native select/autonyms and its localized label as
   visually hidden text. Use one compact, transparent utility treatment with a
   decorative globe/chevron, 44px target and existing focus indication. Group header
@@ -249,6 +265,77 @@ the recorded result's own name/explanation/product names, rather than replacing
 them with registry data. Canonical English indexes still prove catalog completeness.
 
 ## Outcomes and retrospective
+
+### Architecture correction in progress — 2026-10-16
+
+Baseline: active/required/current branch M10, clean tree, HEAD
+`de8c5c6ede06717c46133f278fadea87714f399e`; completed M9 ff317ee is an ancestor.
+No commit/push/merge/advancement is authorized. The historical outcomes below
+describe the earlier custom implementation; this migration supersedes its runtime
+and resource format, preserving wording, selectors, state and timing contracts.
+Affected modules: localization integration, component translation imports, pure
+effect-description default translator, interaction message-key type, JSON resources,
+localization tests, package/lock and TypeScript JSON imports. Simulation, reducer,
+live/replay/heat hooks and styling are not migration targets.
+The baseline's hosted CI run `38765411908` succeeded for de8c5c6 (verified using
+GitHub's public runs API). That historical result does not validate this unpushed
+migration. Current local validation: typecheck/lint PASS, targeted localization
+tests PASS (12), full suite PASS (323 tests / 24 files), build PASS (86 modules).
+Final diff review confirms no simulation, domain, reducer, M9 live/replay/heat hook,
+CSS or CI-workflow changes. Interaction-hook changes are a type-import path only.
+
+Delivered i18next 26.4.7/react-i18next 17.0.19 with two transitive runtime packages;
+npm audit reports no vulnerabilities. Removed custom translator/fallback/parser,
+custom Context and TypeScript wording resources. UI and Help share one small
+`ui.json` namespace per locale; optional VI chemistry uses `chemistry.json`.
+`readContent` only excludes blank/invalid editorial entries before library lookup;
+it is not a translator/fallback implementation. English chemistry defaults remain
+registered/recorded metadata through i18next `defaultValue`, avoiding duplication.
+Native selectors, markup and styles are unchanged apart from their runtime adapter.
+Added plural/interpolation, stable-ID override and session-isolation regressions;
+existing M9 tests are unchanged. Added the short translation guide and pending
+curriculum terminology table; no speculative VI chemistry terms were introduced.
+
+Final validation on Node v25.2.1 (project engine >=24):
+
+- `npm run typecheck`: PASS.
+- `npm run lint`: PASS.
+- `npm test -- --maxWorkers=2 src/localization/localization.test.tsx`: PASS,
+  12 tests, with the original lifecycle/state regressions retained.
+- `npm test -- --maxWorkers=2`: PASS, 323 tests / 24 files.
+- `npm run build`: PASS, 86 modules; JS 344.94 kB / gzip 105.47 kB.
+- `git diff --check`: PASS with command-local `core.safecrlf=false` only.
+
+Existing TEMP/TMP cache workaround only; no test timeout/configuration change.
+An explicit comparison against HEAD confirmed all 177 English / 151 Vietnamese
+UI values retain their wording; placeholders
+now use i18next `{{name}}` syntax and quantity/count forms use `_one`/`_other`.
+
+Browser QA used only the available Codex in-app browser at 1440×960, 390×844 and
+844×390. Inspected EN/VI header, Help, sample/result, chemistry English fallback,
+unchanged formulas/equations and the existing dialog layout. R5 gas stayed active
+through a locale switch and subsequently ended. Explicit replay switched language
+while active with gas only inside the dialog; the live workspace stayed final.
+Manual replay completed. Auto stayed checked through switching and a final-state
+observation hold was observed; closing/reopening returned Auto off with no replay.
+Native keyboard ArrowUp changed language while retaining select focus; Escape
+restored focus to the actual Result opener. A lit lamp and copper-carbonate sample
+were positioned with existing arrow controls: switched EN→VI while heat was
+pending, confirmed it remained pending/heating, then obtained the registered R7
+result without another action. Exact original deadlines and identities are covered
+by the retained automated tests rather than inferred from browser wall time.
+No horizontal overflow was observed at the tested dimensions; the narrow/short
+dialog retained its existing vertical scroll. Screenshots are saved under ignored
+`node_modules/.cache/m10-i18next-{dialog,mobile,header}.png`.
+
+Limits remain: no broad multi-browser, physical touch-device, projector or screen-
+reader verification, and no available reduced-motion browser emulation. Existing
+M9 reduced-motion tests pass unchanged. Chemistry terminology in the new table is
+pending teacher/SGK review, not newly approved. This migration is uncommitted and
+has no new hosted CI result. No commit, push, merge, PR or milestone advancement
+was performed; approval remains the user's decision.
+
+### Initial custom-runtime delivery (historical, superseded above)
 
 Implemented presentation-only localization with 177 complete English message keys
 and 151 Vietnamese generic-UI translations, plus typed chemistry display indexes

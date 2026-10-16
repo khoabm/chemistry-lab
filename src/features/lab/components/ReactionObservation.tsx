@@ -1,9 +1,12 @@
-import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { useChemistryCopy } from '../../../localization/chemistry'
+import { useTranslation } from 'react-i18next'
+import { useStatusLive } from '../../../localization/useStatusLive'
 import type { ReactionResult } from '../../../simulation/reactions/types'
 import { describeReactionEffects } from '../renderers/reactionPresentation'
 
 export function ReactionObservation({ result }: { result: ReactionResult | null }) {
-  const { t, reactionName, reactionExplanation, productName } = useLocalization()
+  const { t } = useTranslation()
+  const { reactionName, reactionExplanation, productName } = useChemistryCopy()
   const resultLive = useStatusLive(result)
   return <div className="reaction-observation">
     <div className="mix-result" role="status" aria-label={result?.trigger === 'heat' ? t('result.heat') : t('result.mix')} aria-live={resultLive} aria-atomic="true">

@@ -387,3 +387,21 @@ large generic frameworks
 
 - hidden event systems
 - complex abstraction hierarchies.
+
+## 15. Localization boundary
+
+Presentation uses i18next/react-i18next through a stable `I18nextProvider` above
+the laboratory. Language is session-local presentation preference, never reducer,
+container or reaction state. Switching language changes copy without remounting
+lab, heat, live-dynamics or replay owners.
+
+`src/i18n` loads editable EN/VI JSON content and configures English fallback,
+interpolation and pluralization. Project-specific helpers in `src/localization`
+read stable domain metadata upward for chemistry names/prose and keep locale-only
+live-region updates quiet. Recorded result metadata remains the English default;
+optional VI overrides use stable IDs. Formulas/equations are not translated.
+
+Allowed: Presentation → localization/content → stable domain metadata.
+Simulation/domain never imports i18next, react-i18next, locale state or translation
+resources. Localization must not determine reaction validity or alter lifecycle
+identity. See `LOCALIZATION.md` and `TRANSLATION_GUIDE.md`.

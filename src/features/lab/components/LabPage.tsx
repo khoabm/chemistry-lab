@@ -1,4 +1,4 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
 import { useReducer } from 'react'
 import { createLabWorkspaceState, labWorkspaceReducer } from '../../../store/labWorkspace'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
@@ -17,7 +17,7 @@ export function LabPage() {
 }
 
 function Laboratory() {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
   useHeatReactions(state.containers, dispatch, !!interaction.preview)

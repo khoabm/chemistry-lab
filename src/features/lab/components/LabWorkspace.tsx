@@ -1,4 +1,6 @@
-import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { useChemistryCopy } from '../../../localization/chemistry'
+import { useTranslation } from 'react-i18next'
+import { useStatusLive } from '../../../localization/useStatusLive'
 import type { LabWorkspaceState } from '../../../store/labWorkspace'
 import type { EquipmentType } from '../../../types/equipment'
 import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
@@ -19,7 +21,8 @@ export function LabWorkspace({
   presentations,
   interaction: { attachBench, preview, message, getEquipmentHandlers },
 }: LabWorkspaceProps) {
-  const { t, reactionName } = useLocalization()
+  const { t } = useTranslation()
+  const { reactionName } = useChemistryCopy()
   const messageLive = useStatusLive(message)
   // Display ordinals are per type on the current bench, independent of stable IDs.
   const counts = new Map<EquipmentType, number>()
@@ -39,7 +42,7 @@ export function LabWorkspace({
           <h2 id="workspace-title">{t('workspace.title')}</h2>
         </div>
         <span className="workspace-status">
-          {state.equipment.length === 0 ? t('workspace.empty') : t(state.equipment.length === 1 ? 'workspace.countOne' : 'workspace.countMany', { count: state.equipment.length })}
+          {state.equipment.length === 0 ? t('workspace.empty') : t('workspace.count', { count: state.equipment.length })}
         </span>
       </div>
       <div

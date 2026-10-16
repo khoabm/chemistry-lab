@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, Dispatch } from 'react'
 import type { LabWorkspaceAction, LabWorkspaceState } from '../../../store/labWorkspace'
 import { nextEquipmentPosition } from '../../../store/labWorkspace'
 import type { EquipmentType, Point } from '../../../types/equipment'
-import type { MessageKey } from '../../../localization/en'
+import type { MessageKey } from '../../../i18n'
 import { benchPosition, isInsideBench } from '../interactions/workspaceGeometry'
 
 export type EquipmentDragSource =

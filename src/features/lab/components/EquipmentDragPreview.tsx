@@ -1,4 +1,4 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
 import type { EquipmentDragPreview as DragPreview } from '../hooks/useEquipmentInteraction'
 import { equipmentFootprint } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
@@ -15,7 +15,7 @@ export function EquipmentDragPreview({ preview, contents, reactionResult = null,
   heating?: boolean
   presentation?: ReactionPresentation | undefined
 }) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   return (
     <div
       className={`equipment-drag-preview ${preview.valid ? 'is-valid' : 'is-invalid'}`}

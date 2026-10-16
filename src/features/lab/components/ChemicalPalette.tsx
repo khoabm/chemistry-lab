@@ -1,4 +1,5 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useChemistryCopy } from '../../../localization/chemistry'
+import { useTranslation } from 'react-i18next'
 import { chemicals } from '../../../simulation/chemicals/catalog'
 import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 
@@ -8,7 +9,8 @@ interface ChemicalPaletteProps {
 }
 
 export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
-  const { t, chemicalName } = useLocalization()
+  const { t } = useTranslation()
+  const { chemicalName } = useChemistryCopy()
   return (
     <section className="palette-section" aria-labelledby="chemicals-title">
       <h3 id="chemicals-title">{t('materials.chemicals')}</h3>

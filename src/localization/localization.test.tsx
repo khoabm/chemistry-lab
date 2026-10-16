@@ -1,9 +1,10 @@
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi as mock } from 'vitest'
-import { en } from './en'
-import { vi, viChemicalNames, viProductNames, viReactionNames, viReactionExplanations } from './vi'
-import { resolveText, translator } from './translation'
+import en from '../i18n/locales/en/ui.json'
+import vi from '../i18n/locales/vi/ui.json'
+import viChemistry from '../i18n/locales/vi/chemistry.json'
+import { createLocalization, readContent } from '../i18n'
 import { chemistryCopy, enChemicalNames, enReactionNames, enReactionExplanations, enProductNames } from './chemistry'
 import { chemicals } from '../simulation/chemicals/catalog'
 import { mixReactions } from '../simulation/reactions/mixReactions'
@@ -56,18 +57,24 @@ describe('M10 canonical resources and explicit fallback', () => {
   })
 
   it('uses English for intentionally missing VI and invalid empty overrides, never keys/blank/undefined', () => {
+    const instance = createLocalization('vi')
+    const t = instance.getFixedT('vi', 'ui')
     expect(vi).not.toHaveProperty('effect.gas.liquid')
-    expect(translator('vi')('effect.gas.liquid')).toBe('Gas bubbles are produced.')
-    expect(translator('vi')('action.add', { name: 'HCl' })).toBe('Thêm HCl')
+    expect(t('effect.gas.liquid')).toBe('Gas bubbles are produced.')
+    expect(t('action.add', { name: 'HCl' })).toBe('Thêm HCl')
     for (const key of Object.keys(en) as (keyof typeof en)[]) {
-      const parameters = Object.fromEntries([...en[key].matchAll(/\{(\w+)\}/g)].map((match) => [match[1], 'example']))
-      const translated = translator('vi')(key, parameters)
+      const parameters = Object.fromEntries([...en[key].matchAll(/\{\{(\w+)\}\}/g)].map((match) => [match[1], 'example']))
+      const translated = t(key, parameters)
       expect(translated.trim()).not.toBe('')
       expect(translated).not.toBe(key)
       expect(translated).not.toMatch(/undefined|null|\{\w+\}/)
     }
-    for (const missing of [undefined, null, '', '   ']) expect(resolveText('English fallback', missing)).toBe('English fallback')
-    const copy = chemistryCopy('vi')
+    for (const missing of [undefined, null, '', '   ']) {
+      const invalid = createLocalization('vi')
+      invalid.addResourceBundle('vi', 'ui', readContent({ 'effect.gas.liquid': missing }))
+      expect(invalid.t('effect.gas.liquid')).toBe('Gas bubbles are produced.')
+    }
+    const copy = chemistryCopy(instance)
     expect(copy.reactionName('R7', 'Provided result name')).toBe('Provided result name')
     expect(copy.reactionExplanation('R7', 'Provided explanation')).toBe('Provided explanation')
     for (const chemical of chemicals) expect(copy.chemicalName(chemical.id)).toBe(chemical.name)
@@ -79,12 +86,49 @@ describe('M10 canonical resources and explicit fallback', () => {
   })
 
   it('keeps VI placeholders and reviewed override IDs compatible with complete English', () => {
-    const tokens = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort()
+    const tokens = (text: string) => [...text.matchAll(/\{\{(\w+)\}\}/g)].map((match) => match[1]).sort()
     for (const [key, value] of Object.entries(vi)) expect(tokens(value)).toEqual(tokens(en[key as keyof typeof en]))
-    for (const [overrides, english] of [[viChemicalNames, enChemicalNames], [viProductNames, enProductNames],
-      [viReactionNames, enReactionNames], [viReactionExplanations, enReactionExplanations]] as const) {
-      for (const key of Object.keys(overrides)) expect(english).toHaveProperty(key)
-    }
+    const validChemistryKeys = new Set([
+      ...Object.keys(enChemicalNames).map((id) => `chemical.${id}`),
+      ...Object.keys(enProductNames).map((id) => `product.${id}`),
+      ...Object.keys(enReactionNames).flatMap((id) => [`reaction.${id}.name`, `reaction.${id}.explanation`]),
+    ])
+    for (const key of Object.keys(viChemistry)) expect(validChemistryKeys.has(key)).toBe(true)
+  })
+
+  it('uses i18next interpolation/plural rules from editable JSON and resolves chemistry overrides by stable ID', () => {
+    const instance = createLocalization()
+    expect(instance.t('workspace.count', { count: 1 })).toBe('1 equipment item')
+    expect(instance.t('workspace.count', { count: 2 })).toBe('2 equipment items')
+    expect(instance.t('sample.unit', { count: 1 })).toBe('unit')
+    expect(instance.t('sample.unit', { count: 2 })).toBe('units')
+    void instance.changeLanguage('vi')
+    expect(instance.t('workspace.count', { count: 2 })).toBe('2 dụng cụ')
+    expect(instance.t('sample.unit', { count: 2 })).toBe('đơn vị')
+    instance.addResourceBundle('vi', 'chemistry', {
+      'chemical.sodium-chloride': 'Reviewed chemical label',
+      'reaction.R7.name': 'Reviewed reaction label',
+      'reaction.R7.explanation': 'Reviewed explanation',
+      'product.copper-oxide': 'Reviewed product label',
+    })
+    const copy = chemistryCopy(instance)
+    expect(copy.chemicalName('sodium-chloride')).toBe('Reviewed chemical label')
+    expect(copy.reactionName('R7', 'Recorded name')).toBe('Reviewed reaction label')
+    expect(copy.reactionExplanation('R7', 'Recorded explanation')).toBe('Reviewed explanation')
+    const product = heatReactions.find((reaction) => reaction.id === 'R7')?.products.find((item) => item.id === 'copper-oxide')
+    if (!product) throw new Error('Registered copper oxide product required')
+    expect(copy.productName(product)).toBe('Reviewed product label')
+    expect(product.formula).toBe('CuO')
+    expect(chemistryCopy(createLocalization()).reactionName('R7', 'Recorded name')).toBe('Recorded name')
+  })
+
+  it('isolates language changes between laboratory instances and defaults a new session to English', () => {
+    const first = createLocalization()
+    const second = createLocalization()
+    void first.changeLanguage('vi')
+    expect(first.t('action.mix')).toBe('Trộn')
+    expect(second.t('action.mix')).toBe('Mix')
+    expect(createLocalization().language).toBe('en')
   })
 })
 

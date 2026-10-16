@@ -1,8 +1,9 @@
-import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
+import { useStatusLive } from '../../../localization/useStatusLive'
 import type { HeatingState, HeatEvaluationState } from '../../../types/heating'
 
 export function HeatingStatus({ state, evaluation }: { state: HeatingState; evaluation: HeatEvaluationState }) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   const heatingLive = useStatusLive(state.status)
   const evaluationLive = useStatusLive(evaluation.status)
   return <div className="heating-status">

@@ -1,6 +1,6 @@
-import { useLocalization } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
 export function LabHelp() {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   return <details className="lab-help">
     <summary>{t('help.title')}</summary>
     <div className="lab-help-content">

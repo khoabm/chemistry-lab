@@ -313,15 +313,18 @@ copy and document language only: equipment, contents, selection, results, heatin
 waits, live ages and manual/Auto replay continue. Reset lab also preserves language;
 reloading the page defaults to English. Locale is not persisted.
 
-Resources live in `src/localization/en.ts` and `vi.ts`; missing/empty Vietnamese
-values immediately use English. Canonical English chemistry metadata is indexed
+Editable JSON resources live in `src/i18n/locales/{en,vi}/ui.json` with optional
+stable-ID overrides in `vi/chemistry.json`. i18next/react-i18next handle English
+fallback, interpolation and plurals; missing/blank Vietnamese uses English.
+Canonical English chemistry metadata is indexed
 by stable IDs in `src/localization/chemistry.ts`, and recorded result metadata
 remains the English fallback when rendered. Formulas/equations never pass through
 translation. Chemical/product names, R1–R8 names/explanations, phenomenon prose and
 scientific captions remain English pending teacher/SGK review. See
-`docs/LOCALIZATION.md` for the review queue and contribution rules, and
-`plans/m10-localization.md` for implementation/validation. No localization package,
-service, new chemistry behavior or lifecycle system was added.
+`docs/LOCALIZATION.md` for the boundary, `docs/TRANSLATION_GUIDE.md` for editing,
+`docs/VI_CHEMISTRY_TERMS.md` for pending review and `plans/m10-localization.md`
+for implementation/validation. No translation service, new chemistry behavior or
+lifecycle system was added.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).

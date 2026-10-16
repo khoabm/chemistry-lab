@@ -1,5 +1,6 @@
 import type { ReactionEffect } from '../../../simulation/reactions/types'
-import { translator, type Translate } from '../../../localization/translation'
+import type { TFunction } from 'i18next'
+import { englishI18n } from '../../../i18n'
 
 // Display colors and wording belong to presentation, never to reaction matching.
 export const precipitateColors = {
@@ -10,7 +11,7 @@ export const precipitateColors = {
 
 export const solidProductColors = { black: '#303330', 'pale-white': '#f2eee4' } as const
 
-export function describeReactionEffects(effects: readonly ReactionEffect[], t: Translate = translator('en')): string {
+export function describeReactionEffects(effects: readonly ReactionEffect[], t: TFunction<'ui'> = englishI18n.getFixedT('en', 'ui')): string {
   return effects.map((effect) => {
     switch (effect.type) {
       case 'precipitate': return t(`effect.precipitate.${effect.color}`)

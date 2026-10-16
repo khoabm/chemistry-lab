@@ -1,4 +1,5 @@
-import { useLocalization, useStatusLive } from '../../../localization/useLocalization'
+import { useTranslation } from 'react-i18next'
+import { useStatusLive } from '../../../localization/useStatusLive'
 import { LanguageSelect } from '../../../localization/LanguageSelect'
 import { useEffect, useId, useRef } from 'react'
 import type { ContainerState } from '../../../types/container'
@@ -15,7 +16,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
   onDismiss: () => void
   presentation?: ReactionPresentation | undefined
 }) {
-  const { t } = useLocalization()
+  const { t } = useTranslation()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   const replay = useReactionReplay(container, presentation)
