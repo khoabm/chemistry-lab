@@ -5,6 +5,7 @@ import { findChemical } from '../../../simulation/chemicals/catalog'
 import type { ContainerState } from '../../../types/container'
 import type { EquipmentType } from '../../../types/equipment'
 import { EquipmentVisual } from './EquipmentVisual'
+import { ChemicalSwatch } from './ChemicalSwatch'
 import { HeatingStatus } from './HeatingStatus'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
@@ -38,8 +39,11 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
           {container.contents.map((portion) => {
             const chemical = findChemical(portion.chemicalId)
             return chemical && <li key={portion.chemicalId}>
-              <strong>{chemical.formula} · {chemicalName(chemical.id)}</strong>
-              <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
+              <ChemicalSwatch chemical={chemical} />
+              <div className="contents-copy">
+                <strong>{chemical.formula} · {chemicalName(chemical.id)}</strong>
+                <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
+              </div>
             </li>
           })}
         </ul>

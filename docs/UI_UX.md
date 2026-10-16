@@ -139,8 +139,18 @@ or chemical IDs. Empty queries retain catalog order; no matches show concise
 localized feedback beside a clear-query action. Clear returns focus to search;
 Enter does not add chemicals. Query is local to the mounted catalog and survives
 locale/selection/tools changes. No new scroll region or live-announcement loop.
-See `plans/m10-materials-search-pass1.md`. Right-panel indicators, broad copy cleanup
-and lamp/tripod/gauze refinement remain pending separate approval.
+See `plans/m10-materials-search-pass1.md`.
+
+M10 Materials refinement Pass 2 reuses one ChemicalSwatch in the catalog and
+selected-container contents. Its color and liquid/solid variant come from the
+same stable-ID catalog entry. Tall rounded-bottom liquid and short angular solid
+shapes distinguish starting-sample state without relying on color alone. Keep
+formula/name, quantity and existing state text; decorative cues are aria-hidden.
+Contents use a narrow cue column without changing panel widths or palette density.
+These cues always represent recorded starting substances, including after Mix or
+Heat; they do not depict products, post-reaction composition, quantity or yield.
+See `plans/m10-chemical-identity-pass2.md`. Broad copy cleanup and alcohol-lamp
+tripod/gauze refinement remain pending separate passes.
 
 The chemical palette should display available chemicals in an easily
 recognizable manner.

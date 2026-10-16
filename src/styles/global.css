@@ -318,7 +318,8 @@ h3 { font-size: 14px; font-weight: 600; }
 
 .container-details { padding-top: var(--space-5); }
 .contents-list { list-style: none; padding: 0; margin: var(--space-4) 0; display: grid; gap: var(--space-3); }
-.contents-list li { display: grid; gap: 5px; padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
+.contents-list li { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: center; gap: var(--space-2); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
+.contents-copy { display: grid; gap: 5px; min-width: 0; }
 .contents-list strong { font-size: 13px; line-height: 1.6; font-weight: 500; }
 .contents-list span { font-size: 12px; color: var(--color-muted); }
 .container-details .action-button { margin-top: var(--space-4); }

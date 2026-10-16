@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useId, useRef, useState } from 'react'
 import { chemicals } from '../../../simulation/chemicals/catalog'
 import type { ChemicalId } from '../../../simulation/chemicals/catalog'
+import { ChemicalSwatch } from './ChemicalSwatch'
 
 interface ChemicalPaletteProps {
   canAdd: boolean
@@ -46,7 +47,7 @@ export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
           <button key={chemical.id} className="chemical-palette-item" type="button"
             disabled={!canAdd} aria-label={t('action.add', { name: chemicalName(chemical.id) })} aria-describedby={`chemical-palette-hint chemical-${chemical.id}-details`}
             onClick={() => onAdd(chemical.id)}>
-            <span className={`chemical-swatch is-${chemical.state}`} style={{ backgroundColor: chemical.color }} aria-hidden="true" />
+            <ChemicalSwatch chemical={chemical} />
             <span id={`chemical-${chemical.id}-details`}><strong>{chemical.formula}</strong><span>{chemicalName(chemical.id)}</span><small>{chemical.state === 'liquid' ? t('sample.liquidMetadata') : t('sample.solidMetadata')}</small></span>
           </button>
         ))}
