@@ -125,6 +125,23 @@ gap. Keep card padding, swatches, the single chemical column and bounded scrolli
 unchanged. Section headings use 15px accent text with a restrained 4px additional
 separation before Chemicals, retaining the existing thin divider.
 
+M10 Materials refinement Pass 1 supersedes only that density treatment: retain
+column widths and readable text sizes, reduce Materials padding/row text gaps,
+and arrange the three visible equipment types in one compact row with 48px
+palette-only drawings and at least 88px tile height. Chemical rows remain a single
+column with formulas, names, the existing swatches and full state metadata.
+Existing hints, action conditions, drag handlers and breakpoint/scroll behavior stay.
+
+Chemicals has a labeled native search field matching formula, canonical English
+name and current localized display name. Presentation-only NFKC/trim/lowercase
+normalization accepts ASCII digits for formula subscripts without changing notation
+or chemical IDs. Empty queries retain catalog order; no matches show concise
+localized feedback beside a clear-query action. Clear returns focus to search;
+Enter does not add chemicals. Query is local to the mounted catalog and survives
+locale/selection/tools changes. No new scroll region or live-announcement loop.
+See `plans/m10-materials-search-pass1.md`. Right-panel indicators, broad copy cleanup
+and lamp/tripod/gauze refinement remain pending separate approval.
+
 The chemical palette should display available chemicals in an easily
 recognizable manner.
 
