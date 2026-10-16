@@ -149,8 +149,8 @@ formula/name, quantity and existing state text; decorative cues are aria-hidden.
 Contents use a narrow cue column without changing panel widths or palette density.
 These cues always represent recorded starting substances, including after Mix or
 Heat; they do not depict products, post-reaction composition, quantity or yield.
-See `plans/m10-chemical-identity-pass2.md`. Alcohol-lamp tripod/gauze refinement
-remains pending Pass 4.
+See `plans/m10-chemical-identity-pass2.md`. The delivered Pass 4 lamp refinement
+is described in section 12 and `plans/m10-lamp-setup-pass4.md`.
 
 M10 Pass 3 supersedes only repeated persistent instructions: Materials keeps one
 chemical availability/add hint, with unit/state explanations in optional Help
@@ -376,6 +376,15 @@ spatial guide without Heat zone text. Keep one Heating label on each actively
 heated container. Existing hidden aria-describedby lamp/heating descriptions,
 equipment names, SVG glow/reaction effects and panel statuses remain unchanged.
 No zone geometry, timing, interaction or simulation behavior changes.
+
+M10 refinement Pass 4 draws the alcohol lamp with a simplified three-legged
+support and sparse gauze above the flame. EquipmentVisual shares this decorative
+setup across Materials, workspace, drag preview and lamp details. The support has
+no equipment identity, state or interaction. The 88×126 logical footprint, drawing
+scale, flame state/animation and marked heating zone remain unchanged.
+Apparatus alignment is qualitative, with no snapping or required contact with
+gauze. Beakers and test tubes retain the same simplified heating interaction;
+the drawing does not model the holder normally used for a real test tube.
 
 The simplified zone uses normalized bench coordinates: horizontally +/-0.07 from
 the lamp, vertically 0.16–0.30 above it, clipped to usable bench bounds. It denotes

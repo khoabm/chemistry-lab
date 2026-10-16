@@ -135,6 +135,12 @@ above it. Place the center of a beaker or test tube in that zone using drag or
 arrow keys; it shows a warm glow and Heating status. Moving the container/source
 out of alignment or extinguishing the source stops heating. Empty containers can
 also heat. Multiple lamps are independent; reset removes all heating state.
+The lamp drawing includes a simplified tripod and sparse support gauze, shared
+by the palette, workspace, drag preview and details. They are decorative parts of
+the same alcohol-lamp equipment, with no separate state or interaction. The
+88×126 interaction footprint and heating zone are unchanged. Placement is
+qualitative rather than exact contact with the gauze; beakers and test tubes
+retain the shared simplified model, without a realistic test-tube holder.
 Filled containers wait approximately two seconds before heat evaluation. Copper
 carbonate shows R7 (black solid and low gas release); hydrated copper sulfate shows
 R8 (pale/white solid). Unsupported heated sets return No observable reaction.

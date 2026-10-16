@@ -56,16 +56,29 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
           <path fill="#fffefa90" d="M43 38h14v30l-5 19h-4l-5-19Z" />
           <path d="M39 38h22M49 47v20" />
         </>}
-        {equipmentType === 'alcohol-lamp' && <>
+        {equipmentType === 'alcohol-lamp' && <g className="alcohol-lamp-setup">
+          {/* Decorative support only; the marked heating zone owns placement. */}
+          <g className="lamp-stand" strokeOpacity="0.65">
+            <path className="lamp-stand-leg" d="m50 18 8 73" strokeOpacity="0.55" />
+            <path className="lamp-stand-leg" d="m26 23-12 71m-4 0h8" />
+            <path className="lamp-stand-leg" d="m74 23 12 71m-4 0h8" />
+            <ellipse cx="50" cy="20" rx="30" ry="5" />
+          </g>
+          <g className="lamp-gauze" strokeWidth="1.2">
+            <path d="M20 10h60l4 9H16Z" fill="#e4ebe3" />
+            <path d="M19 15h62M32 11l-3 7M44 11l-1 7M56 11l1 7M68 11l3 7" strokeOpacity="0.45" />
+          </g>
           {lampStatus === 'lit' && <g className="lamp-flame" stroke="none">
-            <path d="M50 3c-2 8-9 10-9 16a9 9 0 0 0 18 0c0-6-6-10-9-16Z" fill="#e9a341" />
-            <path d="M50 12c-1 5-5 6-5 10a5 5 0 0 0 10 0c0-4-4-6-5-10Z" fill="#fff0a8" />
-            <path d="M46 25q4-8 8 0" stroke="#639db7" strokeWidth="2" />
+            <path d="M50 31c-2 8-9 10-9 16a9 9 0 0 0 18 0c0-6-6-10-9-16Z" fill="#e9a341" />
+            <path d="M50 40c-1 5-5 6-5 10a5 5 0 0 0 10 0c0-4-4-6-5-10Z" fill="#fff0a8" />
+            <path d="M46 53q4-8 8 0" stroke="#639db7" strokeWidth="2" />
           </g>}
-          <path fill="#fffefa90" d="M31 49c-5 6-7 14-7 25 0 8 10 13 26 13s26-5 26-13c0-11-2-19-7-25Z" />
-          <path fill="#b8c5b1" d="M35 39h30v10H35Z" />
-          <path d="M46 39V26h8v13M32 74c10 5 26 5 36 0M33 57v9" />
-        </>}
+          <g className="lamp-body">
+            <path fill="#fffefa90" d="M32 71c-5 4-7 9-7 14 0 7 10 10 25 10s25-3 25-10c0-5-2-10-7-14Z" />
+            <path fill="#b8c5b1" d="M35 64h30v7H35Z" />
+            <path d="M46 64V54h8v10M32 85c10 5 26 5 36 0M33 77v6" />
+          </g>
+        </g>}
       </g>
     </svg>
   )
