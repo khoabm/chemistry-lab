@@ -20,7 +20,7 @@ interface LabWorkspaceProps {
 export function LabWorkspace({
   state,
   presentations,
-  interaction: { attachBench, preview, message, getEquipmentHandlers },
+  interaction: { attachBench, drag, message, getEquipmentHandlers },
 }: LabWorkspaceProps) {
   const { t } = useTranslation()
   const { reactionName, chemicalName } = useChemistryCopy()
@@ -49,13 +49,13 @@ export function LabWorkspace({
       </div>
       <div
         ref={attachBench}
-        className={`workbench${preview ? preview.valid ? ' is-drop-valid' : ' is-drop-invalid' : ''}`}
+        className={`workbench${drag ? drag.valid ? ' is-drop-valid' : ' is-drop-invalid' : ''}`}
         role="group"
         aria-label={t('workspace.bench')}
       >
-        {preview && (
+        {drag && (
           <p className="bench-drop-feedback">
-            {preview.valid ? t('workspace.release') : t('workspace.moveOnto')}
+            {drag.valid ? t('workspace.release') : t('workspace.moveOnto')}
           </p>
         )}
         {state.equipment.length === 0 && <div className="workspace-empty">
@@ -74,8 +74,8 @@ export function LabWorkspace({
           <button
             key={instance.id}
             type="button"
-            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${preview?.source.kind === 'workspace' && preview.source.id === instance.id ? ' is-moving' : ''}`}
-            style={equipmentPositionStyle(instance.position)}
+            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}`}
+            style={equipmentPositionStyle(drag?.source.kind === 'workspace' && drag.source.id === instance.id ? drag.position : instance.position)}
             data-equipment-id={instance.id}
             aria-label={label}
             aria-pressed={state.selectedEquipmentId === instance.id}

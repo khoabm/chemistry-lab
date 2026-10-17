@@ -258,14 +258,15 @@ h3 { font-size: 14px; font-weight: 600; }
 .workspace-equipment { position: absolute; z-index: 1; cursor: grab; touch-action: none; user-select: none; }
 /* Enlarge only the bench drawing; preserve the button's interaction footprint. */
 .workspace-equipment > .equipment-visual { transform: scale(1.2); transform-origin: center; }
-.workspace-equipment:hover > .equipment-visual { filter: drop-shadow(0 0 3px rgb(35 102 83 / 20%)); }
-.workspace-equipment.is-selected { z-index: 3; }
+.workspace-equipment:hover > .equipment-visual { filter: drop-shadow(0 0 2px rgb(35 102 83 / 15%)); }
+.workspace-equipment.is-selected { z-index: 2; }
 /* Follow the drawing's silhouette rather than frame the whole button and label. */
 .workspace-equipment.is-selected > .equipment-visual {
-  filter: drop-shadow(0 0 2px rgb(35 102 83 / 55%)) drop-shadow(0 0 5px rgb(35 102 83 / 25%));
+  filter: drop-shadow(0 0 2px rgb(35 102 83 / 30%));
 }
-.workspace-equipment.is-moving { opacity: 0.35; }
-.workspace-equipment:focus-visible { outline-offset: -3px; }
+.workspace-equipment.is-moving { cursor: grabbing; }
+/* Focus stays above a different selection within the bench's isolated stack. */
+.workspace-equipment:focus-visible { z-index: 3; outline-offset: -3px; }
 .workspace-equipment:active, .equipment-palette-item:active { cursor: grabbing; }
 .workbench.is-drop-valid { outline: 3px solid var(--color-accent); outline-offset: -3px; }
 .workbench.is-drop-invalid { outline: 2px dashed #9f7755; outline-offset: -3px; }

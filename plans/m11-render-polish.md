@@ -14,7 +14,7 @@ it away or using a keyboard-accessible action, and understand why that sample is
 This is an explicitly authorized auxiliary branch within the official active milestone
 `M11 — Dropper Transfer & 2D Material Presentation`. It neither renames M11 nor creates
 another milestone. The completed M11 transfer/material work is the baseline, not work to
-reimplement. This document plans future implementation; it does not claim delivery.
+reimplement. Pass 1 is delivered below; Passes 2–5 remain planned and unimplemented.
 
 ## Scope
 
@@ -443,6 +443,13 @@ Localization is i18next 26/react-i18next 17 with editable EN/VI JSON. Tests are 
 React Testing Library and jsdom. No Zustand, drag library, Motion or E2E framework is
 currently installed. No new dependency is expected or justified by this plan.
 
+### Pass 1 implementation baseline
+
+On 2026-10-17, implementation started on the explicitly authorized
+`M11-render-polish` branch at `75f90b7` with a clean working tree. That commit adds
+this approved plan on top of final M11 `06607c6`; the ancestor check succeeded.
+No branch/milestone transition, dependency installation or Git publication was performed.
+
 ## Testing and validation
 
 ### Existing expectations that must change intentionally
@@ -559,12 +566,13 @@ QA claimed by this planning task.
 - [x] Read repository instructions, final M11 source, closeout and relevant tests.
 - [x] Verify clean dedicated branch contains final completed M11 baseline.
 - [x] Reconcile approved decisions with current ownership and record this ExecPlan.
-- [ ] Pass 1: direct bench drag and selection/focus, with baseline heating preserved.
+- [x] Pass 1: direct bench drag and selection/focus, with baseline heating preserved.
+- [x] Pass 1: targeted tests, full validation and available browser QA recorded below.
 - [ ] Pass 2: mounting state/invariants and native-control tests.
 - [ ] Pass 3: projection, assembly bounds/movement and cancellation/rebind.
 - [ ] Pass 4: coherent mounted-only integration and per-container timer policy.
 - [ ] Pass 5: visual affordance/browser QA and scoped documentation closeout.
-- [ ] Run full validation, inspect final diff and hand off for user review.
+- [ ] Run final cross-pass validation, inspect final diff and hand off the complete polish implementation.
 
 ## Surprises and discoveries
 
@@ -583,6 +591,13 @@ QA claimed by this planning task.
   contradiction makes the approved design impossible, and no chemistry change is needed.
 - There is no single-equipment deletion or persisted lab state, so neither deletion
   infrastructure nor stored-state migration is required.
+- Pass 1: the drag draft must remain active for bench movement even though its preview
+  element is gone. Decoupling `dragActive` from preview rendering preserves M11's global
+  pause/full-wait restart and disabled controls. Existing heating tests were retained;
+  only queries aimed at the removed duplicate visual changed.
+- Pass 1 browser QA: the existing short-landscape sticky tools can cover the upper
+  part of the bench after focus-driven scrolling. An actual drop onto the tools was
+  rejected and restored the committed position. No unrelated sticky/layout CSS was changed.
 
 ## Decision log
 
@@ -605,12 +620,109 @@ QA claimed by this planning task.
   without tiny spatial targets, modal workflows or new hotkeys.
 - 2026-10-17: simple sibling lamp-behind/container-front rendering first; reason: preserve
   identity and limit decorative layering to demonstrable browser-QA needs.
+- 2026-10-17, Pass 1: rename the transient preview state to `EquipmentDragDraft`/`drag`,
+  adding a normalized `position` computed with the existing `benchPosition` helper.
+  The same keyed workspace button/SVG renders this position; pointerup uses the same
+  conversion for its single reducer move. Palette preview keeps its original client
+  point, appearance and add/click behavior. No geometry helper or reducer change is needed.
+- 2026-10-17, Pass 1: return an explicit `dragActive` boolean for the existing global
+  Heat pause and action guards. Remove workspace-only contents/result/payload plumbing
+  from EquipmentDragPreview, since only new palette equipment now uses it. Preserve
+  committed heating cues and heating-zone positions until a valid drop, as M11 does.
+- 2026-10-17, Pass 1: remove moving opacity, use one smaller selected silhouette shadow
+  and a weaker hover shadow. Scope stacking to normal equipment 1, selected 2 and
+  focus-visible 3 within the existing isolated bench. Keep the global focus outline
+  and inset offset unchanged; do not introduce mounting-specific layering in this pass.
 
 ## Outcomes and retrospective
 
-Planning only. This file is the sole intended change; no product implementation,
-translation resource, test, package or official milestone document is changed here.
-No new validation/hosted CI/browser success is claimed. Future implementation must
-replace this section with actual delivered behavior, command results, QA evidence,
-remaining limitations and user-review handoff. Product approval, commit/publication,
-merge and official milestone advancement remain separate user decisions.
+### Pass 1 delivered, 2026-10-17
+
+Existing Beaker, Test tube, Alcohol lamp and Dropper buttons now move visually with
+their transient React drag position after the existing six-pixel threshold. Button,
+SVG, stable equipment ID, contents/result and loaded payload identity are retained.
+No workspace ghost/card is rendered. Palette-to-bench preview remains unchanged.
+Valid release commits once; invalid release and all existing cancellation paths discard
+the draft. Pointer capture/filtering, grab offset, stale-release/click suppression,
+Arrow/Shift movement, focus order, accessible names and feedback remain intact.
+
+Transient and final placement share the existing normalized conversion and single-item
+clamp. Actual pointer coordinates still determine validity, including outside-bench and
+occluding tools. No mounting, assembly bounds or other Pass 2+ behavior was implemented.
+Geometry heating, global Heat pause/full restart, request guards, chemistry, M9 live
+age/Replay, M10 localization and M11 transfer/material semantics remain unchanged.
+
+Selection now uses a smaller single silhouette cue, hover is weaker, the dragged real
+object stays opaque, and focus-visible paints above another selected item without
+raising the bench's existing maximum equipment stack level. No new copy or dependency.
+
+### Pass 1 tests and validation
+
+Added `DirectBenchDrag.test.tsx` with 11 cases for all four equipment types, stable
+button/SVG, draft-before-commit state, one move action, unchanged per-coordinate status,
+capture/release, grab offset, threshold/pointer filtering, every requested cancellation
+path, stale release/click, outside-pointer invalidity despite clamping, edge drop and
+Arrow/Shift movement after cancellation. The harness observes real reducer state and
+dispatched actions separately from the rendered draft.
+
+Adapted workspace-preview queries in LabPage, AlcoholLampVisual, DropperTransfer,
+Polish and ReactionDynamicsFlow tests to inspect the same real visual; palette preview
+coverage remains. Loaded Dropper tests retain the actual payload/SVG through cancel
+and successful move. Added focus-versus-selection coexistence coverage. Expanded
+HeatReactionFlow to prove the unchanged global pause/full 2000ms restart for sample,
+lamp, unrelated Dropper and palette drags. Store/geometry/heating-hook semantics and
+their tests were not rewritten toward mounted-only behavior.
+
+Initial focused runs exposed test-fixture/query issues (the harness output had an
+implicit status role, style matchers need CSS units, and lamp/Dropper selection changes
+which result panel is visible); those were corrected without product changes.
+Focused reruns passed all 11 DirectBenchDrag cases and 53 LabPage cases after the
+harness fixes; the same run still had two selected-panel assertion failures in
+HeatReactionFlow. After that test-only correction, its focused rerun passed all
+16 cases. The final full suite includes all affected files and passed with the final
+test/source versions.
+
+| Command | Actual result |
+| --- | --- |
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS, zero warnings |
+| `npm test -- --maxWorkers=2` | PASS, 389 tests / 32 files, 97.15s |
+| `npm run build` | PASS, 89 modules transformed |
+| `git diff --check` | PASS |
+
+Tests used session-local TEMP/TMP at ignored `node_modules/.cache/pass1-temp`, matching
+the existing host workaround. No timeout, test configuration or dependency changed.
+These are local results, not a hosted CI claim.
+
+### Pass 1 actual browser QA and limits
+
+Used the ChatGPT in-app Chromium browser on local Vite at `127.0.0.1:5177`, with viewport
+overrides 1440×960, 390×844 and 844×390. Native browser pointer drags moved all four
+equipment types at each viewport; loaded Dropper retained its HCl payload. Verified
+offset grabs, desktop palette placement, mobile-width palette placement, desktop edge
+clamping, outside-pointer rejection, and short-landscape sticky-tools occlusion rejection.
+Click-add and native Fill prepared the test setup. No horizontal page overflow was
+observed in the inspected layouts; no console errors were captured.
+
+On desktop, keyboard-focused unselected Beaker remained visible above an overlapping
+selected Test tube, with selection unchanged. Browser style inspection confirmed the
+independent focus outline and equipment stack levels 3 versus 2. Reduced selected halo
+and the opaque real visuals were inspected in screenshots. EN/VI switching retained
+loaded payload and keyboard focus; no translation strings were added.
+
+Evidence is saved outside the repository in this chat's visualization directory:
+`C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/`:
+`pass1-desktop-focus.png`, `pass1-mobile.png`, `pass1-landscape.png` and
+`pass1-final-desktop.png`. Temporary viewport override and QA tab were cleaned up.
+
+The browser tool exposes complete drag gestures, not separate held-button pointer
+steps. Therefore mid-gesture screenshots and Escape/pointercancel/capture-loss/blur/
+hidden cancellation were not independently exercised in browser QA; React integration
+tests cover those paths and transient same-node movement. Mobile/landscape checks used
+viewport emulation and mouse/pointer input, not a physical touch device. No new browser
+reduced-motion emulation, screen-reader certification or quantitative contrast claim.
+
+No outstanding functional Pass 1 defect was found. Remaining items are the stated QA
+limits and the intentionally unchanged overlap/sticky behavior. Passes 2–5 remain
+unimplemented. Product approval, commit/publication, merge and milestone advancement
+remain separate user decisions.

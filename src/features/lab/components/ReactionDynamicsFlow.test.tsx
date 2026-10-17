@@ -110,18 +110,21 @@ describe('M9 reaction dynamics across existing views', () => {
     expect(screen.getByRole('dialog').querySelector('.is-transforming, [data-reaction-effect="gas"]')).not.toBeInTheDocument()
   })
 
-  it('keeps a drag preview on the same active/completed result without restarting on movement', () => {
+  it('keeps the same directly dragged visual on its finite active/completed result without restarting', () => {
     class TestPointerEvent extends MouseEvent { readonly pointerId = 1 }
     vi.stubGlobal('PointerEvent', TestPointerEvent)
     render(<LabPage />)
     const sample = mix('Hydrochloric acid', 'Sodium bicarbonate')
+    const visual = sample.querySelector('.equipment-visual')
     vi.spyOn(screen.getByRole('group', { name: 'Laboratory bench' }), 'getBoundingClientRect').mockReturnValue(new DOMRect(300, 100, 600, 400))
     tick(3000)
     fireEvent.pointerDown(sample, { button: 0, clientX: 430, clientY: 230 })
     fireEvent.pointerMove(sample, { clientX: 470, clientY: 250 })
-    expect(document.querySelector('.equipment-drag-preview [data-reaction-effect="gas"]')).toBeInTheDocument()
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(sample.querySelector('.equipment-visual')).toBe(visual)
+    expect(sample.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
     tick(5000)
-    expect(document.querySelector('.equipment-drag-preview [data-reaction-effect="gas"]')).not.toBeInTheDocument()
+    expect(sample.querySelector('[data-reaction-effect="gas"]')).not.toBeInTheDocument()
     fireEvent.keyDown(sample, { key: 'Escape' })
     fireEvent.keyDown(sample, { key: 'ArrowRight' })
     expect(sample).toHaveAttribute('aria-pressed', 'true')

@@ -110,7 +110,7 @@ describe('M2 chemical and container interactions', () => {
     expect(screen.getByText(/This container is empty/)).toBeInTheDocument()
   })
 
-  it('keeps a filled drag preview, disables contents actions while dragging and preserves contents after a drop', () => {
+  it('moves the filled bench visual directly, disables contents actions and preserves contents after a drop', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
     fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) sulfate' }))
     const source = screen.getByRole('button', { name: 'Beaker 1' })
@@ -119,7 +119,8 @@ describe('M2 chemical and container interactions', () => {
     pointer(source, 'move', 600, 300)
     expect(screen.getByRole('button', { name: 'Add Copper(II) sulfate' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Empty container' })).toBeDisabled()
-    expect(document.querySelector('.equipment-drag-preview [data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(source.querySelector('[data-content-state="liquid"]')).toHaveAttribute('fill', '#478ecb')
     expect(screen.getByRole('button', { name: 'Enlarge selected sample' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
@@ -262,7 +263,8 @@ describe('M5 alcohol lamp interaction', () => {
     const sample = place('Beaker', 0.5, 0.48)
     pointer(sample, 'down', 0, 0)
     pointer(sample, 'move', 400, 300)
-    expect(document.querySelector('.equipment-drag-preview .container-heat-glow')).toBeInTheDocument()
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     fireEvent.keyDown(sample, { key: 'Escape' })
     pointer(sample, 'up', 400, 300)
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
@@ -276,12 +278,13 @@ describe('M5 alcohol lamp interaction', () => {
     expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
   })
 
-  it('preserves a lit lamp preview, disables its toggle while dragging and updates heating when moving the source', () => {
+  it('preserves the directly dragged lamp flame, disables its toggle and updates heating only on drop', () => {
     const lamp = litLamp()
     const sample = place('Beaker', 0.5, 0.48)
     pointer(lamp, 'down', 0, 0)
     pointer(lamp, 'move', 400, 300)
-    expect(document.querySelector('.equipment-drag-preview .lamp-flame')).toBeInTheDocument()
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(lamp.querySelector('.lamp-flame')).toBeInTheDocument()
     const toggle = screen.getByRole('button', { name: 'Extinguish lamp' })
     expect(toggle).toBeDisabled()
     fireEvent.click(toggle)
@@ -317,8 +320,9 @@ describe('M5 alcohol lamp interaction', () => {
     const position = source.getAttribute('style')
     pointer(source, 'down', 0, 0)
     pointer(source, 'move', 400, 300)
+    const draftPosition = source.getAttribute('style')
     fireEvent.keyDown(source, { key: 'ArrowRight', shiftKey: true })
-    expect(source).toHaveAttribute('style', position)
+    expect(source).toHaveAttribute('style', draftPosition)
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     fireEvent.keyDown(source, { key: 'Escape' })
     pointer(source, 'up', 400, 300)
@@ -433,7 +437,8 @@ describe('M4 reaction visualization', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Sample' }))
     pointer(source, 'down', 400, 200)
     pointer(source, 'move', 600, 300)
-    expect(document.querySelector('.equipment-drag-preview [data-reaction-effect="gas"]')).toBeInTheDocument()
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(source.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Mix' })).toBeDisabled()
     fireEvent.keyDown(source, { key: 'Escape' })
     pointer(source, 'up', 600, 300)
@@ -689,6 +694,20 @@ describe('laboratory equipment interactions', () => {
     }
     expect(first).toHaveStyle({ left: 'calc(100% + -44px)', top: 'calc(0% + 63px)' })
     expect(items()).toHaveLength(2)
+  })
+
+  it('keeps focus on a different native equipment button without changing the selection', () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
+    const beaker = screen.getByRole('button', { name: 'Beaker 1' })
+    fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
+    const tube = screen.getByRole('button', { name: 'Test tube 1' })
+    beaker.focus()
+    expect(beaker).toHaveFocus()
+    expect(beaker).toHaveAttribute('aria-pressed', 'false')
+    expect(beaker).not.toHaveClass('is-selected')
+    expect(tube).toHaveAttribute('aria-pressed', 'true')
+    expect(tube).toHaveClass('is-selected')
+    expect(items()).toEqual([beaker, tube])
   })
 
   it('clears an active drag when reset is used', () => {

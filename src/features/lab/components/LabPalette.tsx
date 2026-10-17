@@ -20,7 +20,7 @@ export function LabPalette({ interaction, canAddChemical, onAddChemical }: {
       className={`lab-palette${isExpanded ? ' is-expanded' : ''}`}
       aria-labelledby="palette-title"
       onKeyDown={(event) => {
-        if (event.key === 'Escape' && isExpanded && !interaction.preview) {
+        if (event.key === 'Escape' && isExpanded && !interaction.dragActive) {
           event.preventDefault()
           setExpanded(false)
           toggleRef.current?.focus()
@@ -38,7 +38,7 @@ export function LabPalette({ interaction, canAddChemical, onAddChemical }: {
         aria-label={t('materials.toggle')}
         aria-expanded={isExpanded}
         aria-controls="lab-tools"
-        disabled={interaction.preview !== null}
+        disabled={interaction.dragActive}
         onClick={() => setExpanded((expanded) => !expanded)}
       >
         <span>{t('materials.toggle')}</span>

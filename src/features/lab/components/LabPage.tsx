@@ -21,24 +21,18 @@ function Laboratory() {
   const { t } = useTranslation()
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
   const interaction = useEquipmentInteraction(state, dispatch)
-  useHeatReactions(state.containers, dispatch, !!interaction.preview)
+  // Pass 1 preserves M11's global drag pause, independently of preview rendering.
+  useHeatReactions(state.containers, dispatch, interaction.dragActive)
   const presentations = useReactionDynamics(state.containers)
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
   const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
   const selectedLamp = state.lamps.find((lamp) => lamp.equipmentInstanceId === state.selectedEquipmentId)
   const selectedDropper = state.droppers.find((dropper) => dropper.equipmentInstanceId === state.selectedEquipmentId)
-  const dragSource = interaction.preview?.source
-  const draggingContainer = dragSource?.kind === 'workspace'
-    ? state.containers.find((container) => container.equipmentInstanceId === dragSource.id) : undefined
-  const draggingLamp = dragSource?.kind === 'workspace'
-    ? state.lamps.find((lamp) => lamp.equipmentInstanceId === dragSource.id) : undefined
-  const draggingDropper = dragSource?.kind === 'workspace'
-    ? state.droppers.find((dropper) => dropper.equipmentInstanceId === dragSource.id) : undefined
   return (
     <div
       className="lab-page"
       onKeyDown={(event) => {
-        if (event.key === 'Escape' && interaction.preview && !event.defaultPrevented) {
+        if (event.key === 'Escape' && interaction.dragActive && !event.defaultPrevented) {
           event.preventDefault()
           interaction.cancelDrag()
         }
@@ -48,28 +42,24 @@ function Laboratory() {
       <LabHeader canReset={state.equipment.length > 0} onReset={interaction.resetWorkspace} />
       <LabHelp />
       <main id="laboratory" className="lab-layout" tabIndex={-1}>
-        <LabPalette interaction={interaction} canAddChemical={!!selectedContainer && !interaction.preview}
+        <LabPalette interaction={interaction} canAddChemical={!!selectedContainer && !interaction.dragActive}
           onAddChemical={(chemicalId) => {
-            if (selectedContainer && !interaction.preview) dispatch({ type: 'add-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId, quantity: 1 })
+            if (selectedContainer && !interaction.dragActive) dispatch({ type: 'add-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId, quantity: 1 })
           }} />
         <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
-          container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={!!interaction.preview}
+          container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}
           dropperDetails={selectedDropper && <DropperDetails dropper={selectedDropper} containers={state.containers}
-            equipment={state.equipment} disabled={!!interaction.preview}
+            equipment={state.equipment} disabled={interaction.dragActive}
             onTransfer={(type, containerEquipmentId) => {
-              if (!interaction.preview) dispatch({ type, equipmentId: selectedDropper.equipmentInstanceId, containerEquipmentId })
+              if (!interaction.dragActive) dispatch({ type, equipmentId: selectedDropper.equipmentInstanceId, containerEquipmentId })
             }} />}
           presentation={selectedContainer ? presentations.get(selectedContainer.id) : undefined}
           onMix={() => { if (selectedContainer) dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onClear={() => { if (selectedContainer) dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onToggleLamp={() => { if (selectedLamp) dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId }) }} />
       </main>
-      {interaction.preview && <EquipmentDragPreview preview={interaction.preview}
-        contents={draggingContainer?.contents} reactionResult={draggingContainer?.reactionResult ?? null}
-        payload={draggingDropper?.payload}
-        presentation={draggingContainer ? presentations.get(draggingContainer.id) : undefined}
-        lampStatus={draggingLamp?.status ?? 'extinguished'} heating={draggingContainer?.heatingState.status === 'heating'} />}
+      {interaction.drag?.source.kind === 'palette' && <EquipmentDragPreview preview={interaction.drag} />}
       <footer className="lab-footer">
         <p>{t('app.footer')}</p>
         <p>{t('app.demonstrations')} <span aria-hidden="true">·</span> {t('app.introductory')}</p>

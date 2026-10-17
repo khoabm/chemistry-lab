@@ -10,9 +10,10 @@ export type EquipmentDragSource =
   | { kind: 'palette'; equipmentType: EquipmentType }
   | { kind: 'workspace'; equipmentType: EquipmentType; id: string }
 
-export interface EquipmentDragPreview {
+export interface EquipmentDragDraft {
   source: EquipmentDragSource
   point: Point
+  position: Point
   valid: boolean
 }
 
@@ -50,7 +51,7 @@ export function useEquipmentInteraction(
   const benchRef = useRef<HTMLDivElement>(null)
   const sessionRef = useRef<PointerSession | null>(null)
   const suppressPointerClickRef = useRef(false)
-  const [preview, setPreview] = useState<EquipmentDragPreview | null>(null)
+  const [drag, setDrag] = useState<EquipmentDragDraft | null>(null)
   const [message, setMessage] = useState<WorkspaceMessage>({ key: 'workspace.feedback.initial' })
 
   const attachBench = useCallback((element: HTMLDivElement | null) => {
@@ -60,7 +61,7 @@ export function useEquipmentInteraction(
   const clearSession = useCallback(() => {
     const session = sessionRef.current
     sessionRef.current = null
-    setPreview(null)
+    setDrag(null)
     if (session?.target.hasPointerCapture?.(session.pointerId)) {
       session.target.releasePointerCapture(session.pointerId)
     }
@@ -121,9 +122,11 @@ export function useEquipmentInteraction(
         if (!session.dragging && Math.hypot(point.x - session.start.x, point.y - session.start.y) < 6) return
         session.dragging = true
         event.preventDefault()
-        setPreview({
+        const center = { x: point.x - session.offset.x, y: point.y - session.offset.y }
+        setDrag({
           source: session.source,
-          point: { x: point.x - session.offset.x, y: point.y - session.offset.y },
+          point: center,
+          position: benchPosition(center, bench.getBoundingClientRect()),
           valid: canDropOnBench(point, bench),
         })
       },
@@ -196,7 +199,7 @@ export function useEquipmentInteraction(
     }
   }
 
-  return { attachBench, preview, message, getEquipmentHandlers, cancelDrag, resetWorkspace }
+  return { attachBench, drag, dragActive: drag !== null, message, getEquipmentHandlers, cancelDrag, resetWorkspace }
 }
 
 export type EquipmentInteraction = ReturnType<typeof useEquipmentInteraction>

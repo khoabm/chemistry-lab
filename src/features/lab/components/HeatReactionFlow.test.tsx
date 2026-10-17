@@ -103,16 +103,24 @@ describe('M6 laboratory heat flow', () => {
     }
   })
 
-  it('pauses waiting during drag and restarts safely after cancellation', () => {
-    const { sample } = heat()
+  it.each(['sample', 'lamp', 'dropper', 'palette'])('preserves M11 global Heat pause and full restart during a %s drag', (sourceType) => {
+    const { sample, lamp } = heat()
+    if (sourceType === 'dropper') fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
+    const source = sourceType === 'sample' ? sample : sourceType === 'lamp' ? lamp
+      : screen.getByRole('button', { name: sourceType === 'dropper' ? 'Dropper 1' : 'Add Test tube' })
     tick(1000)
-    fireEvent.pointerDown(sample, { button: 0, clientX: 0, clientY: 0 })
-    fireEvent.pointerMove(sample, { clientX: 400, clientY: 300 })
+    fireEvent.pointerDown(source, { button: 0, clientX: 0, clientY: 0 })
+    fireEvent.pointerMove(source, { clientX: 400, clientY: 300 })
+    expect(document.querySelector('.equipment-drag-preview') !== null).toBe(sourceType === 'palette')
     tick(heatReactionDelayMs * 2)
     expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
-    fireEvent.keyDown(sample, { key: 'Escape' })
-    fireEvent.pointerUp(sample, { clientX: 400, clientY: 300 })
-    tick()
+    fireEvent.keyDown(source, { key: 'Escape' })
+    fireEvent.pointerUp(source, { clientX: 400, clientY: 300 })
+    tick(heatReactionDelayMs - 1)
+    expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    tick(1)
+    expect(sample.querySelector('[data-reaction-effect="solid-color-change"]')).toBeInTheDocument()
+    fireEvent.click(sample)
     expect(screen.getByRole('status', { name: 'Heat result' })).toHaveTextContent(reactions[0].name)
   })
 

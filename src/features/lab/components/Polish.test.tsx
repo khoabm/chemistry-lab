@@ -23,7 +23,10 @@ function draggableLab() {
 function startDrag(source: HTMLElement) {
   fireEvent.pointerDown(source, { button: 0, clientX: 10, clientY: 10 })
   fireEvent.pointerMove(source, { clientX: 450, clientY: 250 })
-  expect(document.querySelector('.equipment-drag-preview')).toBeInTheDocument()
+  if (source.classList.contains('workspace-equipment')) {
+    expect(source).toHaveClass('is-moving')
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+  } else expect(document.querySelector('.equipment-drag-preview')).toBeInTheDocument()
 }
 
 describe('M8 experiment action hierarchy', () => {
