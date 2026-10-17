@@ -9,6 +9,7 @@ import { ChemicalSwatch } from './ChemicalSwatch'
 import { HeatingStatus } from './HeatingStatus'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
+import type { ReactNode } from 'react'
 
 interface ContainerDetailsProps {
   container: ContainerState
@@ -19,9 +20,10 @@ interface ContainerDetailsProps {
   disabled: boolean
   presentation?: ReactionPresentation | undefined
   visible?: boolean
+  mountControls?: ReactNode
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, presentation, visible = true }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, presentation, visible = true, mountControls }: ContainerDetailsProps) {
   const { t } = useTranslation()
   const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
@@ -59,6 +61,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
           onClick={onClear}>{t('action.empty')}</button>
       </div>
       {container.contents.length > 0 && <p id="empty-container-hint" className="empty-caption">{t('sample.emptyHint')}</p>}
+      {mountControls}
       {container.contents.length > 0 && <figure className="sample-closeup" aria-label={t('sample.closeup')}>
         <button type="button" disabled={disabled} aria-label={t('sample.enlarge')} aria-haspopup="dialog"
           onClick={onEnlarge}>

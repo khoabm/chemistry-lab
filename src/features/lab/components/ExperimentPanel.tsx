@@ -22,9 +22,11 @@ interface ExperimentPanelProps {
   onToggleLamp: () => void
   presentation?: ReactionPresentation | undefined
   dropperDetails?: ReactNode
+  mountControls?: ReactNode
+  lampSupportStatus?: ReactNode
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation, dropperDetails }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -74,6 +76,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-sample-panel`} aria-labelledby={`${id}-sample-tab`}
         tabIndex={0} hidden={activeTab !== 'sample'}>
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
+          mountControls={mountControls}
           presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}
           onClear={() => { setDetailTab(null); selectTab('sample'); onClear() }}
@@ -86,7 +89,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
         </button>}
         {result ? <ReactionObservation result={result} /> : <p className="empty-caption">{t('experiment.noResult')}</p>}
       </div>
-      </> : lamp ? <LampDetails lamp={lamp} disabled={disabled} onToggle={onToggleLamp} />
+      </> : lamp ? <LampDetails lamp={lamp} disabled={disabled} onToggle={onToggleLamp} supportStatus={lampSupportStatus} />
         : equipment?.equipmentType === 'dropper' ? dropperDetails ?? <section className="container-details">
           <h3>{t('experiment.dropperTitle')}</h3>
           <p className="empty-caption">{t('dropper.hint')}</p>

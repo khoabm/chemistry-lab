@@ -378,6 +378,11 @@ h3 { font-size: 14px; font-weight: 600; }
 .dropper-details > label { display: block; margin-top: var(--space-4); font-size: 13px; font-weight: 500; }
 .dropper-details > select { width: 100%; min-width: 0; min-height: 44px; margin-top: var(--space-2); padding: var(--space-2); font: inherit; font-size: 13px; color: var(--color-text); background: var(--color-panel); border: 1px solid var(--color-line); border-radius: var(--radius-small); }
 .dropper-details > select:focus-visible { outline-offset: -3px; }
+.mount-controls { margin-top: var(--space-4); }
+.mount-controls h4 { margin: 0 0 var(--space-2); font-size: 13px; }
+.mount-controls label { display: block; margin-top: var(--space-3); font-size: 13px; }
+.mount-controls select { width: 100%; min-width: 0; min-height: 44px; margin-top: var(--space-2); padding: var(--space-2); font: inherit; color: var(--color-text); background: var(--color-panel); border: 1px solid var(--color-line); border-radius: var(--radius-small); }
+.mount-controls select:focus-visible { outline-offset: -3px; }
 .lamp-details .action-button { margin-top: var(--space-3); }
 .heating-status { margin: var(--space-3) 0; font-size: 13px; line-height: 1.6; }
 .heating-status .is-heating { color: #80541c; font-weight: 600; }

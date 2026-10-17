@@ -2,11 +2,13 @@ import { useTranslation } from 'react-i18next'
 import { useStatusLive } from '../../../localization/useStatusLive'
 import type { AlcoholLampState } from '../../../types/heating'
 import { EquipmentVisual } from './EquipmentVisual'
+import type { ReactNode } from 'react'
 
-export function LampDetails({ lamp, disabled, onToggle }: {
+export function LampDetails({ lamp, disabled, onToggle, supportStatus }: {
   lamp: AlcoholLampState
   disabled: boolean
   onToggle: () => void
+  supportStatus?: ReactNode
 }) {
   const { t } = useTranslation()
   const lampLive = useStatusLive(lamp.status)
@@ -14,6 +16,7 @@ export function LampDetails({ lamp, disabled, onToggle }: {
     <h3 id="lamp-details-title">{t('lamp.title')}</h3>
     <EquipmentVisual equipmentType="alcohol-lamp" lampStatus={lamp.status} />
     <p role="status" aria-label={t('lamp.status')} aria-live={lampLive}>{lamp.status === 'lit' ? t('lamp.lit') : t('lamp.off')}</p>
+    {supportStatus}
     <button type="button" className={`action-button action-button--${lamp.status === 'lit' ? 'secondary' : 'primary'}`} disabled={disabled} onClick={onToggle}>
       {lamp.status === 'lit' ? t('action.extinguish') : t('action.ignite')}
     </button>

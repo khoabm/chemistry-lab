@@ -14,7 +14,8 @@ it away or using a keyboard-accessible action, and understand why that sample is
 This is an explicitly authorized auxiliary branch within the official active milestone
 `M11 — Dropper Transfer & 2D Material Presentation`. It neither renames M11 nor creates
 another milestone. The completed M11 transfer/material work is the baseline, not work to
-reimplement. Pass 1 is delivered below; Passes 2–5 remain planned and unimplemented.
+reimplement. Pass 1 and Pass 2 foundations are delivered below; Passes 3–5 remain
+planned. The production mounting integration gate remains closed until Pass 4.
 
 ## Scope
 
@@ -450,6 +451,13 @@ On 2026-10-17, implementation started on the explicitly authorized
 this approved plan on top of final M11 `06607c6`; the ancestor check succeeded.
 No branch/milestone transition, dependency installation or Git publication was performed.
 
+### Pass 2 implementation baseline
+
+On 2026-10-17, the branch was `M11-render-polish` at `4c8f271` with a clean working
+tree. That HEAD contains the approved Pass 1, including its 389-test validation
+and direct-drag implementation. The official milestone remains M11. No Git mutation,
+dependency installation or milestone transition is part of this pass.
+
 ## Testing and validation
 
 ### Existing expectations that must change intentionally
@@ -568,7 +576,8 @@ QA claimed by this planning task.
 - [x] Reconcile approved decisions with current ownership and record this ExecPlan.
 - [x] Pass 1: direct bench drag and selection/focus, with baseline heating preserved.
 - [x] Pass 1: targeted tests, full validation and available browser QA recorded below.
-- [ ] Pass 2: mounting state/invariants and native-control tests.
+- [x] Pass 2: mounting state/invariants and native-control tests; production integration remains unwired.
+- [x] Pass 2: full local validation and final scope review recorded below.
 - [ ] Pass 3: projection, assembly bounds/movement and cancellation/rebind.
 - [ ] Pass 4: coherent mounted-only integration and per-container timer policy.
 - [ ] Pass 5: visual affordance/browser QA and scoped documentation closeout.
@@ -598,6 +607,15 @@ QA claimed by this planning task.
 - Pass 1 browser QA: the existing short-landscape sticky tools can cover the upper
   part of the bench after focus-driven scrolling. An actual drop onto the tools was
   rejected and restored the committed position. No unrelated sticky/layout CSS was changed.
+- Pass 2: mounting state can be implemented independently of geometry and timers.
+  Relation-only mount/rebind updates preserve container references and current Heat
+  requests. Removing with an explicitly supplied free position still uses the unchanged
+  M11 geometry synchronizer if that position changes; it does not introduce mounted-only
+  heating. The new controls must not be wired into LabPage at this internal stage.
+- Pass 2: opening controls on an already-mounted container has no prior local lamp
+  choice. Remove must retain the just-freed lamp as the next choice, otherwise the same
+  action button becomes disabled and undermines focus retention. This edge case was
+  fixed and covered before handoff.
 
 ## Decision log
 
@@ -633,6 +651,23 @@ QA claimed by this planning task.
   and a weaker hover shadow. Scope stacking to normal equipment 1, selected 2 and
   focus-visible 3 within the existing isolated bench. Keep the global focus outline
   and inset offset unchanged; do not introduce mounting-specific layering in this pass.
+- 2026-10-17, Pass 2: add readonly mount pairs in the existing reducer state and share
+  `getMountIssue`/`getMountTargetIssue` plus collection queries from `store/mounting.ts`.
+  Mount requires a free compatible container/available lamp; rebind explicitly supplies
+  its expected old lamp, replaces the pair atomically and never evicts an occupant.
+  Repeated same-support commands are no-ops. Remove likewise checks its expected lamp
+  and accepts only a finite normalized free position, committing relation/position together.
+- 2026-10-17, Pass 2: leave anchor adjustment, derived rendering and move/detach semantics
+  for Pass 3. Mount/rebind neither move equipment nor synchronize Heat from the new
+  relation. Reset clears the one collection. No reverse occupancy map or new equipment
+  state is added, and material/lamp actions retain the relation.
+- 2026-10-17, Pass 2: implement ContainerMountControls and LampSupportStatus as native,
+  controlled foundations with optional composition slots in ContainerDetails,
+  LampDetails and ExperimentPanel. LabPage imports/passes none of them. This is the
+  approved integration gate, not a feature flag or alternate heating implementation.
+  One stable Mount/Remove button retains focus across the relation change; availability
+  reasons are described, IDs remain stable, and locale-only status updates stay quiet.
+  Remove also retains the current lamp choice when controls were opened after mounting.
 
 ## Outcomes and retrospective
 
@@ -723,6 +758,96 @@ viewport emulation and mouse/pointer input, not a physical touch device. No new 
 reduced-motion emulation, screen-reader certification or quantitative contrast claim.
 
 No outstanding functional Pass 1 defect was found. Remaining items are the stated QA
-limits and the intentionally unchanged overlap/sticky behavior. Passes 2–5 remain
-unimplemented. Product approval, commit/publication, merge and milestone advancement
+limits and the intentionally unchanged overlap/sticky behavior. At the Pass 1 handoff,
+Passes 2–5 remained unimplemented. Product approval, commit/publication, merge and milestone advancement
 remain separate user decisions.
+
+### Pass 2 delivered foundations, 2026-10-17
+
+`LabWorkspaceState.mounts` is the sole authoritative readonly collection of
+`containerEquipmentId`/`lampEquipmentId` pairs. Pure application helpers query either
+end and validate supported, existing equipment and matching container/lamp state.
+Only Beaker/Test tube may mount, independently of contents, results and lamp ignition.
+Mount does not infer a relation from geometry, read localization or evaluate chemistry.
+
+New reducer actions are `mount-container`, `remove-from-support` and
+`rebind-container`. They validate the latest state and either commit atomically or
+return the original state. Occupied supports cannot eject/swap; a container cannot
+acquire a second lamp through Mount. Rebind requires the expected source ID; Remove
+requires the expected source and an upstream-prepared finite position in [0,1].
+Position policy/geometry is intentionally absent. Mount/rebind preserve equipment,
+containers/results/contents, droppers/payload, selection and Heat request identities.
+Remove preserves materials/results and uses existing geometry heating for an actual
+free-position change. Reset clears relations and retains monotonic ID/request guards.
+
+ContainerMountControls provides a labeled native lamp select and Mount/Remove action,
+empty/occupied/unavailable reasons, off-lamp eligibility and current-lamp description.
+LampSupportStatus reports derived occupancy. The same action DOM node/focus survives
+mount/remove. New generic copy is complete in EN/VI with existing English fallback and
+locale-only live-region suppression. Minimal scoped styles reuse existing controls and
+44px targets; no palette, workspace or apparatus visual changes.
+
+Optional `mountControls` and `lampSupportStatus` composition slots allow the existing
+detail components to be tested without connecting production orchestration. **LabPage
+does not supply these controls.** There is no public mounting UI, anchor projection,
+snap target, derived mounted position, grouped movement, pointer mounting/detach,
+mounted-only heating or timer redesign yet. Existing geometry multi-container heating,
+overlapping-source fallback and global drag pause/full restart remain in production.
+No changes to simulation, reaction matching, Pass 1 interaction, Dropper policy, live
+dynamics/Replay, current heating Help or official milestone documents.
+
+### Pass 2 tests and verification
+
+Added `store/mounting.test.ts` for type/reference validation, one-to-one capacity,
+same-support no-ops, occupied-target races, explicit atomic rebind, stale source
+rejection, atomic removal/position validation, Reset, off/empty/filled/completed samples,
+unchanged contents/result/payload identity, retained relations during material/lamp
+actions, and no chemistry evaluation by relation commands. Tests explicitly retain
+geometry heating despite an internal relation to a different off lamp, and prove that
+mounting near no valid zone does not itself create Heat or a pending request in Pass 2.
+
+Added `ContainerMountControls.test.tsx` with reducer-backed composition tests for
+native select/action semantics, same-button focus retention, occupied/no-lamp/no-free-
+support feedback, disabled controls, occupancy in both detail/panel slots, EN/VI
+identity/focus preservation, English fallback and production integration remaining off.
+
+The initial focused run passed 49 tests in 5 files (new foundations plus existing
+labHeating, heatEvaluation and useHeatReactions tests). Two additional final cases cover
+the lamp panel composition and a filled sample on a remote lit lamp. The first full
+run passed 417/418 tests; its sole failure was a new test incorrectly expecting a
+zero-argument onClick callback instead of React's existing event argument. That assertion
+was corrected to require one invocation, without changing the ignition handler. A final
+focus review added the already-mounted-on-open removal case and fixed local choice
+retention. The final focused run passed all 30 new mounting tests in 2 files. Full final
+validation results are recorded at handoff below. No existing heating expectation was
+rewritten toward future mounting semantics. Tests use session-local ignored
+TEMP/TMP at `node_modules/.cache/pass2-temp`; configuration/dependencies are unchanged.
+
+No browser QA is claimed for these unwired foundations. Their accessible composition
+and interaction behavior were checked in React Testing Library/jsdom. Real apparatus
+alignment, pointer integration and browser QA remain behind the planned Pass 3–4 gate;
+there is no new production screen to visually certify in Pass 2.
+
+### Pass 2 final validation and handoff
+
+| Command | Actual result |
+| --- | --- |
+| `npm run typecheck` | PASS, including final control/focus changes |
+| `npm run lint` | PASS, zero warnings |
+| `npm test -- --maxWorkers=2` | PASS, 419 tests / 34 files, 118.77s |
+| `npm run build` | PASS, 90 modules transformed |
+| `git diff --check` | PASS |
+
+The final full suite includes 30 new mounting cases (20 policy/reducer, 10 component)
+and all 389 Pass 1/M11 regressions. No existing tests or heating expectations were
+removed or relaxed. Final source review confirmed no changes to LabPage, workspace
+rendering, pointer interaction/geometry, heating hooks/zones, Dropper policy, simulation,
+reaction dynamics/Replay, package files or milestone documentation. New code remains
+within application policy, native-control foundations, optional detail composition,
+generic EN/VI strings and scoped control CSS. No new dependency or persistent flag.
+
+Pass 2 is complete as an internal foundation. No known functional foundation issue
+remains after the focus fix. Browser/physical touch certification and production
+mounting behavior remain intentionally deferred. Passes 3–5 are not implemented;
+the Pass 4 integration gate remains closed. Changes are left uncommitted on
+`M11-render-polish` for user review; no push, merge or milestone advancement.
