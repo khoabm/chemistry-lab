@@ -71,7 +71,7 @@ describe('M7 teaching workflow', () => {
     render(<LabPage />)
     fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
     expect(screen.getByRole('heading', { name: 'Selected dropper' })).toBeInTheDocument()
-    expect(screen.getByText(/Fill only from one unreacted liquid substance/)).toHaveTextContent('not a measured volume')
+    expect(screen.getByText(/Each fill transfers 1 simplified unit/)).toHaveTextContent('Dispensing does not Mix automatically.')
     expect(screen.getByRole('button', { name: 'Fill dropper' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: 'Mix' })).not.toBeInTheDocument()
