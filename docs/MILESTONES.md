@@ -2,11 +2,11 @@
 
 ## Active milestone
 
-`M10 — Localization Foundation`
+`M11 — Dropper Transfer & 2D Material Presentation`
 
 ## Active milestone branch
 
-`M10`
+`M11`
 
 Each milestone must be developed on the Git branch matching its milestone ID.
 
@@ -622,3 +622,90 @@ M10 is complete when:
 - Vietnamese chemistry terminology not yet teacher-approved is clearly left for review rather than guessed
 - relevant tests, typecheck, lint and build validation pass
 - M10 ExecPlan and localization documentation match the delivered implementation
+
+M10 was user-approved complete after localization foundation, UI refinement and
+publication closeout were integrated into `main`. Complete Vietnamese chemistry
+terminology/prose remains intentionally deferred to a later dedicated polish branch
+with teacher/SGK review and is not a blocker for continuing the product roadmap.
+
+---
+
+# M11 — Dropper Transfer & 2D Material Presentation
+
+## Goal
+
+Activate the existing Dropper as a meaningful qualitative transfer tool and improve
+2D material recognition without introducing pouring, quantitative chemistry or fluid
+simulation.
+
+The detailed implementation plan is defined in:
+
+`plans/m11-dropper-transfer-material-presentation.md`
+
+## Deliverables
+
+- expose Dropper as usable laboratory equipment
+- fill Dropper from a Beaker/Test tube only when the source currently contains exactly
+  one transferable liquid chemical
+- one qualitative payload per fill; one Dropper payload at a time
+- source material decreases when sampled so transfer does not duplicate material
+- dispense into a supported Beaker/Test tube and empty the Dropper payload
+- dispensing changes contents only; the user must still explicitly press Mix
+- accessible feedback for invalid fill/dispense states
+- improved qualitative 2D recognition of liquid, solid, precipitate formation and
+  persistent final deposit
+- preserve M9 reaction dynamics/replay and M10 localization behavior
+- tests and documentation for the approved interaction and rendering behavior
+
+## User-visible result
+
+A learner can place a Dropper, take one qualitative liquid sample from a valid source
+container, move/use the Dropper to dispense that sample into another container, then
+choose when to press Mix. Liquids, solids and precipitate/deposit states are easier to
+recognize during classroom use.
+
+## Architectural requirement
+
+Preserve:
+
+`Presentation → Application state → Simulation → Domain data`
+
+Dropper payload belongs to explicit application state. Stable chemical/equipment IDs
+remain identity. Transfer must not hide chemistry evaluation inside React or rendering.
+
+Material rendering consumes existing semantic/container/reaction state and must not
+infer reaction validity.
+
+## Non-goals
+
+Do not add:
+
+- pouring
+- automatic reaction after dispense
+- Dropper pickup of solids or precipitate
+- post-reaction product reuse/chaining
+- reaction-product composition engine
+- reactant-consumption chemistry
+- limiting/excess reagent logic
+- stoichiometry, concentration, measured volume or moles
+- fluid/collision/spill simulation
+- required liquid slosh behavior
+- 3D
+- new chemicals, reactions or triggers
+- Vietnamese chemistry-content completion
+
+## Completion criteria
+
+M11 is complete when:
+
+- Dropper can transfer one simplified liquid portion between supported containers
+  without duplicating material
+- invalid source/destination/load states are predictable and accessible
+- dispensing never evaluates a reaction automatically
+- explicit Mix after dispensing continues to use the existing deterministic engine
+- reset and existing interaction/heating behavior remain correct
+- liquid, solid and representative precipitate/final-deposit states are visually
+  distinguishable without introducing chemistry rules into presentation
+- M9 finite dynamics/replay and M10 localization/fallback behavior remain intact
+- relevant tests, typecheck, lint and build validation pass
+- the M11 ExecPlan and documentation match the delivered implementation
