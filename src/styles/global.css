@@ -43,12 +43,15 @@ svg { display: block; }
 .lab-header {
   min-height: 112px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
+  row-gap: var(--space-3);
+  padding-block: var(--space-3);
   border-bottom: 1px solid var(--color-line);
 }
-.lab-brand { display: flex; align-items: center; gap: var(--space-4); }
+.lab-brand { display: flex; align-items: center; gap: var(--space-4); flex-shrink: 0; max-width: 100%; }
 .brand-mark {
   display: grid;
   place-items: center;
@@ -64,8 +67,10 @@ svg { display: block; }
 h1 { margin-top: 5px; font-size: 23px; font-weight: 600; letter-spacing: -0.7px; }
 h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; }
 h3 { font-size: 14px; font-weight: 600; }
-.header-actions { display: flex; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); }
+.header-actions { display: flex; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); margin-inline-start: auto; }
 .header-preferences { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
+/* Reserve compact utility slots without constraining the full header. */
+.header-preferences .preview-label { min-inline-size: 150px; }
 .language-select { position: relative; display: inline-flex; flex-shrink: 0; color: var(--color-muted); font-size: 12px; }
 .language-select select {
   appearance: none;
@@ -85,8 +90,9 @@ h3 { font-size: 14px; font-weight: 600; }
 .language-select-icon { left: 10px; width: 16px; height: 16px; }
 .language-select-chevron { right: 10px; width: 10px; height: 10px; }
 .sample-detail-preferences { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--space-2); }
-.reset-action { max-width: 210px; }
-.reset-action p { margin-top: var(--space-2); font-size: 10px; line-height: 1.5; color: var(--color-muted); }
+.reset-action { flex: 0 1 210px; width: 210px; min-width: 0; max-width: 210px; }
+.reset-action > .action-button { width: 100%; justify-content: center; }
+.reset-action p { min-block-size: 3em; margin-top: var(--space-2); font-size: 10px; line-height: 1.5; color: var(--color-muted); }
 .lab-help { margin-top: var(--space-4); border: 1px solid var(--color-line); border-radius: var(--radius-small); background: var(--color-panel); }
 .lab-help summary { min-height: 44px; padding: var(--space-3) var(--space-4); cursor: pointer; color: var(--color-accent); font-size: 13px; font-weight: 600; }
 .lab-help-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--space-5); padding: var(--space-4); }
@@ -147,6 +153,8 @@ h3 { font-size: 14px; font-weight: 600; }
 .palette-section { padding: var(--space-5) 0; }
 .palette-section + .palette-section { border-top: 1px solid var(--color-line); }
 .empty-caption { margin-top: var(--space-3); color: var(--color-muted); font-size: 12px; line-height: 1.6; }
+/* This short guidance reserves two lines; longer copy can still grow. */
+.lab-palette #equipment-palette-hint { min-block-size: 3.2em; }
 .palette-note { margin-top: auto; padding-top: var(--space-6); max-width: 150px; color: var(--color-muted); font-size: 12px; line-height: 1.7; }
 
 .lab-workspace { grid-area: workspace; display: flex; flex-direction: column; min-width: 0; }
@@ -456,6 +464,7 @@ h3 { font-size: 14px; font-weight: 600; }
 }
 
 @media (max-width: 900px) {
+  .header-preferences { flex-direction: column; align-items: flex-start; gap: 0; }
   .lab-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'palette' 'workspace' 'observations'; }
   .lab-palette { position: sticky; top: 0; z-index: 8; align-self: start; height: auto; padding: 0; }
   .lab-palette > .panel-heading { display: none; }
@@ -511,6 +520,7 @@ h3 { font-size: 14px; font-weight: 600; }
   h1 { font-size: 21px; }
   .header-actions { width: 100%; justify-content: space-between; }
   .header-preferences { flex: 1; min-width: 0; flex-direction: column; align-items: flex-start; gap: 0; }
+  .header-preferences .preview-label { min-inline-size: 0; min-block-size: 2.8em; line-height: 1.4; }
   .header-actions .reset-action { max-width: 55%; }
   .lab-layout { margin: var(--space-5) 0; }
   .workspace-heading h2 { font-size: 17px; }

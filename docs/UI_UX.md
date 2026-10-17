@@ -750,6 +750,17 @@ target and visible keyboard focus. Header metadata groups with the preference;
 Reset and dialog Close retain their stronger outlined treatment. Narrow layouts
 may wrap the utility group without changing dialog focus order or lifecycle.
 
+M10 locale layout stability reserves header metadata/Reset slots and two lines
+for the Reset hint, with a two-line metadata minimum on mobile. At the existing
+narrow breakpoint, metadata and language stack; utilities can wrap below the brand
+instead of compressing it. The whole header has no fixed width or height.
+Only Equipment palette guidance reserves a two-line minimum so Chemicals/search
+do not move when that hint wraps differently in EN/VI. Longer text may still grow;
+equipment tiles, chemical rows and bounded tools scrolling retain their sizes/rules.
+These are scoped CSS rules, with no locale selectors or JavaScript measurement.
+Workspace feedback, Replay controls/captions and scientific/Help prose remain
+naturally sized; no global button widths or caption minimums are introduced.
+
 English is complete/default; Vietnamese generic UI is incremental. Missing or
 unapproved Vietnamese terminology appears as English, preserving meaningful
 labels rather than raw keys/blank controls. Chemistry notation is unchanged.

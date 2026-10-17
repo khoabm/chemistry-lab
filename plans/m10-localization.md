@@ -536,3 +536,60 @@ review and broader browser/touch/screen-reader/projector verification remain opt
 follow-up work. Only the unused table and this living plan changed in this review.
 These review fixes are uncommitted and have no new hosted CI result; no commit,
 push, merge, PR or milestone advancement was performed.
+
+### Scoped locale layout stability — 2026-10-17
+
+Authorized only header utility stability and the Equipment hint slot, preserving
+accepted refinement Passes 1–4 and leaving all other prose/controls flexible.
+Baseline M10-ui-refinement is clean at ea4f8ee4996b8996f707ecaab2fb7b219312248d,
+matching remote HEAD. This is a small CSS-only refinement, not a new system or
+milestone. Use existing header/palette selectors, natural wrapping and scoped
+minimum dimensions; no translation, markup, state, dependency or timing change.
+Delivered CSS only in global.css: metadata has a scoped minimum inline slot;
+Reset uses its existing 210px maximum as a preferred, shrinkable slot with a
+full-slot button and two-line hint minimum. At <=900px preferences stack; mobile
+metadata reserves two lines. Header flex wrapping protects the product identity
+when utilities need their own row, with restrained row spacing/padding. No total
+header/group width is fixed. Equipment guidance alone reserves two lines (3.2em
+at its existing 1.6 line height); longer text can grow. One-line hints therefore
+reserve an additional 19.2px, without changing tile/card sizes or scroll rules.
+
+Browser inspection discovered that flex-basis alone did not stabilize intrinsic
+utility width: VI could still wrap Reset to a new row. An explicit preferred
+width on the Reset slot, still bounded by the existing mobile 55% maximum and
+allowed to shrink/wrap text, solves this without fixing the whole utility group.
+At intermediate widths utilities wrap beneath the brand instead of compressing it.
+
+Paired in-app browser QA: 1440×960, 1200×900, 1180×900, 390×844 and 844×390,
+with no-selection and an existing R5 result/non-empty query, plus opened mobile
+tools. Header/selector/Reset geometry and Equipment hint/Chemicals heading/search
+positions match between EN/VI at these viewports. At 1200px the old search Y
+559.4/540.2 becomes 559.4/559.4; at 1180px 567.4/548.2 becomes 567.4/567.4.
+The desktop header stays 112px; utility height is 82px in both locales rather
+than 82/67px. The mobile selector stays at Y=121.6 in both locales, replacing
+the old 104/120px shift. These are observations, not pixel-test contracts.
+
+Additional narrow/breakpoint checks at 901, 900, 760, 700, 561, 560 and 320px
+found no horizontal overflow. Product text retains its width with wrapped utilities;
+at 320px the longer VI Reset label grows to two lines rather than clipping.
+Header/search/Clear focus remains visible with >=44px controls. Sticky tools keep
+bounded scrolling, query/Clear behavior and Escape focus return. A modal Auto
+Replay locale switch remains enabled and dismissal restores the actual opener.
+No browser console errors observed. Ctrl+Plus did not change viewport/DPR in the
+available tool, so actual browser zoom is not claimed; smaller-width QA and source
+inspection confirm natural wrapping/no maximum height on the reserved text slots.
+
+Intentionally unchanged: workspace feedback, Replay button widths/captions,
+Help/scientific/model prose and all other actions/rows. In particular, the
+no-selection chemical availability paragraph can wrap from one to two lines on
+mobile, moving the first chemical after the search; it is outside the approved
+Equipment-hint correction. A selected-container catalog starts at the same
+position in both locales. No artificial jsdom geometry tests were added because
+markup/semantics are unchanged; existing regressions protect state/lifecycles.
+Validation: `npm run typecheck`, `npm run lint`, `npm test -- --maxWorkers=2`
+(349 tests / 28 files, 138.69s), `npm run build` and `git diff --check` PASS.
+Tests used the existing command-local ignored TEMP/TMP cache workaround; no test
+configuration or timeout changed. Final diff is limited to global.css, UI_UX.md
+and this plan. No tests were removed or weakened. Current CSS changes are local
+and uncommitted; no new GitHub-hosted CI result is claimed for them.
+Prior-pass publication/CI closeout is intentionally deferred to the later review.
