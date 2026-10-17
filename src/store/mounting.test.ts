@@ -127,6 +127,27 @@ describe('Pass 2 mounting application policy and reducer', () => {
     expect(remove(rebound, 'equipment-4', { x: 0.1, y: 0.1 }).containers[0]?.heatingState.status).toBe('not-heating')
   })
 
+  it('keeps atomic assembly moves on legacy committed geometry until the production integration gate opens', () => {
+    let state = setup()
+    state = reduce(state, { type: 'move', id: 'equipment-4', position: { x: 0.5, y: 0.7 } })
+    state = reduce(state, { type: 'move', id: 'equipment-1', position: { x: 0.5, y: 0.48 } })
+    state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'copper-carbonate', quantity: 1 })
+    state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-4' })
+    const offAssembly = mount(state, 'equipment-1', 'equipment-5')
+    const movedOff = reduce(offAssembly, { type: 'move-lamp-assembly', lampEquipmentId: 'equipment-5',
+      containerEquipmentId: 'equipment-1', position: { x: 0.8, y: 0.8 } })
+    expect(movedOff.containers).toBe(offAssembly.containers)
+    expect(movedOff.nextHeatRequestId).toBe(offAssembly.nextHeatRequestId)
+    const litAssembly = rebind(movedOff, 'equipment-5', 'equipment-4')
+    const movedLit = reduce(litAssembly, { type: 'move-lamp-assembly', lampEquipmentId: 'equipment-4',
+      containerEquipmentId: 'equipment-1', position: { x: 0.8, y: 0.7 } })
+    expect(movedLit.mounts).toBe(litAssembly.mounts)
+    expect(movedLit.equipment[0]).toBe(litAssembly.equipment[0])
+    expect(movedLit.containers[0]!.heatingState.status).toBe('not-heating')
+    expect(movedLit.containers[0]!.heatEvaluation.status).toBe('idle')
+    expect(movedLit.containers[0]!.contents).toBe(litAssembly.containers[0]!.contents)
+  })
+
   it('preserves completed results, contents and Dropper payload identity; material actions retain relations', () => {
     let state = setup()
     state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid', quantity: 2 })

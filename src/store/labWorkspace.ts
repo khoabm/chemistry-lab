@@ -10,7 +10,7 @@ import { isCompletedHeatReaction } from '../simulation/reactions/types'
 import type { HeatEvaluationState } from '../types/heating'
 import type { DropperState } from '../types/dropper'
 import { prepareDropperFill, prepareDropperDispense } from './dropperTransfer'
-import { findContainerMount, getMountIssue, getMountTargetIssue, type EquipmentMount } from './mounting'
+import { findContainerMount, findLampMount, getMountIssue, getMountTargetIssue, type EquipmentMount } from './mounting'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
@@ -35,9 +35,10 @@ export type LabWorkspaceAction =
   | { type: 'evaluate-heat'; equipmentId: string; requestId: number }
   | { type: 'fill-dropper'; equipmentId: string; containerEquipmentId: string }
   | { type: 'dispense-dropper'; equipmentId: string; containerEquipmentId: string }
-  | { type: 'mount-container'; containerEquipmentId: string; lampEquipmentId: string }
-  | { type: 'remove-from-support'; containerEquipmentId: string; lampEquipmentId: string; position: Point }
-  | { type: 'rebind-container'; containerEquipmentId: string; fromLampEquipmentId: string; lampEquipmentId: string }
+  | { type: 'mount-container'; containerEquipmentId: string; lampEquipmentId: string; lampPosition?: Point }
+  | { type: 'remove-from-support'; containerEquipmentId: string; lampEquipmentId: string; position: Point; selectContainer?: true }
+  | { type: 'rebind-container'; containerEquipmentId: string; fromLampEquipmentId: string; lampEquipmentId: string; lampPosition?: Point }
+  | { type: 'move-lamp-assembly'; lampEquipmentId: string; containerEquipmentId: string; position: Point }
 
 export function createLabWorkspaceState(): LabWorkspaceState {
   return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [], droppers: [], mounts: [], nextHeatRequestId: 1 }
@@ -73,6 +74,19 @@ function boundedPosition(position: Point): Point {
   }
 }
 
+function validWorkspacePosition(position: Point): boolean {
+  return Number.isFinite(position.x) && Number.isFinite(position.y)
+    && position.x >= 0 && position.x <= 1 && position.y >= 0 && position.y <= 1
+}
+
+function positionEquipment(state: LabWorkspaceState, id: string, position: Point | undefined): LabWorkspaceState {
+  if (!position) return state
+  const equipment = state.equipment.map((item) => item.id === id
+    && (item.position.x !== position.x || item.position.y !== position.y)
+    ? { ...item, position: { ...position } } : item)
+  return equipment.every((item, index) => item === state.equipment[index]) ? state : { ...state, equipment }
+}
+
 export function nextEquipmentPosition(count: number): Point {
   return { x: 0.15 + (count % 3) * 0.35, y: 0.4 + (Math.floor(count / 3) % 2) * 0.45 }
 }
@@ -91,23 +105,41 @@ export function labWorkspaceReducer(
       : state
   }
 
-  // Pass 2's internal relation transitions do not replace geometry-based heating.
+  // Internal relation transitions do not replace geometry-based heating.
   // Production mount controls remain unwired until the Pass 4 integration gate.
   if (action.type === 'mount-container') {
     if (getMountIssue(state, action.containerEquipmentId, action.lampEquipmentId)
-      || findContainerMount(state.mounts, action.containerEquipmentId)) return state
-    return { ...state, mounts: [...state.mounts, {
+      || findContainerMount(state.mounts, action.containerEquipmentId)
+      || action.lampPosition && !validWorkspacePosition(action.lampPosition)) return state
+    const positioned = positionEquipment(state, action.lampEquipmentId, action.lampPosition)
+    const next = { ...positioned, mounts: [...state.mounts, {
       containerEquipmentId: action.containerEquipmentId, lampEquipmentId: action.lampEquipmentId,
     }] }
+    return positioned === state ? next : synchronizeHeating(next)
   }
 
   if (action.type === 'rebind-container') {
     const current = findContainerMount(state.mounts, action.containerEquipmentId)
     if (!current || current.lampEquipmentId !== action.fromLampEquipmentId
       || current.lampEquipmentId === action.lampEquipmentId
-      || getMountTargetIssue(state, action.containerEquipmentId, action.lampEquipmentId)) return state
-    return { ...state, mounts: state.mounts.map((mount) => mount === current
+      || getMountTargetIssue(state, action.containerEquipmentId, action.lampEquipmentId)
+      || action.lampPosition && !validWorkspacePosition(action.lampPosition)) return state
+    const positioned = positionEquipment(state, action.lampEquipmentId, action.lampPosition)
+    const next = { ...positioned, mounts: state.mounts.map((mount) => mount === current
       ? { containerEquipmentId: action.containerEquipmentId, lampEquipmentId: action.lampEquipmentId } : mount) }
+    return positioned === state ? next : synchronizeHeating(next)
+  }
+
+  if (action.type === 'move-lamp-assembly') {
+    const mount = findLampMount(state.mounts, action.lampEquipmentId)
+    if (!mount || mount.containerEquipmentId !== action.containerEquipmentId
+      || getMountTargetIssue(state, action.containerEquipmentId, action.lampEquipmentId)
+      || !validWorkspacePosition(action.position)) return state
+    const next = positionEquipment(state, action.lampEquipmentId, action.position)
+    // One legacy geometry synchronization, never a detach/reacquire sequence.
+    // Mounted Heat ownership is deliberately deferred to Pass 4.
+    return next === state && state.selectedEquipmentId === action.lampEquipmentId ? state
+      : synchronizeHeating({ ...next, selectedEquipmentId: action.lampEquipmentId })
   }
 
   if (action.type === 'remove-from-support') {
@@ -122,6 +154,7 @@ export function labWorkspaceReducer(
     return synchronizeHeating({ ...state,
       mounts: state.mounts.filter((mount) => mount !== current),
       equipment: equipment.every((item, index) => item === state.equipment[index]) ? state.equipment : equipment,
+      selectedEquipmentId: action.selectContainer ? action.containerEquipmentId : state.selectedEquipmentId,
     })
   }
 

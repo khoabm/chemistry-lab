@@ -191,6 +191,7 @@
   "mount.ready": "This support is available, even when the lamp is off.",
   "mount.removeHint": "Remove this container from its current support.",
   "mount.occupied": "This support already holds another container.",
+  "mount.noRoom": "There is not enough room on the bench for this setup.",
   "mount.invalidContainer": "Only a placed beaker or test tube can use this support.",
   "mount.invalidLamp": "This lamp is no longer available.",
   "mount.alreadyMounted": "Remove the container from its current support first.",

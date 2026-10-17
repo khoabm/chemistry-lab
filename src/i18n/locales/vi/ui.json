@@ -168,6 +168,7 @@
   "mount.ready": "Giá đỡ còn trống, kể cả khi đèn đã tắt.",
   "mount.removeHint": "Nhấc dụng cụ khỏi giá đỡ hiện tại.",
   "mount.occupied": "Giá đỡ đã có dụng cụ khác.",
+  "mount.noRoom": "Bàn không đủ chỗ cho bộ dụng cụ này.",
   "mount.invalidContainer": "Chỉ cốc thủy tinh hoặc ống nghiệm trên bàn mới đặt được lên giá.",
   "mount.invalidLamp": "Đèn này không còn khả dụng.",
   "mount.alreadyMounted": "Nhấc dụng cụ khỏi giá hiện tại trước.",

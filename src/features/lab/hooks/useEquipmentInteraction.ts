@@ -5,6 +5,9 @@ import { nextEquipmentPosition } from '../../../store/labWorkspace'
 import type { EquipmentType, Point } from '../../../types/equipment'
 import type { MessageKey } from '../../../i18n'
 import { benchPosition, isInsideBench } from '../interactions/workspaceGeometry'
+import type { BenchBounds } from '../interactions/workspaceGeometry'
+import { mountedPositions } from '../interactions/supportGeometry'
+import type { supportPlacement, SupportDragPlacement } from '../interactions/supportPlacement'
 
 export type EquipmentDragSource =
   | { kind: 'palette'; equipmentType: EquipmentType }
@@ -15,6 +18,7 @@ export interface EquipmentDragDraft {
   point: Point
   position: Point
   valid: boolean
+  placement?: SupportDragPlacement
 }
 
 interface PointerSession {
@@ -27,7 +31,7 @@ interface PointerSession {
 }
 
 interface WorkspaceMessage {
-  key: Extract<MessageKey, `workspace.feedback.${string}`>
+  key: Extract<MessageKey, `workspace.feedback.${string}`> | 'mount.noRoom' | 'mount.occupied'
   equipmentType?: EquipmentType
 }
 
@@ -47,16 +51,27 @@ function canDropOnBench(point: Point, bench: HTMLDivElement): boolean {
 export function useEquipmentInteraction(
   state: LabWorkspaceState,
   dispatch: Dispatch<LabWorkspaceAction>,
+  placement?: typeof supportPlacement,
 ) {
   const benchRef = useRef<HTMLDivElement>(null)
   const sessionRef = useRef<PointerSession | null>(null)
   const suppressPointerClickRef = useRef(false)
   const [drag, setDrag] = useState<EquipmentDragDraft | null>(null)
+  const [benchBounds, setBenchBounds] = useState<BenchBounds | null>(null)
   const [message, setMessage] = useState<WorkspaceMessage>({ key: 'workspace.feedback.initial' })
+
+  const measureBench = useCallback(() => {
+    const rect = benchRef.current?.getBoundingClientRect()
+    if (!rect || rect.width <= 0 || rect.height <= 0) return
+    setBenchBounds((previous) => previous && previous.left === rect.left && previous.top === rect.top
+      && previous.width === rect.width && previous.height === rect.height ? previous
+      : { left: rect.left, top: rect.top, width: rect.width, height: rect.height })
+  }, [])
 
   const attachBench = useCallback((element: HTMLDivElement | null) => {
     benchRef.current = element
-  }, [])
+    if (element) measureBench()
+  }, [measureBench])
 
   const clearSession = useCallback(() => {
     const session = sessionRef.current
@@ -87,6 +102,19 @@ export function useEquipmentInteraction(
       clearSession()
     }
   }, [cancelDrag, clearSession])
+
+  useEffect(() => {
+    const resized = () => { cancelDrag(); measureBench() }
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => {
+      const rect = benchRef.current?.getBoundingClientRect()
+      if (sessionRef.current && rect && benchBounds
+        && (rect.width !== benchBounds.width || rect.height !== benchBounds.height)) cancelDrag()
+      measureBench()
+    })
+    if (benchRef.current) observer?.observe(benchRef.current)
+    window.addEventListener('resize', resized)
+    return () => { observer?.disconnect(); window.removeEventListener('resize', resized) }
+  }, [benchBounds, cancelDrag, measureBench])
 
   function resetWorkspace() {
     cancelDrag()
@@ -122,12 +150,16 @@ export function useEquipmentInteraction(
         if (!session.dragging && Math.hypot(point.x - session.start.x, point.y - session.start.y) < 6) return
         session.dragging = true
         event.preventDefault()
+        measureBench()
         const center = { x: point.x - session.offset.x, y: point.y - session.offset.y }
+        const draftPlacement = placement && session.source.kind === 'workspace'
+          ? placement.resolveDrag(state, session.source.id, center, bench.getBoundingClientRect()) : undefined
         setDrag({
           source: session.source,
           point: center,
-          position: benchPosition(center, bench.getBoundingClientRect()),
-          valid: canDropOnBench(point, bench),
+          position: draftPlacement?.position ?? benchPosition(center, bench.getBoundingClientRect()),
+          valid: canDropOnBench(point, bench) && (draftPlacement?.valid ?? true),
+          ...(draftPlacement ? { placement: draftPlacement } : {}),
         })
       },
       onPointerUp(event) {
@@ -140,9 +172,21 @@ export function useEquipmentInteraction(
           if (bench && canDropOnBench(point, bench)) {
             const bounds = bench.getBoundingClientRect()
             const position = benchPosition({ x: point.x - session.offset.x, y: point.y - session.offset.y }, bounds)
-            dispatch(session.source.kind === 'palette'
+            const dropPlacement = placement && session.source.kind === 'workspace'
+              ? placement.resolveDrag(state, session.source.id,
+                { x: point.x - session.offset.x, y: point.y - session.offset.y }, bounds) : undefined
+            if (dropPlacement && !dropPlacement.valid) {
+              setMessage({ key: dropPlacement.target?.kind === 'invalid'
+                && dropPlacement.target.reason === 'assembly-too-large' ? 'mount.noRoom'
+                : dropPlacement.target?.kind === 'invalid' && dropPlacement.target.reason === 'occupied'
+                  ? 'mount.occupied' : 'workspace.feedback.invalid' })
+              clearSession()
+              return
+            }
+            const action: LabWorkspaceAction | null = dropPlacement ? dropPlacement.action : session.source.kind === 'palette'
               ? { type: 'add', equipmentType: session.source.equipmentType, position }
-              : { type: 'move', id: session.source.id, position })
+              : { type: 'move', id: session.source.id, position }
+            if (action) dispatch(action)
             setMessage({ key: session.source.kind === 'palette' ? 'workspace.feedback.placed' : 'workspace.feedback.moved', equipmentType: session.source.equipmentType })
           } else {
             setMessage({ key: 'workspace.feedback.invalid' })
@@ -190,16 +234,26 @@ export function useEquipmentInteraction(
         if (!direction || !instance) return
         event.preventDefault()
         const step = event.shiftKey ? 0.12 : 0.04
-        dispatch({ type: 'move', id: instance.id, position: {
-          x: instance.position.x + direction.x * step,
-          y: instance.position.y + direction.y * step,
-        } })
+        const action = placement && benchRef.current
+          ? placement.keyboardMove(state, instance.id, { x: direction.x * step, y: direction.y * step }, benchRef.current.getBoundingClientRect())
+          : { type: 'move' as const, id: instance.id, position: {
+            x: instance.position.x + direction.x * step,
+            y: instance.position.y + direction.y * step,
+          } }
+        if (!action) { setMessage({ key: 'mount.noRoom' }); return }
+        dispatch(action)
         setMessage({ key: 'workspace.feedback.keyboardMoved', equipmentType: instance.equipmentType })
       },
     }
   }
 
-  return { attachBench, drag, dragActive: drag !== null, message, getEquipmentHandlers, cancelDrag, resetWorkspace }
+  const renderedPositions = benchBounds
+    ? new Map(mountedPositions(state, benchBounds, drag?.source.kind === 'workspace'
+      ? { id: drag.source.id, position: drag.position, lifted: true } : undefined))
+    : new Map(state.equipment.map((item) => [item.id, item.position]))
+  if (drag?.placement?.lampDraft) renderedPositions.set(drag.placement.lampDraft.id, drag.placement.lampDraft.position)
+  return { attachBench, drag, dragActive: drag !== null, message, getEquipmentHandlers, cancelDrag, resetWorkspace,
+    renderedPositions, supportPlacement: placement }
 }
 
 export type EquipmentInteraction = ReturnType<typeof useEquipmentInteraction>

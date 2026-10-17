@@ -267,6 +267,25 @@ h3 { font-size: 14px; font-weight: 600; }
 .workspace-equipment.is-moving { cursor: grabbing; }
 /* Focus stays above a different selection within the bench's isolated stack. */
 .workspace-equipment:focus-visible { z-index: 3; outline-offset: -3px; }
+.workspace-equipment.is-support-apparatus > .equipment-visual {
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  width: 84px;
+  height: 84px;
+  transform: translateX(-50%) scale(1.2);
+}
+.workspace-equipment.is-support-apparatus > span:not(.visually-hidden):not(.equipment-state) {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  width: 100%;
+}
+.workspace-equipment.is-support-lamp { z-index: 1; }
+.workspace-equipment.is-support-container { z-index: 2; }
+/* Retain Pass 1 focus priority; unfocused lamps stay behind their containers. */
+.workspace-equipment.is-support-apparatus:focus-visible { z-index: 3; }
+.workspace-equipment.is-support-target { border-color: var(--color-accent); border-style: dashed; }
 .workspace-equipment:active, .equipment-palette-item:active { cursor: grabbing; }
 .workbench.is-drop-valid { outline: 3px solid var(--color-accent); outline-offset: -3px; }
 .workbench.is-drop-invalid { outline: 2px dashed #9f7755; outline-offset: -3px; }

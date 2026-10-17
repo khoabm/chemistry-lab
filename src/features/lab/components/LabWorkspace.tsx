@@ -20,7 +20,7 @@ interface LabWorkspaceProps {
 export function LabWorkspace({
   state,
   presentations,
-  interaction: { attachBench, drag, message, getEquipmentHandlers },
+  interaction: { attachBench, drag, message, getEquipmentHandlers, renderedPositions, supportPlacement },
 }: LabWorkspaceProps) {
   const { t } = useTranslation()
   const { reactionName, chemicalName } = useChemistryCopy()
@@ -33,7 +33,9 @@ export function LabWorkspace({
     const container = state.containers.find((item) => item.equipmentInstanceId === instance.id)
     const lamp = state.lamps.find((item) => item.equipmentInstanceId === instance.id)
     const dropper = state.droppers.find((item) => item.equipmentInstanceId === instance.id)
-    return { instance, container, lamp, dropper, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
+    const supportApparatus = instance.equipmentType !== 'dropper' && (supportPlacement
+      || state.mounts.some((mount) => mount.containerEquipmentId === instance.id || mount.lampEquipmentId === instance.id))
+    return { instance, container, lamp, dropper, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
   })
 
   return (
@@ -55,7 +57,9 @@ export function LabWorkspace({
       >
         {drag && (
           <p className="bench-drop-feedback">
-            {drag.valid ? t('workspace.release') : t('workspace.moveOnto')}
+            {drag.placement?.target?.kind === 'invalid' && drag.placement.target.reason === 'occupied'
+              ? t('mount.occupied') : drag.placement?.target?.kind === 'invalid' && drag.placement.target.reason === 'assembly-too-large'
+                ? t('mount.noRoom') : drag.valid ? t('workspace.release') : t('workspace.moveOnto')}
           </p>
         )}
         {state.equipment.length === 0 && <div className="workspace-empty">
@@ -70,12 +74,12 @@ export function LabWorkspace({
         </div>}
         {labeledEquipment.filter(({ lamp }) => lamp?.status === 'lit').map(({ instance }) =>
           <HeatingZone key={`zone-${instance.id}`} position={instance.position} />)}
-        {labeledEquipment.map(({ instance, label, container, lamp, dropper }) => (
+        {labeledEquipment.map(({ instance, label, container, lamp, dropper, supportApparatus }) => (
           <button
             key={instance.id}
             type="button"
-            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}`}
-            style={equipmentPositionStyle(drag?.source.kind === 'workspace' && drag.source.id === instance.id ? drag.position : instance.position)}
+            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}${supportApparatus ? ` is-support-apparatus${lamp ? ' is-support-lamp' : ' is-support-container'}` : ''}${drag?.placement?.lampDraft?.id === instance.id ? ' is-support-target' : ''}`}
+            style={equipmentPositionStyle(renderedPositions.get(instance.id) ?? instance.position)}
             data-equipment-id={instance.id}
             aria-label={label}
             aria-pressed={state.selectedEquipmentId === instance.id}

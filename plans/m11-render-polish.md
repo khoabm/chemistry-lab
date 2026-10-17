@@ -578,13 +578,26 @@ QA claimed by this planning task.
 - [x] Pass 1: targeted tests, full validation and available browser QA recorded below.
 - [x] Pass 2: mounting state/invariants and native-control tests; production integration remains unwired.
 - [x] Pass 2: full local validation and final scope review recorded below.
-- [ ] Pass 3: projection, assembly bounds/movement and cancellation/rebind.
+- [x] Pass 3: projection, assembly bounds/movement and cancellation/rebind.
+  Internal implementation and validation complete on 2026-10-17 from clean
+  `M11-render-polish` HEAD `067e601` (approved Pass 2); browser limits recorded below.
+  Production composition remains closed: `LabPage` does not supply the concrete
+  support-placement policy or native mount controls. Internal reducer-backed tests
+  supply that policy to the existing Pointer Events hook.
 - [ ] Pass 4: coherent mounted-only integration and per-container timer policy.
 - [ ] Pass 5: visual affordance/browser QA and scoped documentation closeout.
 - [ ] Run final cross-pass validation, inspect final diff and hand off the complete polish implementation.
 
 ## Surprises and discoveries
 
+- Pass 3: default flex SVG placement depends on label wrapping. A fixed scoped SVG
+  slot is necessary for reliable contact anchors; free production equipment keeps
+  its existing layout while the support composition is closed.
+- Pass 3: derived mounted positions disagree with dormant legacy Heat geometry.
+  Atomic movement can legitimately end the old geometric request even with the
+  relation intact. This is covered explicitly and keeps public integration gated.
+- Pass 3: the existing short-landscape sticky palette can obscure upper bench
+  content after scrolling. It was observed in production QA and left outside scope.
 - The baseline gap found during design review is resolved in this checkout: polish now
   contains remote M11's final 06607c6 closeout. Local M11 and remote polish pointers still
   name e0e742b; do not mistake those older pointers for missing source in current HEAD.
@@ -619,6 +632,20 @@ QA claimed by this planning task.
 
 ## Decision log
 
+- 2026-10-17, Pass 3: use a concrete optional support-placement composition dependency
+  in the existing pointer hook, supplied by internal reducer-backed harnesses only.
+  Reason: test complete mounting without exposing a second production Heat truth;
+  no persisted flag, duplicate drag system or debug route is necessary.
+- 2026-10-17, Pass 3: derive contacts from fixed SVG geometry and clamp one union anchor;
+  reject unfittable assemblies and cancel on resize. Reason: preserve alignment,
+  cancellation and one spatial authority without synchronizing dormant child positions.
+- 2026-10-17, Pass 3: prepare native/pointer Mount and Remove with shared geometry,
+  validate optional lamp anchor adjustment in the same mount/rebind transition,
+  and add one pair-validated assembly move. Reason: prevent partial spatial/relation
+  state and retain reducer-owned eligibility/material identity.
+- 2026-10-17, Pass 3: retain one legacy geometry synchronization after actual committed
+  anchor changes, without touching Heat hooks or timing. Reason: preserve the M11
+  production contract until Pass 4 owns the coherent source/timer migration.
 - 2026-10-17: reuse native Pointer Events and transient React interaction state for
   direct drag; reason: stable DOM/cancellation with no committed per-frame moves.
 - 2026-10-17: one authoritative mount-pair collection; derive occupancy and mounted
@@ -851,3 +878,166 @@ remains after the focus fix. Browser/physical touch certification and production
 mounting behavior remain intentionally deferred. Passes 3–5 are not implemented;
 the Pass 4 integration gate remains closed. Changes are left uncommitted on
 `M11-render-polish` for user review; no push, merge or milestone advancement.
+
+### Pass 3 internal projection and interaction, 2026-10-17
+
+Baseline was clean `M11-render-polish` HEAD `067e601`, following approved Pass 2
+and Pass 1 commit `4c8f271`. AGENTS, `.agent/PLANS.md`, this plan, architecture,
+UI/UX and M11 boundaries were inspected before implementation. React/useReducer,
+native Pointer Events, CSS/SVG and Vitest/RTL remain the stack; no dependency added.
+
+`supportGeometry.ts` owns the presentation geometry. It uses the existing 88×126
+equipment footprint plus 4px clearance, an 84px SVG slot scaled by 1.2, support
+contact y=12 and silhouette bottom contacts y=85 (Beaker) / y=89 (Test tube), in
+the existing 100×100 viewBox. A scoped fixed SVG slot prevents translated label
+wrapping from shifting contact alignment. The resulting type-specific vertical
+offsets are 73.584px and 77.616px, converted through current bench dimensions to
+normalized presentation positions. No SVG/DOM coordinates enter application state.
+
+`projectSupport` clamps one requested lamp anchor against the union of lamp and
+projected container footprints, with label/focus clearance. It never clamps children
+independently. An unfittable union returns null. A fitting resize derives a bounded
+rendered assembly without reducer synchronization. If a resize makes the assembly
+impossible to fit, the relation and projected alignment remain (potentially clipped),
+and assembly movement is rejected; no silent detach or dormant-position fallback.
+
+`mountedPositions` is a derived per-render map, not another writable relationship
+collection. The lamp committed/draft anchor determines the mounted container;
+the stored container free position remains dormant. Lifted drafts override only
+the visible container, leaving the authoritative relation unchanged. Buttons and
+SVGs remain keyed siblings. Scoped normal/selected z-order paints lamp/support behind
+containers; keyboard focus retains Pass 1's existing level 3/independent outline,
+including on a lamp, so another selection cannot obscure the focus indicator.
+No reparenting, merged identity, front gauze overlay or scene graph was introduced.
+
+`resolveSupportTarget` returns free bench, same support, available support, or an
+explicit invalid result (outside, occupied, unfittable, invalid equipment). Targets
+are independent of lamp ignition and only accept existing Beaker/Test tube instances.
+Candidate rectangles extend 36px horizontally and 28px vertically around contact-
+aligned container centers. Both the existing support and a minimally fitted anchor
+are considered near an edge; this permits a valid mount to nudge the lamp inward.
+Nearest distance wins, then current support on an exact tie, then stable lexical ID.
+An occupied nearest support is invalid; it does not silently fall through to another
+overlapping lamp, eject an occupant or swap containers.
+
+`supportPlacement.ts` prepares actions from that geometry and the existing application
+eligibility policy. `prepareSupportMount` serves native and pointer mounting/rebinding.
+Mount/rebind accept an optional normalized `lampPosition`, validated before any
+mutation, so relation plus minimum edge adjustment commit together. Native removal
+tries nearby right, left, then down bounded placements, accepting a free target and
+returning null if none fits. It never restores a stale historical position. The future
+production caller must report/disable a native placement rejected by preparation;
+the existing public controls are still unwired.
+
+The new reducer action `move-lamp-assembly` validates the current container/lamp pair
+and updates only the lamp position atomically. It preserves the mount and dormant
+container position. Arrow movement selects the moved lamp, matching existing free
+movement. `remove-from-support` accepts optional `selectContainer: true` for keyboard
+detach, preserving Pass 2 native removal's existing selection contract otherwise.
+All material/result/payload identities are preserved. No independent child move,
+detach/reacquire sequence or reaction evaluation is dispatched.
+
+The existing interaction hook accepts the concrete `supportPlacement` composition
+dependency in internal harnesses. This is not a persisted/runtime feature flag or
+second drag system. Pointer capture/filtering, 6px threshold, stable grab offset,
+click suppression and cancellation continue in the same session implementation.
+After threshold, an existing container is a lifted free draft, optionally projected
+to a valid support. Valid release produces exactly one mount, detach, rebind or
+assembly move; same-support return produces no reducer action. Occupied/outside/
+unfittable release discards the draft. Escape, pointercancel, lost capture, blur,
+hidden document and resize cancel without application mutation, including rejection
+of stale pointerup. ResizeObserver remeasures responsive bench bounds. No pointer
+coordinate announcements were added. The generic EN/VI `mount.noRoom` message
+explains an unfittable setup; occupied feedback reuses Pass 2 copy.
+
+Arrow/Shift on a mounted lamp use the same union bounds and .04/.12 movement steps.
+Arrow/Shift on a mounted container detach and move once from its displayed position,
+selecting it and retaining focus. Keyboard movement does not implicitly snap/rebind;
+free Arrow behavior remains unchanged. Native Mount/Remove are exercised alongside
+the workspace in a reducer-backed test harness, using shared preparation helpers.
+
+### Pass 3 integration gate and Heat compatibility
+
+**Normal LabPage is unchanged and does not supply supportPlacement or native mount
+controls.** Existing relations can be rendered by LabWorkspace, but the public
+application cannot create them. Palette remains the existing preview/add interaction;
+direct palette-to-support creation is not introduced. Full mounting capability is
+exercised internally, without a production debug UI, permanent flag or dual Heat rule.
+
+`synchronizeHeating`, heatingZone, useHeatReactions, delay/request timing and the
+global any-drag pause/full-restart policy are unchanged. For internal assembly movement
+or mount/rebind with a changed lamp anchor, the reducer calls the existing geometry
+synchronization once after the atomic final transition. It still reads committed
+equipment positions, including a mounted container's dormant free position. Thus an
+internal mounted sample can visually follow its lamp while its legacy geometry Heat
+source changes or disappears. A dedicated reducer regression documents this explicitly;
+this is precisely why public integration must remain closed until Pass 4. No mounted
+Heat source, geometry-or-mount fallback, per-container timer, remaining-duration token
+bookkeeping or early Pass 4 behavior has been introduced.
+
+### Pass 3 verification and limitations
+
+Added 16 pure geometry/action-preparation tests and 22 reducer-backed mounted workspace
+tests, plus one explicit legacy Heat/assembly reducer regression. Coverage includes
+both silhouettes, different bench sizes, all edges, too-small rejection, deterministic
+overlapping targets, lit/off equivalence, occupancy, native edge adjustment/removal,
+derived positions, stable button/SVG/clip identity, transient assembly movement,
+lift/detach/same-support/rebind, all cancellation paths plus resize, stale pointerup,
+grab offset, pointer IDs, Arrow/Shift, focus/selection, loaded Dropper movement,
+contents/result/presentation-start identity, completed Heat occurrence preservation,
+locale changes and the closed production integration gate. No existing heating
+expectations were rewritten toward mounting. Initial new tests had two incorrect
+copy/status queries; assertions were corrected to the existing localized strings and
+the workspace status node. A final keyboard review added explicit selection handling
+without changing native Remove's established selection behavior.
+
+Focused final run: 59 tests / 3 files passed (8.69s). Earlier complete suite passed
+457 tests / 36 files (117.84s); that preceded the final extra legacy assembly regression
+and keyboard/copy refinements. Final complete validation is recorded below. TEMP/TMP
+remain session-local in ignored `node_modules/.cache/pass3-temp`.
+
+Actual browser QA used localhost Vite in the in-app browser at 1440×960, 390×844 and
+844×390. Production Beaker, Test tube and alcohol-lamp direct drags succeeded;
+mount controls/snap were absent. Tab focus remained visibly independent of selection;
+no horizontal overflow or console errors were observed. This was viewport emulation
+with mouse/pointer input, not physical touch testing. At the short landscape viewport,
+the existing sticky palette header obscures upper bench content after scrolling; no
+unrelated sticky/overlap CSS change was made. Screenshots are outside the repository:
+`C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/`
+with names `pass3-production-desktop.png`, `pass3-production-mobile.png` and
+`pass3-production-landscape.png`. The temporary viewport and QA tab were cleaned up.
+
+There is no served internal browser harness. Mounted support alignment, independent
+mounted hit targets, mounted focus/layering and assembly edge/resize behavior have
+geometry/RTL coverage, **not real-browser visual certification**. They must be inspected
+when the coherent Pass 4 integration is available; this limitation does not authorize
+opening production mounting early. No decorative front support layer was added.
+
+Pass 4 still owns the single production source switch from geometry to mounts, coherent
+native/pointer integration, remaining-delay/token and per-container lifted-draft timer
+policy, removal/replacement of legacy Heat-zone ownership, and updated source/timer
+integration regressions. Pass 5 visual/documentation closeout remains excluded.
+
+### Pass 3 final validation and handoff
+
+| Command | Actual result |
+| --- | --- |
+| `npm run typecheck` | PASS; also repeated by the final build |
+| `npm run lint` | PASS, zero warnings |
+| `npm test -- --maxWorkers=2` | PASS, 458 tests / 36 files, 111.67s |
+| `npm run build` | PASS, 91 modules transformed, including the final scoped focus-priority rule |
+| `git diff --check` | PASS |
+
+All 419 baseline tests remain, with 39 added cases. Final scope review includes new
+untracked geometry/placement and integration test files as well as tracked diffs.
+No changes to LabPage, Heat hooks/zones/timing, simulation/reaction definitions,
+M9 dynamics/Replay, Dropper transfer semantics, package files, official milestone
+documents or auxiliary framework/store infrastructure. No permanent feature flag,
+public contradictory mounting workflow or new dependency. Focused apparatus styling
+retains the existing keyboard focus priority without adding another stack level.
+
+Pass 3 is complete as an internal capability. No known failing internal behavior remains;
+the browser certification and impossible-fit clipping/native error-composition limitations
+above remain explicit. Passes 4–5 are incomplete, and the product integration gate remains
+closed. The temporary dev server was stopped. Changes remain uncommitted on
+`M11-render-polish`; no push, merge, hosted CI claim or milestone advancement.

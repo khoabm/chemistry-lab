@@ -62,7 +62,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
           <path d="M39 38h22M49 47v20" />
         </>}
         {equipmentType === 'alcohol-lamp' && <g className="alcohol-lamp-setup">
-          {/* Decorative support only; the marked heating zone owns placement. */}
+          {/* Support contact geometry is projected in the interaction layer. */}
           <g className="lamp-stand" strokeOpacity="0.65">
             <path className="lamp-stand-leg" d="m50 18 8 73" strokeOpacity="0.55" />
             <path className="lamp-stand-leg" d="m26 23-12 71m-4 0h8" />
