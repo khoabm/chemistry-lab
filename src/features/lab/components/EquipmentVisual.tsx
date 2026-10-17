@@ -10,10 +10,12 @@ import { isContainerEquipment } from '../../../types/container'
 import { solidProductColors } from '../renderers/reactionPresentation'
 import { completedPresentation, type ReactionPresentation, type ReplayStage } from '../renderers/reactionDynamics'
 import { useReactionAnimationSync } from '../hooks/useReactionAnimationSync'
+import { findChemical } from '../../../simulation/chemicals/catalog'
 
-export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], reactionResult = null, lampStatus = 'extinguished', heating = false, presentation = completedPresentation, visible = true, replayStage }: {
+export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], payload, reactionResult = null, lampStatus = 'extinguished', heating = false, presentation = completedPresentation, visible = true, replayStage }: {
   equipmentType: EquipmentType
   contents?: readonly ChemicalPortion[] | undefined
+  payload?: ChemicalPortion | null | undefined
   reactionResult?: ReactionResult | null
   lampStatus?: AlcoholLampState['status']
   heating?: boolean
@@ -54,6 +56,9 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
         {equipmentType === 'dropper' && <>
           <path fill="#397963" d="M39 18a11 11 0 0 1 22 0v20H39Z" />
           <path fill="#fffefa90" d="M43 38h14v30l-5 19h-4l-5-19Z" />
+          {payload && <path className="dropper-payload" data-chemical-id={payload.chemicalId}
+            fill={findChemical(payload.chemicalId)?.color} fillOpacity="0.85" strokeWidth="0.7"
+            d="M45 53q5 2 10 0v15l-4 17h-2l-4-17Z" />}
           <path d="M39 38h22M49 47v20" />
         </>}
         {equipmentType === 'alcohol-lamp' && <g className="alcohol-lamp-setup">

@@ -99,9 +99,15 @@ Dependencies should be introduced only when required by the current milestone.
 
 ## Current status
 
-M10 localization extends the delivered M9 reaction dynamics: place and move beakers, test tubes and alcohol lamps.
-These three types are exposed by the explicit paletteEquipmentTypes list;
-Dropper remains supported internally but is hidden from the normal 2D palette.
+M11 extends the delivered M9 dynamics and M10 localization: place and move beakers,
+test tubes, droppers and alcohol lamps through the explicit paletteEquipmentTypes list.
+Select a Dropper, choose a single-liquid source and Fill one simplified unit;
+choose a destination and Dispense, then select that container and explicitly Mix.
+Source material decreases; each Dropper owns one payload and cannot refill while
+loaded. Empty, solid, multi-entry and successfully reacted sources are unavailable;
+products are never sampled. Payloads survive movement/selection/language changes;
+Reset clears them. Transfer edits clear stale results and refresh normal guarded
+Heat waits, without automatically mixing. No measured volume or stoichiometry is implied.
 Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
 farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
@@ -263,6 +269,10 @@ the details panel retains the simplified quantity counts. After a successful Mix
 a neutral representative liquid and semantic effect overlays illustrate the result.
 The drawing is qualitative, without concentration, duration or yield calculations.
 The refined M4 visuals add translucent liquid surfaces and textured solid samples.
+M11 refines meniscus/depth cues, resting solid silhouettes and granular final
+precipitate deposits through that same shared renderer, retaining colors, finite
+dynamics/replay and qualitative levels. Starting-material bands do not represent
+immiscible layers; no slosh, fluid physics or post-reaction composition is modeled.
 An enlarged selected-sample view reuses the same renderer in the observation panel.
 Click its close-up button to open a presentation-sized native dialog with the
 sample and existing reaction details; Close, Escape or the backdrop dismiss it

@@ -212,6 +212,18 @@ behavior, but is hidden from the normal palette. Future exposure or reagent-deli
 work requires explicit approval. Do not remove its internal support or implement delivery as
 part of this visibility correction.
 
+M11 supersedes that visibility restriction: all four equipment types are available
+in a compact two-by-two palette. Selected Dropper details appear directly in
+Experiment, outside container tabs. Native source/destination selects and Fill/
+Dispense controls use shared application eligibility rules, with disabled options
+and readable reasons. Successful actions return focus to the container select.
+Each Dropper displays empty/loaded state and a decorative catalog-colored payload
+in the shared workspace/details/drag-preview SVG; accessible text identifies it.
+Only one unreacted liquid entry with at least one simplified unit can be sampled.
+Source quantity decreases and zero portions disappear; Dispense empties the payload
+without Mix. Select the destination and explicitly Mix afterward. Normal Heat
+checks still apply after material edits in a lit zone. Reset clears payloads.
+
 Equipment should have clear visual icons or illustrations.
 
 A first-time user should recognize that equipment can be placed into the
@@ -311,6 +323,11 @@ textured solid samples based on existing catalog appearance. Share the drawn
 liquid bounds with reaction effects so bubbles and suspended solids remain inside
 the liquid and container. Starting-substance bands remain a simplified inventory
 illustration, not a claim of immiscibility or density layering.
+
+M11 refines the existing surface with a restrained meniscus/depth overlay, resting
+solid mound/grain/base cues and a textured precipitate bed with cloud/floc contrast.
+The same bounds, registered colors, shared finite M9 age and replay stages apply
+across workspace, close-up, dialog and preview. No liquid slosh or physics is added.
 
 The selected sample has an enlarged view in the Experiment panel's Sample tab, reusing the
 bench renderer. Its labeled close-up button opens an optional sample-detail modal
@@ -488,7 +505,7 @@ tabs, action styling, status semantics and local focusable equation scrolling.
 
 The right panel is headed Experiment. Sample and Result tabs appear only when
 a supported container (beaker/test tube) with container state is selected. Lamp
-details, dropper information and the no-selection help appear directly, without
+details, Dropper transfer controls and the no-selection help appear directly, without
 tabs or tabpanel semantics. Do not change their existing interactions. Sample
 contains selected-container contents/quantities, heating status, Mix/Empty actions
 and the close-up. Result contains reaction name, Observation, equation,
@@ -689,7 +706,7 @@ bench or persist onboarding state. Empty containers explain chemical addition;
 filled unevaluated containers offer Mix/Heat next steps.
 When a Heat check is pending, replace the ready hint with wait guidance and explain
 that explicit Mix cancels the pending check. Do not change the evaluation lifecycle.
-Selected droppers explain that reagent delivery is unavailable. Existing panel layout/bench geometry and
+Selected droppers offer the M11 transfer controls described above. Existing panel layout/bench geometry and
 animations remain unchanged.
 
 ---

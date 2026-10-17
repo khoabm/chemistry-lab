@@ -2,7 +2,6 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { StrictMode } from 'react'
 import { LabPage } from './LabPage'
-import { ExperimentPanel } from './ExperimentPanel'
 import { heatReactionDelayMs } from '../hooks/useHeatReactions'
 
 afterEach(() => { cleanup(); vi.useRealTimers() })
@@ -62,12 +61,13 @@ describe('Experiment Sample/Result tabs', () => {
     expect(within(panel).getByRole('status', { name: 'Lamp status' })).toHaveTextContent('Lamp extinguished.')
   })
 
-  it('shows an existing internal dropper directly without tabs or reagent actions', () => {
-    render(<ExperimentPanel equipment={{ id: 'existing-dropper', equipmentType: 'dropper', position: { x: 0.5, y: 0.5 } }}
-      container={null} lamp={null} disabled={false} onMix={vi.fn()} onClear={vi.fn()} onToggleLamp={vi.fn()} />)
+  it('shows dropper transfer controls directly without container tabs or Mix', () => {
+    render(<LabPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
     const panel = screen.getByRole('complementary', { name: 'Experiment' })
     expect(within(panel).getByRole('heading', { name: 'Selected dropper' })).toBeVisible()
-    expect(within(panel).getByText(/Reagent delivery is not available/)).toBeVisible()
+    expect(within(panel).getByRole('combobox', { name: 'Source container' })).toBeVisible()
+    expect(within(panel).getByRole('button', { name: 'Fill dropper' })).toBeDisabled()
     expect(within(panel).queryByRole('tablist', { hidden: true })).not.toBeInTheDocument()
     expect(within(panel).queryByRole('tabpanel', { hidden: true })).not.toBeInTheDocument()
     expect(within(panel).queryByRole('button', { name: 'Mix' })).not.toBeInTheDocument()

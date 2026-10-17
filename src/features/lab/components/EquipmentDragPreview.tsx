@@ -7,9 +7,10 @@ import type { ReactionResult } from '../../../simulation/reactions/types'
 import type { AlcoholLampState } from '../../../types/heating'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 
-export function EquipmentDragPreview({ preview, contents, reactionResult = null, lampStatus = 'extinguished', heating = false, presentation }: {
+export function EquipmentDragPreview({ preview, contents, payload, reactionResult = null, lampStatus = 'extinguished', heating = false, presentation }: {
   preview: DragPreview
   contents?: readonly ChemicalPortion[] | undefined
+  payload?: ChemicalPortion | null | undefined
   reactionResult?: ReactionResult | null
   lampStatus?: AlcoholLampState['status']
   heating?: boolean
@@ -23,6 +24,7 @@ export function EquipmentDragPreview({ preview, contents, reactionResult = null,
       aria-hidden="true"
     >
       <EquipmentVisual equipmentType={preview.source.equipmentType} contents={contents} reactionResult={reactionResult}
+        payload={payload}
         presentation={presentation}
         lampStatus={lampStatus} heating={heating} />
       <span>{t(`equipment.${preview.source.equipmentType}`)}</span>

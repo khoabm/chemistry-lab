@@ -6,7 +6,7 @@ import { equipmentTypes } from '../equipment'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { LabWorkspace } from './LabWorkspace'
 
-// Seed internal equipment without re-exposing a Dropper control in the palette.
+// Keep direct renderer/interaction coverage independent of palette controls.
 function ExistingDropperBench() {
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, () => {
     const dropper = labWorkspaceReducer(createLabWorkspaceState(), {
@@ -21,7 +21,7 @@ function ExistingDropperBench() {
   return <LabWorkspace presentations={new Map()} state={state} interaction={interaction} />
 }
 
-describe('retained internal Dropper support', () => {
+describe('Dropper equipment movement and non-container behavior', () => {
   it('renders, labels, selects and moves an existing dropper without heating it', () => {
     expect(equipmentTypes).toContain('dropper')
     render(<StrictMode><ExistingDropperBench /></StrictMode>)

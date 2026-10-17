@@ -119,8 +119,10 @@ be required for every reaction.
 
 As of M3, both tools support placement and movement only. This note records the
 requested future behavior; it does not expand M3 completion criteria. Dropper
-interaction has no assigned implementation milestone yet. Its milestone placement
-and interaction design require explicit user approval before implementation.
+interaction was later approved for M11: one single-liquid qualitative payload per
+Dropper, source subtraction, atomic dispense and explicit Mix afterward. Successfully
+reacted sources/products, solids and mixtures cannot be sampled. Normal Heat checks
+continue after transfer edits; no new chemistry trigger or product reuse is added.
 
 ---
 

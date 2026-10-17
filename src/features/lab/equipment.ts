@@ -6,5 +6,5 @@ export const equipmentTypes: readonly EquipmentType[] = [
 
 // Palette visibility is independent of supported internal equipment types.
 export const paletteEquipmentTypes: readonly EquipmentType[] = [
-  'beaker', 'test-tube', 'alcohol-lamp',
+  'beaker', 'test-tube', 'dropper', 'alcohol-lamp',
 ]

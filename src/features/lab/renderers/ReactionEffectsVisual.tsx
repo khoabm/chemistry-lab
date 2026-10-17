@@ -26,10 +26,14 @@ export function ReactionEffectsVisual({ effects, layout, presentation = complete
                 <rect x={x} y={surface} width={width} height={height} fillOpacity="0.48" />
                 {flocPositions.slice(0, 6).map((offset, index) => <ellipse key={offset}
                   cx={x + width * offset} cy={surface + height * (0.25 + index % 3 * 0.22)}
-                  rx={width * 0.25} ry={height * 0.24} fillOpacity="0.45" />)}
+                  rx={width * 0.25} ry={height * 0.24} fillOpacity="0.45" stroke="#62736b" strokeOpacity="0.18" strokeWidth="0.4" />)}
               </g>}
-              <path className="precipitate-bed" d={`M${x} ${bottom - 5}q${width / 4}-3 ${width / 2} 0t${width / 2} 0v7H${x}Z`}
-                stroke="#62736b" strokeOpacity="0.55" strokeWidth="0.5" />
+              <g className="precipitate-bed">
+                <path d={`M${x} ${bottom - 5}l${width * 0.15}-1 ${width * 0.15} 0.8 ${width * 0.2}-1.6 ${width * 0.2} 1 ${width * 0.15}-0.7 ${width * 0.15} 1.5v7H${x}Z`}
+                  stroke="#62736b" strokeOpacity="0.7" strokeWidth="0.65" />
+                <path className="deposit-texture" d={`M${x + 3} ${bottom - 3}h${width * 0.2}m3 1h${width * 0.15}m3-1h${width * 0.2}`}
+                  fill="none" stroke="#62736b" strokeOpacity="0.4" strokeWidth="0.6" />
+              </g>
               {flocPositions.map((offset, index) => <path key={offset} className="precipitate-particle"
                 d={`M${x + 2 + (width - 4) * offset} ${bottom - 5 - index % 3}l-1.4-1 0.5-1.5 1.7-0.4 1.3 1.5-0.7 1.5Z`}
                 stroke="#62736b" strokeOpacity="0.55" strokeWidth="0.4"

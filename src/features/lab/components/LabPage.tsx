@@ -11,6 +11,7 @@ import { useHeatReactions } from '../hooks/useHeatReactions'
 import { LabHelp } from './LabHelp'
 import { useReactionDynamics } from '../hooks/useReactionDynamics'
 import { LocalizationProvider } from '../../../localization/LocalizationProvider'
+import { DropperDetails } from './DropperDetails'
 
 export function LabPage() {
   return <LocalizationProvider><Laboratory /></LocalizationProvider>
@@ -25,11 +26,14 @@ function Laboratory() {
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
   const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
   const selectedLamp = state.lamps.find((lamp) => lamp.equipmentInstanceId === state.selectedEquipmentId)
+  const selectedDropper = state.droppers.find((dropper) => dropper.equipmentInstanceId === state.selectedEquipmentId)
   const dragSource = interaction.preview?.source
   const draggingContainer = dragSource?.kind === 'workspace'
     ? state.containers.find((container) => container.equipmentInstanceId === dragSource.id) : undefined
   const draggingLamp = dragSource?.kind === 'workspace'
     ? state.lamps.find((lamp) => lamp.equipmentInstanceId === dragSource.id) : undefined
+  const draggingDropper = dragSource?.kind === 'workspace'
+    ? state.droppers.find((dropper) => dropper.equipmentInstanceId === dragSource.id) : undefined
   return (
     <div
       className="lab-page"
@@ -51,6 +55,11 @@ function Laboratory() {
         <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={!!interaction.preview}
+          dropperDetails={selectedDropper && <DropperDetails dropper={selectedDropper} containers={state.containers}
+            equipment={state.equipment} disabled={!!interaction.preview}
+            onTransfer={(type, containerEquipmentId) => {
+              if (!interaction.preview) dispatch({ type, equipmentId: selectedDropper.equipmentInstanceId, containerEquipmentId })
+            }} />}
           presentation={selectedContainer ? presentations.get(selectedContainer.id) : undefined}
           onMix={() => { if (selectedContainer) dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onClear={() => { if (selectedContainer) dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId }) }}
@@ -58,6 +67,7 @@ function Laboratory() {
       </main>
       {interaction.preview && <EquipmentDragPreview preview={interaction.preview}
         contents={draggingContainer?.contents} reactionResult={draggingContainer?.reactionResult ?? null}
+        payload={draggingDropper?.payload}
         presentation={draggingContainer ? presentations.get(draggingContainer.id) : undefined}
         lampStatus={draggingLamp?.status ?? 'extinguished'} heating={draggingContainer?.heatingState.status === 'heating'} />}
       <footer className="lab-footer">

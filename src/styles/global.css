@@ -217,7 +217,7 @@ h3 { font-size: 14px; font-weight: 600; }
     transition: background-color 120ms ease-out, border-color 120ms ease-out;
   }
 }
-.equipment-palette { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+.equipment-palette { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
 .equipment-palette-item {
   display: flex;
   flex-direction: column;
@@ -372,6 +372,11 @@ h3 { font-size: 14px; font-weight: 600; }
 .reacted-solid.is-transforming { animation: solid-transform var(--effect-duration) ease-in-out both; }
 .lamp-details { padding-top: var(--space-5); }
 .lamp-details .equipment-visual { height: 110px; margin: var(--space-4) 0; }
+.dropper-details > .equipment-visual { height: 110px; margin-block: var(--space-3); }
+.dropper-details > [role='status'] { display: flex; align-items: center; gap: var(--space-2); line-height: 1.6; }
+.dropper-details > label { display: block; margin-top: var(--space-4); font-size: 13px; font-weight: 500; }
+.dropper-details > select { width: 100%; min-width: 0; min-height: 44px; margin-top: var(--space-2); padding: var(--space-2); font: inherit; font-size: 13px; color: var(--color-text); background: var(--color-panel); border: 1px solid var(--color-line); border-radius: var(--radius-small); }
+.dropper-details > select:focus-visible { outline-offset: -3px; }
 .lamp-details .action-button { margin-top: var(--space-3); }
 .heating-status { margin: var(--space-3) 0; font-size: 13px; line-height: 1.6; }
 .heating-status .is-heating { color: #80541c; font-weight: 600; }
@@ -506,7 +511,7 @@ h3 { font-size: 14px; font-weight: 600; }
   .lab-palette .empty-caption { margin-top: var(--space-2); }
   .palette-desktop-hint { display: none; }
   .palette-mobile-hint { display: inline; }
-  .equipment-palette { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: var(--space-2); }
+  .equipment-palette { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--space-2); }
   .equipment-palette-item { min-height: 88px; touch-action: pan-y; }
   .equipment-palette-item .equipment-visual { height: 48px; }
   .workbench { min-height: 420px; height: 420px; }

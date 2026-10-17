@@ -405,3 +405,14 @@ Allowed: Presentation → localization/content → stable domain metadata.
 Simulation/domain never imports i18next, react-i18next, locale state or translation
 resources. Localization must not determine reaction validity or alter lifecycle
 identity. See `LOCALIZATION.md` and `TRANSLATION_GUIDE.md`.
+
+## 16. Qualitative Dropper transfer
+
+M11 Dropper transfer is owned by the existing laboratory reducer, with one nullable
+ChemicalPortion payload per Dropper equipment ID (not a ContainerState). Pure
+application helpers validate Fill/Dispense and prepare atomic source/payload/target
+updates; the portion helper subtracts qualitative units without UI dependencies.
+Contents mutations reuse result invalidation and heating synchronization. Transfer
+never invokes Mix; normal Heat generations still apply. Presentation reads stable
+eligibility reasons and catalog metadata for native controls and loaded cues.
+No product list is used as transferable material; contents remain starting portions.

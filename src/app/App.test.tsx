@@ -20,12 +20,11 @@ describe('laboratory foundation', () => {
 
     const materials = screen.getByRole('complementary', { name: 'Lab materials' })
     const equipment = within(screen.getByRole('region', { name: 'Equipment' }))
-    expect(equipment.getAllByRole('button')).toHaveLength(3)
-    for (const name of ['Beaker', 'Test tube', 'Alcohol lamp']) {
+    expect(equipment.getAllByRole('button')).toHaveLength(4)
+    for (const name of ['Beaker', 'Test tube', 'Dropper', 'Alcohol lamp']) {
       expect(equipment.getByRole('button', { name: `Add ${name}` })).toBeEnabled()
     }
-    expect(equipment.queryByRole('button', { name: 'Add Dropper', hidden: true })).not.toBeInTheDocument()
-    expect(equipment.queryByText('Dropper')).not.toBeInTheDocument()
+    expect(equipment.getByText('Dropper')).toBeVisible()
     expect(within(materials).getByRole('button', { name: 'Add Beaker' })).toBeEnabled()
     expect(within(screen.getByRole('region', { name: 'Chemicals' })).getAllByRole('button')).toHaveLength(11)
     expect(within(materials).getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()

@@ -166,10 +166,18 @@ describe('semantic reaction presentation', () => {
       const sample = container.querySelector(`[data-content-state="${chemical.state}"]`)
       expect(sample).toHaveAttribute('fill', chemical.color)
       expect(container.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
-      if (chemical.state === 'liquid') expect(container.querySelector('.liquid-surface')).toBeInTheDocument()
+      if (chemical.state === 'liquid') {
+        expect(container.querySelector('.liquid-surface')).toBeInTheDocument()
+        expect(container.querySelector('.liquid-meniscus')).toBeInTheDocument()
+        expect(container.querySelector('.liquid-depth')).toBeInTheDocument()
+        expect(container.querySelector('.solid-mound')).not.toBeInTheDocument()
+      }
       else {
         expect(sample?.querySelectorAll('path').length).toBeGreaterThan(1)
+        expect(sample?.querySelector('.solid-mound')).toBeInTheDocument()
+        expect(sample?.querySelector('.solid-grain')).toBeInTheDocument()
         expect(container.querySelector('.liquid-surface')).not.toBeInTheDocument()
+        expect(container.querySelector('.liquid-depth')).not.toBeInTheDocument()
       }
     })
   }

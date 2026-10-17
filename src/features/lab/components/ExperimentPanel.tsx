@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useId, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { isContainerEquipment, type ContainerState } from '../../../types/container'
 import type { EquipmentInstance } from '../../../types/equipment'
 import type { AlcoholLampState } from '../../../types/heating'
@@ -20,9 +21,10 @@ interface ExperimentPanelProps {
   onClear: () => void
   onToggleLamp: () => void
   presentation?: ReactionPresentation | undefined
+  dropperDetails?: ReactNode
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation, dropperDetails }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -85,9 +87,9 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
         {result ? <ReactionObservation result={result} /> : <p className="empty-caption">{t('experiment.noResult')}</p>}
       </div>
       </> : lamp ? <LampDetails lamp={lamp} disabled={disabled} onToggle={onToggleLamp} />
-        : equipment?.equipmentType === 'dropper' ? <section className="container-details">
+        : equipment?.equipmentType === 'dropper' ? dropperDetails ?? <section className="container-details">
           <h3>{t('experiment.dropperTitle')}</h3>
-          <p className="empty-caption">{t('experiment.dropperHint')}</p>
+          <p className="empty-caption">{t('dropper.hint')}</p>
         </section> : <div className="observation-empty">
         <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M14 8h20a3 3 0 0 1 3 3v29H11V11a3 3 0 0 1 3-3Z" />

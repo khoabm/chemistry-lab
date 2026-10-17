@@ -9,6 +9,7 @@ import { EquipmentVisual } from './EquipmentVisual'
 import { describeReactionEffects } from '../renderers/reactionPresentation'
 import { HeatingZone } from './HeatingZone'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
+import { findChemical } from '../../../simulation/chemicals/catalog'
 
 interface LabWorkspaceProps {
   state: LabWorkspaceState
@@ -22,7 +23,7 @@ export function LabWorkspace({
   interaction: { attachBench, preview, message, getEquipmentHandlers },
 }: LabWorkspaceProps) {
   const { t } = useTranslation()
-  const { reactionName } = useChemistryCopy()
+  const { reactionName, chemicalName } = useChemistryCopy()
   const messageLive = useStatusLive(message)
   // Display ordinals are per type on the current bench, independent of stable IDs.
   const counts = new Map<EquipmentType, number>()
@@ -31,7 +32,8 @@ export function LabWorkspace({
     counts.set(instance.equipmentType, number)
     const container = state.containers.find((item) => item.equipmentInstanceId === instance.id)
     const lamp = state.lamps.find((item) => item.equipmentInstanceId === instance.id)
-    return { instance, container, lamp, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
+    const dropper = state.droppers.find((item) => item.equipmentInstanceId === instance.id)
+    return { instance, container, lamp, dropper, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
   })
 
   return (
@@ -68,7 +70,7 @@ export function LabWorkspace({
         </div>}
         {labeledEquipment.filter(({ lamp }) => lamp?.status === 'lit').map(({ instance }) =>
           <HeatingZone key={`zone-${instance.id}`} position={instance.position} />)}
-        {labeledEquipment.map(({ instance, label, container, lamp }) => (
+        {labeledEquipment.map(({ instance, label, container, lamp, dropper }) => (
           <button
             key={instance.id}
             type="button"
@@ -81,6 +83,7 @@ export function LabWorkspace({
             {...getEquipmentHandlers({ kind: 'workspace', equipmentType: instance.equipmentType, id: instance.id })}
           >
             <EquipmentVisual equipmentType={instance.equipmentType}
+              payload={dropper?.payload}
               contents={container?.contents} reactionResult={container?.reactionResult ?? null}
               presentation={container ? presentations.get(container.id) : undefined}
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
@@ -89,6 +92,7 @@ export function LabWorkspace({
               {lamp ? t('workspace.off') : t('workspace.heating')}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
+              {dropper ? dropper.payload ? t('dropper.loaded', { name: chemicalName(dropper.payload.chemicalId), formula: findChemical(dropper.payload.chemicalId)?.formula }) : t('dropper.empty') : ''}
               {lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : container?.heatingState.status === 'heating' ? `${t('heat.heating')} ` : ''}
               {container?.reactionResult?.status === 'reaction'
                 ? `${reactionName(container.reactionResult.reactionId, container.reactionResult.name)}. ${describeReactionEffects(container.reactionResult.effects, t)}`

@@ -14,3 +14,16 @@ export function addChemicalPortion(
   return contents.map((portion) => portion.chemicalId === chemicalId
     ? { ...portion, quantity: total } : portion)
 }
+
+export function removeChemicalPortion(
+  contents: readonly ChemicalPortion[], chemicalId: ChemicalId, quantity: number,
+): readonly ChemicalPortion[] {
+  const portion = contents.find((item) => item.chemicalId === chemicalId)
+  if (!findChemical(chemicalId) || !portion || !Number.isFinite(portion.quantity) || !Number.isFinite(quantity)
+    || quantity <= 0 || portion.quantity < quantity) return contents
+  const remainder = portion.quantity - quantity
+  // Reject arithmetic that cannot represent the actual subtraction safely.
+  if (portion.quantity - remainder !== quantity) return contents
+  return remainder === 0 ? contents.filter((item) => item !== portion)
+    : contents.map((item) => item === portion ? { ...item, quantity: remainder } : item)
+}

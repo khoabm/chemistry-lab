@@ -8,6 +8,8 @@ import type { AlcoholLampState } from '../types/heating'
 import { findHeatingLamp } from '../simulation/heating/heatingZone'
 import { isCompletedHeatReaction } from '../simulation/reactions/types'
 import type { HeatEvaluationState } from '../types/heating'
+import type { DropperState } from '../types/dropper'
+import { prepareDropperFill, prepareDropperDispense } from './dropperTransfer'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
@@ -15,6 +17,7 @@ export interface LabWorkspaceState {
   nextSerial: number
   containers: readonly ContainerState[]
   lamps: readonly AlcoholLampState[]
+  droppers: readonly DropperState[]
   nextHeatRequestId: number
 }
 
@@ -28,9 +31,11 @@ export type LabWorkspaceAction =
   | { type: 'mix'; equipmentId: string }
   | { type: 'toggle-lamp'; equipmentId: string }
   | { type: 'evaluate-heat'; equipmentId: string; requestId: number }
+  | { type: 'fill-dropper'; equipmentId: string; containerEquipmentId: string }
+  | { type: 'dispense-dropper'; equipmentId: string; containerEquipmentId: string }
 
 export function createLabWorkspaceState(): LabWorkspaceState {
-  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [], nextHeatRequestId: 1 }
+  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [], droppers: [], nextHeatRequestId: 1 }
 }
 
 function synchronizeHeating(state: LabWorkspaceState): LabWorkspaceState {
@@ -122,6 +127,19 @@ export function labWorkspaceReducer(
     })
   }
 
+  if (action.type === 'fill-dropper' || action.type === 'dispense-dropper') {
+    const dropper = state.droppers.find((item) => item.equipmentInstanceId === action.equipmentId)
+    const supported = state.equipment.some((item) => item.id === action.containerEquipmentId && isContainerEquipment(item.equipmentType))
+    const container = supported ? state.containers.find((item) => item.equipmentInstanceId === action.containerEquipmentId) : undefined
+    const prepared = action.type === 'fill-dropper' ? prepareDropperFill(dropper, container) : prepareDropperDispense(dropper, container)
+    if (prepared.issue !== null || !dropper || !container) return state
+    return synchronizeHeating({ ...state,
+      droppers: state.droppers.map((item) => item === dropper ? { ...item, payload: prepared.payload } : item),
+      containers: state.containers.map((item) => item === container
+        ? { ...item, contents: prepared.contents, reactionResult: null, heatEvaluation: { status: 'idle' } } : item),
+    })
+  }
+
   if (!Number.isFinite(action.position.x) || !Number.isFinite(action.position.y)) {
     return state
   }
@@ -140,6 +158,8 @@ export function labWorkspaceReducer(
         : state.containers,
       lamps: instance.equipmentType === 'alcohol-lamp'
         ? [...state.lamps, { equipmentInstanceId: instance.id, status: 'extinguished' }] : state.lamps,
+      droppers: instance.equipmentType === 'dropper'
+        ? [...state.droppers, { equipmentInstanceId: instance.id, payload: null }] : state.droppers,
       selectedEquipmentId: instance.id,
       nextSerial: state.nextSerial + 1,
     })

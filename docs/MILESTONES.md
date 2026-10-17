@@ -649,8 +649,12 @@ The detailed implementation plan is defined in:
   one transferable liquid chemical
 - one qualitative payload per fill; one Dropper payload at a time
 - source material decreases when sampled so transfer does not duplicate material
+- each Fill moves exactly one simplified unit; zero portions are removed and
+  successfully reacted sources are unavailable
 - dispense into a supported Beaker/Test tube and empty the Dropper payload
 - dispensing changes contents only; the user must still explicitly press Mix
+- transfer contents edits invalidate old results/Heat generations and retain normal
+  Heat scheduling in a lit zone; unrelated container clocks remain unchanged
 - accessible feedback for invalid fill/dispense states
 - improved qualitative 2D recognition of liquid, solid, precipitate formation and
   persistent final deposit

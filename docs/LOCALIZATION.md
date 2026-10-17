@@ -271,7 +271,9 @@ Intentionally pending teacher/SGK review (English fallback in VI):
 - Unsupported-result educational guidance (`result.unsupported`, `result.retry`).
 
 Generic buttons, tabs, equipment labels, instructions, status feedback and replay
-copy are translated. This is not a claim that the pending chemistry vocabulary
+copy are translated. M11 Fill/Dispense/source/destination/status and eligibility
+feedback use the same EN/VI UI JSON and stable-ID chemistry fallback. Payloads
+and source/destination selection never use translated text as identity. This is not a claim that the pending chemistry vocabulary
 has been approved. Limiting/excess reactants, consumption, post-reaction composition
 and reaction chaining remain deferred; no related behavior was introduced.
 

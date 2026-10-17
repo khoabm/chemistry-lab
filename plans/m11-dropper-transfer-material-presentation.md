@@ -36,7 +36,8 @@ Dropper transfer:
   qualitative portion to the destination so material is not duplicated
 - transferred quantity remains a simplified application unit, not millilitres,
   moles, concentration or measured volume
-- dispensing never evaluates chemistry automatically
+- dispensing never invokes Mix or directly evaluates chemistry; normal Heat checks
+  remain possible after contents edits in a lit zone
 - Mix remains an explicit user action after transfer
 - invalid fill/dispense states must be understandable and accessible
 - reset clears Dropper payload together with the rest of the laboratory state
@@ -58,7 +59,7 @@ Dropper transfer:
 M11 must not add:
 
 - pouring between containers
-- automatic reaction evaluation after Dropper dispensing
+- automatic Mix or direct chemistry evaluation by the Dropper transition
 - taking solids or precipitate into the Dropper
 - taking or reusing post-reaction products as new reactants
 - reaction-product chaining or post-reaction composition modelling
@@ -79,7 +80,7 @@ engine.
 
 ## Existing system
 
-`src/types/equipment.ts` already includes `dropper` in `EquipmentType`.
+At the pre-implementation baseline, `src/types/equipment.ts` already included `dropper` in `EquipmentType`.
 `src/features/lab/equipment.ts` keeps Dropper internally supported while excluding it
 from `paletteEquipmentTypes`, so M11 should extend the existing equipment system
 instead of inventing a second tool model.
@@ -132,9 +133,10 @@ fill again until its payload is dispensed or explicitly cleared by an allowed re
 path.
 
 Dispensing validates a supported destination container, removes the Dropper payload,
-and adds the same qualitative portion to the destination. Dispensing must not call or
-schedule `evaluateReaction`; the existing explicit Mix action remains the only mix
-trigger. Any existing reaction result on a container whose contents are materially
+and adds the same qualitative portion to the destination. Dispensing must not perform
+Mix or directly evaluate chemistry; the existing explicit Mix action remains the only
+mix trigger. Contents edits still synchronize existing Heat requests normally, including
+a new guarded wait while material remains above a lit lamp. Any existing reaction result on a container whose contents are materially
 changed should follow the repository's established invalidation rules rather than
 remaining as if it still described unchanged contents.
 
@@ -271,23 +273,55 @@ Perform available browser QA for at least the established representative layouts
 - [x] User approved M11 product direction and boundaries.
 - [x] Verify latest `main` baseline and create branch `M11` from it.
 - [x] Create initial M11 ExecPlan.
-- [ ] Run pre-implementation requirement/source analysis and reconcile this plan with
+- [x] Run pre-implementation requirement/source analysis and reconcile this plan with
   concrete current implementation details.
-- [ ] Implement Dropper payload and qualitative transfer state.
-- [ ] Expose and integrate Dropper Fill/Dispense interaction.
-- [ ] Preserve explicit manual Mix and existing chemistry boundaries.
-- [ ] Refine liquid/solid 2D material presentation.
-- [ ] Refine precipitate/deposit readability without chemistry changes.
-- [ ] Add/update tests.
-- [ ] Run full validation.
-- [ ] Complete available browser/responsive/accessibility QA.
-- [ ] Update outcomes and request user review before merge or milestone advancement.
+- [x] Implement Dropper payload and qualitative transfer state.
+- [x] Expose and integrate Dropper Fill/Dispense interaction.
+- [x] Preserve explicit manual Mix and existing chemistry boundaries.
+- [x] Refine liquid/solid 2D material presentation.
+- [x] Refine precipitate/deposit readability without chemistry changes.
+- [x] Add/update tests.
+- [x] Run full validation.
+- [x] Complete available browser/responsive/accessibility QA.
+- [x] Update outcomes and hand off for user review before merge or milestone advancement.
 
 ## Surprises and discoveries
 
-None so far.
+Pre-implementation analysis confirmed clean M11 at 8b600d7a05f4df328438f985c6f15694db09b317,
+matching origin/M11, two documentation commits ahead of main 15158f9. All existing
+M11 documentation is preserved. Source already provides meniscus/sheen, granular
+solid mounds and finite precipitate cloud/settling/deposit; refine these, not rewrite.
+Portions allow positive finite numbers but have no subtraction helper. Zero portions
+must be removed, not left for layout division or heat scheduling. Contents edits
+reset result/evaluation then synchronize heating; the approved implementation request
+explicitly preserves this behavior, resolving the earlier no-scheduling ambiguity.
+Typecheck caught a non-distributive action discriminant and new fixture inference;
+use distinct typed Fill/Dispense variants and typed fixtures, without assertions or
+weakening strict settings. StrictMode deliberately invokes the pure reducer twice;
+the UI regression now distinguishes that explicit-Mix behavior from zero evaluations
+during transfer/localization. Initial focused tests passed 80 tests/4 files and the
+transfer-focused rerun passed 23 tests/2 files. The first full run found one further
+historical Teaching UX test asserting unavailable delivery (373 passed, one failed).
+It now checks accessible M11 controls and preserves the non-container/no-Mix assertions.
 
 ## Decision log
+
+- Implementation reconciliation, 2026-10-17: one readonly Dropper state per equipment
+  ID, with nullable ChemicalPortion payload; never a ContainerState. Atomic reducer
+  Fill/Dispense move exactly one simplified unit. Quantity 1 removes the source entry;
+  <1/non-finite/invalid entries and unsafe arithmetic are rejected without mutation.
+  Successful reaction sources are ineligible because contents retain starting materials.
+  No-reaction sources remain eligible. Never read products for transfer.
+- Reuse Add/Empty contents invalidation and heating synchronization for both transfer
+  directions. Preserve unrelated container references/request IDs and live/replay owners.
+  Destination edits follow existing fresh-experiment semantics, not product chaining.
+- Add compact native source/destination selection to selected Dropper details, outside
+  container tabs; shared pure eligibility helpers supply stable reason codes. Payload
+  survives selection/movement/locale changes; Reset removes all droppers. Four palette
+  items use a readable two-by-two arrangement. Reuse the shared renderer for loaded cues.
+- Keep all new copy in existing EN/VI JSON; retain chemistry English fallback and native
+  focus/status semantics. No new dependency. Preserve M9 durations, animation names,
+  shared age and reduced-motion progression while refining SVG material readability.
 
 - Decision: use Dropper transfer instead of pouring for M11.
   Reason: it adds meaningful laboratory manipulation with smaller interaction and
@@ -306,7 +340,7 @@ None so far.
   Reason: otherwise Dropper transfer would duplicate material. This conservation is
   qualitative application-state behavior, not stoichiometric reaction consumption.
 
-- Decision: Dropper dispensing never triggers chemistry automatically.
+- Decision: Dropper dispensing never triggers Mix automatically.
   Reason: explicit Mix is an established laboratory action and keeping it explicit
   prevents transfer mechanics from becoming a hidden reaction trigger.
 
@@ -320,5 +354,62 @@ None so far.
 
 ## Outcomes and retrospective
 
-M11 implementation has not started yet. This section will be updated after delivery
-with the final behavior, known limitations and follow-up work.
+Delivered the existing Dropper through the four-item equipment palette. The reducer
+owns one nullable payload per Dropper and commits validated Fill/Dispense atomically.
+Fill removes exactly one qualitative unit, including removing the last source entry;
+invalid/unsafe quantities and successful reaction sources are rejected unchanged.
+Dispense merges through existing portion semantics, empties its payload and clears
+stale results. Mix stays explicit. Normal Heat request generations are refreshed for
+edited samples in a lit zone; unrelated container/result references are preserved.
+
+Shared SVG rendering now shows the held payload in details, workspace and drag
+preview. Native source/destination controls expose eligibility reasons and keep
+keyboard focus after transfer. Generic controls/status use existing EN/VI JSON;
+unreviewed chemistry names retain English fallback. Liquid meniscus/depth, resting
+solid silhouette/grains and cloud-versus-deposit readability refine existing rendering
+without changing M9 durations, effects, shared live/replay age or reduced-motion rules.
+
+Coverage added in `src/store/dropperTransfer.test.ts`,
+`src/features/lab/components/DropperTransfer.test.tsx` and
+`src/features/lab/hooks/DropperLifecycle.test.tsx` protects atomicity, invalid sources,
+conservation, independent payloads, Reset, explicit Mix, locale/movement retention,
+pending Heat generations and stale live/replay cleanup. Existing palette/teaching
+tests were migrated from hidden/unavailable Dropper expectations. Material tests cover
+all catalog entries in both supported container renderers without pixel assertions.
+
+Browser QA used only the ChatGPT in-app browser against local Vite at 1440×960,
+1180×900, 390×844 and 844×390. Observed four-tile palette, empty/loaded Dropper,
+keyboard Fill/focus-visible, native selects with invalid empty/solid/mixture/reacted
+sources, two independent Droppers, loaded pointer drag, source quantity reduction,
+destination addition and explicit Mix producing R2. EN/VI changes retained payload
+and chemistry fallback. Inspected liquids, resting solids, finite R2 cloud/deposit,
+Enlarged View Replay and Auto Replay hold; switching language preserved Auto Replay.
+Fill and Dispense in the lit zone each showed the normal pending Heat state. R7
+transformed solid stayed black after extinguishing. A no-reaction single-liquid source
+remained transferable, and taking its last unit removed its result/material. Desktop,
+Experiment-below, mobile sticky tools and short landscape showed no horizontal page
+overflow or clipped controls; mobile tools still scrolled and Escape restored focus.
+Console warning/error capture was empty. Screenshots are external QA artifacts, not
+application assets.
+
+Final local validation on 2026-10-17:
+
+- `npm run typecheck` — passed, strict application and tooling TypeScript checks.
+- `npm run lint` — passed, zero warnings.
+- `npm test -- --maxWorkers=2` — 374 tests in 31 files passed, 123.06 seconds.
+  Test commands used the existing ignored `node_modules/.cache/m10-temp` TEMP/TMP
+  location for this environment; no test configuration or timeout was changed.
+- `npm run build` — passed, 89 modules; production assets built successfully.
+- `git diff --check` — passed.
+
+HEAD remains `8b600d7a05f4df328438f985c6f15694db09b317` on M11. This is local
+validation of the uncommitted implementation, not a new GitHub-hosted CI result.
+
+No new dependency, state/drag/animation framework, reaction rule, trigger or heating
+geometry was introduced. Chemistry and quantitative composition remain unchanged.
+There was no browser reduced-motion emulation, broad multi-browser, physical touch,
+screen-reader or projector test; existing reduced-motion semantic/CSS tests remain
+the evidence for that mode. Liquid bands are starting-material illustrations, not
+density layers; payload units are not measured volume. Slosh, product pickup, chaining,
+pouring and quantitative chemistry remain excluded. Changes are local for user review;
+no commit, push, merge or milestone advancement is authorized by this delivery.
