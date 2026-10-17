@@ -170,3 +170,17 @@ two local contents-layout CSS rules, UI documentation and this plan (seven files
 Simulation, reducer, types, localization resources, package/lock, M9 hooks, dialog,
 lamp and active milestone remain untouched. Work is uncommitted on
 M10-ui-refinement at f9a4269; no commit, push, merge, PR or milestone advancement.
+
+### Publication closeout — 2026-10-17
+
+The preceding implementation-time validation and local-work statements remain
+historical snapshots; this note supersedes their publication/acceptance status.
+Pass 2 was published on M10-ui-refinement as
+`dfbce68ba296a86d70e35f37b9e663fa9931d9bc`. GitHub Actions
+[run 38911313264](https://github.com/khoabm/chemistry-lab/actions/runs/38911313264)
+completed successfully for that exact SHA: dependency installation, typecheck,
+lint, full tests and production build passed. Pass 2 is user-accepted; its shared
+starting-substance cues remain in final reviewed HEAD `0e14dcd`. Passes 3 and 4
+are now delivered and accepted, superseding the earlier pending-work status.
+Technical decisions and recorded QA limits are unchanged. See the final refinement
+closeout in `m10-localization.md`; merge and milestone approval remain user decisions.

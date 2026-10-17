@@ -194,3 +194,17 @@ UI documentation and this focused plan. Simulation, reducer, types, M9 hooks,
 right panel, equipment renderer, package/lock and active milestone are untouched.
 Work remains uncommitted on M10-ui-refinement at 6d1f7e0; no push/merge/PR or
 milestone advancement occurred. No hosted CI is claimed for these local changes.
+
+### Publication closeout — 2026-10-17
+
+The implementation-time snapshots above are preserved, including the original
+local validation and then-pending later passes. Their uncommitted/pre-Pass-1 HEAD/
+no-hosted-CI wording is superseded here and no longer describes current status.
+Pass 1 was published on M10-ui-refinement as
+`f9a4269efe97555cc34010f2498bcc835f201bfd`. GitHub Actions
+[run 38907690092](https://github.com/khoabm/chemistry-lab/actions/runs/38907690092)
+completed successfully for that exact SHA: dependency installation, typecheck,
+lint, full tests and production build passed. Pass 1 is user-accepted and retained
+in the final reviewed refinement HEAD `0e14dcd`; Passes 2–4 are now also delivered
+and accepted. See the final refinement closeout in `m10-localization.md` for the
+combined CI evidence, QA limits and merge-review status. M10 is not advanced.

@@ -219,3 +219,17 @@ Scientific/model captions, unsupported-result explanations and lit-lamp guidance
 are intentionally longer: they explain boundaries, not redundant next actions.
 Pass 4 alcohol-lamp/tripod/gauze visuals remain pending. No commit/push/merge/PR
 or milestone advancement was performed.
+
+### Publication closeout — 2026-10-17
+
+The implementation-time snapshots above retain their original validation, timeout
+discovery and then-pending Pass 4. This note supersedes the old Pass 2 HEAD,
+uncommitted/no-hosted-CI status and pending-Pass-4 wording as current status.
+Pass 3 was published on M10-ui-refinement as
+`02386f86dd3e5a6b3ba940d701c46524773c4527`. GitHub Actions
+[run 38914753342](https://github.com/khoabm/chemistry-lab/actions/runs/38914753342)
+completed successfully for that exact SHA: dependency installation, typecheck,
+lint, full tests and production build passed. Pass 3 is user-accepted and retained
+in final reviewed HEAD `0e14dcd`; Pass 4 has since been delivered and accepted.
+Scientific/model guidance, contextual rules and QA limits remain as recorded.
+See `m10-localization.md` for combined closeout; M10 is not advanced or declared merged.

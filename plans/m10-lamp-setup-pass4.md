@@ -172,3 +172,17 @@ the actual LabPage pointer integration test. No physical touch/projector,
 multi-browser or reduced-motion browser emulation was performed; reduced-motion
 CSS and existing regressions remain unchanged. No physical apparatus simulation
 is intended. Changes remain local for review; no publication or milestone change.
+
+### Publication closeout — 2026-10-17
+
+The prior Pass 3 HEAD/five-local-files/no-hosted-CI statements describe the
+implementation handoff, preserved alongside its validation and browser limits.
+They are superseded as current status: Pass 4 was published on M10-ui-refinement as
+`ea4f8ee4996b8996f707ecaab2fb7b219312248d`. GitHub Actions
+[run 38983385094](https://github.com/khoabm/chemistry-lab/actions/runs/38983385094)
+completed successfully for that exact SHA: dependency installation, typecheck,
+lint, full tests and production build passed. Pass 4 is user-accepted and retained
+in final reviewed HEAD `0e14dcd`. The tripod/gauze remain decorative in the shared
+renderer; the 88×126 interaction footprint, heating zone and heating/interaction
+semantics are unchanged. See `m10-localization.md` for combined closeout and merge
+review. This records publication history, not authorization to publish or merge.

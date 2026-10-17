@@ -220,6 +220,7 @@ No:
 - [x] Add editorial guide/glossary and synchronize architecture documentation.
 - [x] Validate migration and perform focused browser QA.
 - [x] Review migrated M10 boundaries and remove the unused pre-JSON equipment-label catalog; synchronize publication/CI history.
+- [x] Close refinement Passes 1–4 and locale layout stability documentation using verified publication/hosted CI evidence; prepare for merge review only.
 - [ ] User review and milestone approval.
 
 ## Decision log
@@ -590,6 +591,54 @@ Validation: `npm run typecheck`, `npm run lint`, `npm test -- --maxWorkers=2`
 (349 tests / 28 files, 138.69s), `npm run build` and `git diff --check` PASS.
 Tests used the existing command-local ignored TEMP/TMP cache workaround; no test
 configuration or timeout changed. Final diff is limited to global.css, UI_UX.md
-and this plan. No tests were removed or weakened. Current CSS changes are local
-and uncommitted; no new GitHub-hosted CI result is claimed for them.
-Prior-pass publication/CI closeout is intentionally deferred to the later review.
+and this plan. No tests were removed or weakened. At implementation handoff these
+CSS changes were local/uncommitted and hosted CI had not run for them; the later
+publication closeout below supersedes that status and the deferred Pass 1–4 closeout.
+
+### Final UI-refinement publication closeout — 2026-10-17
+
+Verified from local Git, remote branch heads and GitHub Actions runs/jobs/logs:
+the clean pre-closeout HEAD is `0e14dcd7689a2c06ee9c3a45700dba84849b2b24`,
+matching origin/M10-ui-refinement. M10 baseline
+`6d1f7e0c923999a11f02c423bc15f5b7e864a48e` matches origin/M10 and is an ancestor;
+the refinement branch is ahead by exactly five commits with zero divergence.
+The user has accepted Passes 1–4 and locale layout stability. Their individual
+plans preserve original implementation/validation snapshots, with dated closeouts
+superseding old publication/pending-later-pass statements.
+
+| Accepted delivery | Published commit | Successful hosted CI |
+| --- | --- | --- |
+| Pass 1 — Materials density + Chemical Search | `f9a4269efe97555cc34010f2498bcc835f201bfd` | [38907690092](https://github.com/khoabm/chemistry-lab/actions/runs/38907690092) |
+| Pass 2 — Shared Chemical Visual Identity | `dfbce68ba296a86d70e35f37b9e663fa9931d9bc` | [38911313264](https://github.com/khoabm/chemistry-lab/actions/runs/38911313264) |
+| Pass 3 — Contextual Copy Cleanup | `02386f86dd3e5a6b3ba940d701c46524773c4527` | [38914753342](https://github.com/khoabm/chemistry-lab/actions/runs/38914753342) |
+| Pass 4 — Alcohol Lamp Heating-Setup Visual | `ea4f8ee4996b8996f707ecaab2fb7b219312248d` | [38983385094](https://github.com/khoabm/chemistry-lab/actions/runs/38983385094) |
+| Locale Layout Stability | `0e14dcd7689a2c06ee9c3a45700dba84849b2b24` | [38987554289](https://github.com/khoabm/chemistry-lab/actions/runs/38987554289) |
+
+Every listed run completed successfully on its exact commit, including install,
+typecheck, lint, tests and build. The latest run, 38987554289, used Ubuntu with
+Node v24.21.0 and passed `npm ci`, `npm run typecheck`, `npm run lint`,
+`npm test -- --maxWorkers=2` (349 tests / 28 files) and `npm run build`.
+This is hosted product-code evidence, distinct from the local validation above.
+Locale layout stability is accepted after product/code review: runtime edits were
+scoped to CSS/presentation, with no locale-specific logic or JavaScript measurement.
+Content-driven scientific/Help prose remains naturally sized.
+
+Final review found no product-code blocker. The combined refinement introduced
+no simulation/domain/reaction/heating semantic change, new dependency, or M9
+live/replay lifecycle change. The branch is ready for merge review after this
+documentation closeout is reviewed; it has not been merged into M10. M10 remains
+the active milestone and is not declared complete or advanced here. Publication,
+merge and milestone approval require separate user authorization; prior published
+commits are recorded history, not autonomous Codex publication in this task.
+
+Existing QA limits remain: no broad multi-browser, physical touch-device,
+screen-reader or projector verification; reduced-motion browser emulation was
+unavailable, while existing reduced-motion regressions passed. Actual browser zoom
+was not applied by the available tool during layout QA. No new browser/device QA
+is claimed by this documentation task.
+
+This closeout changes only these five plans. Full diff/stat and scope review
+confirm no non-documentation changes; `git diff --check` passes. Product tests
+were not rerun merely for documentation status, and no test was added or changed.
+Run 38987554289 validates the published product-code SHA, not these uncommitted
+documentation edits. No new hosted run is claimed for the closeout itself.
