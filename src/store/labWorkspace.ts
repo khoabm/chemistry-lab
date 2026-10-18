@@ -10,6 +10,11 @@ import type { HeatEvaluationState } from '../types/heating'
 import type { DropperState } from '../types/dropper'
 import { prepareDropperFill, prepareDropperDispense } from './dropperTransfer'
 import { findContainerMount, findLampMount, findMountedHeatingLamp, getMountIssue, getMountTargetIssue, type EquipmentMount } from './mounting'
+import type { ThermometerAttachment, ThermometerState } from '../types/thermal'
+import { ambientTemperature, emptyThermal, initialSample, invalidateThermal, referenceStartingTemperature } from '../simulation/thermal/profiles'
+import { releaseReferenceHeat } from '../simulation/thermal/model'
+import { advanceWorkspaceThermal } from './thermalLifecycle'
+import { thermometerTargetIssue } from './thermometerAttachment'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
@@ -20,10 +25,14 @@ export interface LabWorkspaceState {
   droppers: readonly DropperState[]
   mounts: readonly EquipmentMount[]
   nextHeatRequestId: number
+  simulationTime: number
+  thermalEpoch: number
+  thermometers: readonly ThermometerState[]
+  thermometerAttachments: readonly ThermometerAttachment[]
 }
 
 export type LabWorkspaceAction =
-  | { type: 'add'; equipmentType: EquipmentType; position: Point }
+  | { type: 'add'; equipmentType: EquipmentType; position: Point; attachTo?: string }
   | { type: 'move'; id: string; position: Point }
   | { type: 'select'; id: string }
   | { type: 'reset' }
@@ -38,9 +47,14 @@ export type LabWorkspaceAction =
   | { type: 'remove-from-support'; containerEquipmentId: string; lampEquipmentId: string; position: Point; selectContainer?: true }
   | { type: 'rebind-container'; containerEquipmentId: string; fromLampEquipmentId: string; lampEquipmentId: string; lampPosition?: Point }
   | { type: 'move-lamp-assembly'; lampEquipmentId: string; containerEquipmentId: string; position: Point }
+  | { type: 'prepare-r6'; equipmentId: string }
+  | { type: 'advance-thermal'; epoch: number; time: number; liftedContainerId: string | null; liftedThermometerId: string | null }
+  | { type: 'attach-thermometer'; thermometerId: string; containerId: string }
+  | { type: 'detach-thermometer'; thermometerId: string; position: Point }
 
 export function createLabWorkspaceState(): LabWorkspaceState {
-  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [], droppers: [], mounts: [], nextHeatRequestId: 1 }
+  return { equipment: [], selectedEquipmentId: null, nextSerial: 1, containers: [], lamps: [], droppers: [], mounts: [], nextHeatRequestId: 1,
+    simulationTime: 0, thermalEpoch: 1, thermometers: [], thermometerAttachments: [] }
 }
 
 function synchronizeHeating(state: LabWorkspaceState): LabWorkspaceState {
@@ -56,8 +70,10 @@ function synchronizeHeating(state: LabWorkspaceState): LabWorkspaceState {
       if (heatEvaluation.status !== 'idle' && !retainMixCancellation) heatEvaluation = { status: 'idle' }
     } else if (isCompletedHeatReaction(container.reactionResult)) {
       if (heatEvaluation.status !== 'evaluated') heatEvaluation = { status: 'evaluated' }
-    } else if (heatEvaluation.status !== 'cancelled' && (!sameSource || heatEvaluation.status === 'idle')) {
+    } else if (['r7', 'r8'].includes(container.thermal.kind) && (!sameSource || heatEvaluation.status === 'idle')) {
       heatEvaluation = { status: 'pending', requestId: nextHeatRequestId++ }
+    } else if (!['r7', 'r8'].includes(container.thermal.kind) && heatEvaluation.status !== 'idle') {
+      heatEvaluation = { status: 'idle' }
     }
     if (sameSource && heatEvaluation === container.heatEvaluation) return container
     return { ...container, heatEvaluation, heatingState: lampId ? { status: 'heating', lampId } : { status: 'not-heating' } }
@@ -95,7 +111,38 @@ export function labWorkspaceReducer(
   action: LabWorkspaceAction,
 ): LabWorkspaceState {
   if (action.type === 'reset') {
-    return { ...createLabWorkspaceState(), nextSerial: state.nextSerial, nextHeatRequestId: state.nextHeatRequestId }
+    return { ...createLabWorkspaceState(), nextSerial: state.nextSerial, nextHeatRequestId: state.nextHeatRequestId, thermalEpoch: state.thermalEpoch + 1 }
+  }
+
+  if (action.type === 'advance-thermal') return action.epoch === state.thermalEpoch
+    ? advanceWorkspaceThermal(state, action.time, action.liftedContainerId, action.liftedThermometerId) : state
+
+  if (action.type === 'prepare-r6') {
+    const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
+    const type = state.equipment.find((item) => item.id === action.equipmentId)?.equipmentType
+    if (!container || !type || container.contents.length || container.thermal.referenceUsed || container.thermal.temperature === null) return state
+    const tube = type === 'test-tube'
+    const temperature = referenceStartingTemperature(container.thermal.temperature, type)
+    if (temperature === null) return state
+    return synchronizeHeating({ ...state, containers: state.containers.map((item) => item !== container ? item : {
+      ...item, contents: [{ chemicalId: 'hydrochloric-acid', quantity: 1 }, { chemicalId: 'sodium-hydroxide', quantity: 1 }],
+      reactionResult: null, heatEvaluation: { status: 'idle' },
+      thermal: { kind: 'r6', temperature, referenceUsed: true, energyRemaining: tube ? 114 : 1425,
+        batchId: `${state.thermalEpoch}:${state.nextHeatRequestId}`, completed: false },
+    }), nextHeatRequestId: state.nextHeatRequestId + 1 })
+  }
+
+  if (action.type === 'attach-thermometer') {
+    if (thermometerTargetIssue(state, action.thermometerId, action.containerId)) return state
+    const current = state.thermometerAttachments.find((item) => item.thermometerEquipmentId === action.thermometerId)
+    if (current?.containerEquipmentId === action.containerId) return state
+    return { ...state, thermometerAttachments: [...state.thermometerAttachments.filter((item) => item !== current),
+      { thermometerEquipmentId: action.thermometerId, containerEquipmentId: action.containerId }] }
+  }
+  if (action.type === 'detach-thermometer') {
+    if (!validWorkspacePosition(action.position) || !state.thermometerAttachments.some((item) => item.thermometerEquipmentId === action.thermometerId)) return state
+    return { ...positionEquipment(state, action.thermometerId, action.position),
+      thermometerAttachments: state.thermometerAttachments.filter((item) => item.thermometerEquipmentId !== action.thermometerId) }
   }
 
   if (action.type === 'select') {
@@ -166,24 +213,22 @@ export function labWorkspaceReducer(
   }
 
   if (action.type === 'evaluate-heat') {
-    const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
-    if (!container || container.heatingState.status !== 'heating' || container.contents.length === 0
-      || findMountedHeatingLamp(state, action.equipmentId) !== container.heatingState.lampId
-      || container.heatEvaluation.status !== 'pending' || container.heatEvaluation.requestId !== action.requestId) return state
-    const reactionResult = evaluateReaction({ contents: container.contents, trigger: 'heat' })
-    return { ...state, containers: state.containers.map((item) => item.id === container.id
-      ? { ...item, reactionResult, heatEvaluation: { status: 'evaluated' } } : item) }
+    // Legacy delayed callbacks cannot bypass the sole thermal qualification path.
+    return state
   }
 
   if (action.type === 'mix') {
     const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
     if (!container || container.contents.length === 0 || isCompletedHeatReaction(container.reactionResult)) return state
     const reactionResult = evaluateReaction({ contents: container.contents, trigger: 'mix' })
+    const release = reactionResult.status === 'reaction' && reactionResult.reactionId === 'R6'
+      && container.thermal.kind === 'r6' && container.thermal.temperature !== null
+    const thermal = release ? releaseReferenceHeat(container.thermal, state.equipment.find((item) => item.id === action.equipmentId)!.equipmentType)
+      : reactionResult.status === 'reaction' ? invalidateThermal(container.thermal) : container.thermal
     return {
       ...state,
       containers: state.containers.map((item) => item.id === container.id ? {
-        ...item, reactionResult,
-        heatEvaluation: item.heatEvaluation.status === 'pending' ? { status: 'cancelled' } : item.heatEvaluation,
+        ...item, reactionResult, thermal,
       } : item),
     }
   }
@@ -194,10 +239,15 @@ export function labWorkspaceReducer(
     const contents = action.type === 'clear-container'
       ? container.contents.length ? [] : container.contents
       : addChemicalPortion(container.contents, action.chemicalId, action.quantity)
-    if (contents === container.contents) return state
+    if (contents === container.contents && action.type !== 'clear-container') return state
+    if (action.type === 'clear-container' && !contents.length && container.thermal.kind === 'empty'
+      && !container.thermal.referenceUsed && container.reactionResult === null) return state
+    const thermal = action.type === 'clear-container' ? emptyThermal(container.thermal.temperature)
+      : container.thermal.kind === 'empty' && !container.thermal.referenceUsed
+        ? initialSample(contents, container.thermal, state.equipment.find((item) => item.id === action.equipmentId)!.equipmentType) : invalidateThermal(container.thermal)
     return synchronizeHeating({
       ...state,
-      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents, reactionResult: null, heatEvaluation: { status: 'idle' } } : item),
+      containers: state.containers.map((item) => item.id === container.id ? { ...item, contents, thermal, reactionResult: null, heatEvaluation: { status: 'idle' } } : item),
     })
   }
 
@@ -210,7 +260,7 @@ export function labWorkspaceReducer(
     return synchronizeHeating({ ...state,
       droppers: state.droppers.map((item) => item === dropper ? { ...item, payload: prepared.payload } : item),
       containers: state.containers.map((item) => item === container
-        ? { ...item, contents: prepared.contents, reactionResult: null, heatEvaluation: { status: 'idle' } } : item),
+        ? { ...item, contents: prepared.contents, thermal: invalidateThermal(item.thermal), reactionResult: null, heatEvaluation: { status: 'idle' } } : item),
     })
   }
 
@@ -219,6 +269,7 @@ export function labWorkspaceReducer(
   }
 
   if (action.type === 'add') {
+    if (action.attachTo && (action.equipmentType !== 'thermometer' || thermometerTargetIssue(state, null, action.attachTo))) return state
     const instance: EquipmentInstance = {
       id: `equipment-${state.nextSerial}`,
       equipmentType: action.equipmentType,
@@ -228,12 +279,14 @@ export function labWorkspaceReducer(
       ...state,
       equipment: [...state.equipment, instance],
       containers: isContainerEquipment(instance.equipmentType)
-        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [], reactionResult: null, heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' } }]
+        ? [...state.containers, { id: `container-${instance.id}`, equipmentInstanceId: instance.id, contents: [], thermal: emptyThermal(), reactionResult: null, heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' } }]
         : state.containers,
       lamps: instance.equipmentType === 'alcohol-lamp'
         ? [...state.lamps, { equipmentInstanceId: instance.id, status: 'extinguished' }] : state.lamps,
       droppers: instance.equipmentType === 'dropper'
         ? [...state.droppers, { equipmentInstanceId: instance.id, payload: null }] : state.droppers,
+      thermometers: instance.equipmentType === 'thermometer' ? [...state.thermometers, { equipmentInstanceId: instance.id, reading: ambientTemperature }] : state.thermometers,
+      thermometerAttachments: action.attachTo ? [...state.thermometerAttachments, { thermometerEquipmentId: instance.id, containerEquipmentId: action.attachTo }] : state.thermometerAttachments,
       selectedEquipmentId: instance.id,
       nextSerial: state.nextSerial + 1,
     })

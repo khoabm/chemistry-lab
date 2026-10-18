@@ -1,3 +1,4 @@
+import { fitFreeSample, sensorExtension } from './thermometerPlacement'
 import type { LabWorkspaceAction, LabWorkspaceState } from '../../../store/labWorkspace'
 import { findContainerMount, findLampMount, getMountTargetIssue } from '../../../store/mounting'
 import type { Point } from '../../../types/equipment'
@@ -21,7 +22,7 @@ export function prepareSupportMount(state: LabWorkspaceState, containerEquipment
   if (!container || !lamp) return null
   const current = findContainerMount(state.mounts, containerEquipmentId)
   if (current?.lampEquipmentId === lampEquipmentId) return null
-  const projection = projectSupport(lamp.position, container.equipmentType, bounds)
+  const projection = projectSupport(lamp.position, container.equipmentType, bounds, sensorExtension(state, containerEquipmentId))
   if (!projection) return null
   return current ? { type: 'rebind-container', containerEquipmentId, fromLampEquipmentId: current.lampEquipmentId,
     lampEquipmentId, lampPosition: projection.lampPosition }
@@ -47,7 +48,8 @@ function prepareRemovalAt(state: LabWorkspaceState, containerEquipmentId: string
   const position = mountedPositions(state, bounds).get(containerEquipmentId)
   if (!position) return { issue: 'invalidContainer', action: null }
   const center = equipmentCenter(position, bounds)
-  const candidate = benchPosition({ x: center.x + offset.x, y: center.y + offset.y }, bounds)
+  const candidate = fitFreeSample(state, containerEquipmentId, benchPosition({ x: center.x + offset.x, y: center.y + offset.y }, bounds), bounds)
+  if (!candidate) return { issue: 'noRoom', action: null }
   const placed = equipmentCenter(candidate, bounds)
   // Clamping must not turn an outward Arrow into a tiny, ambiguous unmount.
   if (offset.x && (placed.x - center.x) * Math.sign(offset.x) < removalClearance.x - 1e-9
@@ -76,7 +78,7 @@ function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds
   const assembly = findLampMount(state.mounts, id)
   if (assembly) {
     const type = state.equipment.find((item) => item.id === assembly.containerEquipmentId)?.equipmentType
-    const projection = type ? projectSupport(position, type, bounds) : null
+    const projection = type ? projectSupport(position, type, bounds, sensorExtension(state, assembly.containerEquipmentId)) : null
     return { position: projection?.lampPosition ?? position, valid: projection !== null,
       ...(!projection ? { target: { kind: 'invalid' as const, reason: 'assembly-too-large' as const } } : {}),
       action: projection ? { type: 'move-lamp-assembly', lampEquipmentId: id,
@@ -88,12 +90,21 @@ function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds
   const target = resolveSupportTarget(state, id, center, bounds)
   const current = findContainerMount(state.mounts, id)
   if (target.kind === 'invalid') return { position, valid: false, action: null, target }
-  if (target.kind === 'free-bench') return { position: target.position, valid: true, target,
+  if (target.kind === 'free-bench') {
+    const fitted = fitFreeSample(state, id, target.position, bounds)
+    if (!fitted) return { position, valid: false, action: null }
+    target.position = fitted
+    return { position: target.position, valid: true, target,
     action: current ? { type: 'remove-from-support', containerEquipmentId: id,
       lampEquipmentId: current.lampEquipmentId, position: target.position } : { type: 'move', id, position: target.position } }
-  return { position: target.projection.containerPosition, valid: true, target,
-    lampDraft: { id: target.lampEquipmentId, position: target.projection.lampPosition },
-    action: target.kind === 'same-support' ? null : prepareSupportMount(state, id, target.lampEquipmentId, bounds) }
+  }
+  const prepared = prepareSupportMount(state, id, target.lampEquipmentId, bounds)
+  if (target.kind !== 'same-support' && !prepared) return { position, valid: false, action: null }
+  const fittedSupport = projectSupport(target.projection.lampPosition, instance.equipmentType, bounds, sensorExtension(state, id))
+  if (!fittedSupport) return { position, valid: false, action: null }
+  return { position: fittedSupport.containerPosition, valid: true, target,
+    lampDraft: { id: target.lampEquipmentId, position: fittedSupport.lampPosition },
+    action: target.kind === 'same-support' ? null : prepared }
 }
 
 function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds: BenchBounds): LabWorkspaceAction | null {
@@ -104,7 +115,7 @@ function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds
   const assembly = findLampMount(state.mounts, id)
   if (assembly) {
     const type = state.equipment.find((item) => item.id === assembly.containerEquipmentId)?.equipmentType
-    const projection = type ? projectSupport(requested, type, bounds) : null
+    const projection = type ? projectSupport(requested, type, bounds, sensorExtension(state, assembly.containerEquipmentId)) : null
     return projection ? { type: 'move-lamp-assembly', lampEquipmentId: id,
       containerEquipmentId: assembly.containerEquipmentId, position: projection.lampPosition } : null
   }
@@ -115,7 +126,8 @@ function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds
     x: Math.sign(delta.x) * removalClearance.x + delta.x * (bounds.width - equipmentFootprint.width),
     y: Math.sign(delta.y) * removalClearance.y + delta.y * (bounds.height - equipmentFootprint.height),
   }, true).action
-  return { type: 'move', id, position: requested }
+  const fitted = fitFreeSample(state, id, requested, bounds)
+  return fitted ? { type: 'move', id, position: fitted } : null
 }
 
 // Native controls share prepareSupportMount/Removal; all commits use the reducer policy.

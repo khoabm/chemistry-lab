@@ -8,7 +8,7 @@ export const chemicals = [
   { id: 'sodium-carbonate', name: 'Sodium carbonate', formula: 'Na₂CO₃', state: 'liquid', color: '#d7e9ed' },
   { id: 'hydrochloric-acid', name: 'Hydrochloric acid', formula: 'HCl', state: 'liquid', color: '#d7e9ed' },
   { id: 'sodium-bicarbonate', name: 'Sodium bicarbonate', formula: 'NaHCO₃', state: 'solid', color: '#fffefa' },
-  { id: 'copper-carbonate', name: 'Copper(II) carbonate', formula: 'CuCO₃', state: 'solid', color: '#609d73' },
+  { id: 'copper-carbonate', name: 'Basic copper(II) carbonate', formula: 'Cu₂CO₃(OH)₂', state: 'solid', color: '#609d73' },
   { id: 'copper-sulfate-pentahydrate', name: 'Copper(II) sulfate pentahydrate', formula: 'CuSO₄·5H₂O', state: 'solid', color: '#478ecb' },
 ] as const
 

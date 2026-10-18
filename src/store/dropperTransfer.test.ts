@@ -116,7 +116,7 @@ describe('atomic qualitative dropper transfer', () => {
     expect(dispense(reset)).toBe(reset)
   })
 
-  it('invalidates pending source Heat generations, preserves unrelated requests and stops evaluating an emptied source', () => {
+  it('invalidates numerical source history, preserves unrelated requests and keeps emptied sources chemically idle', () => {
     let state = setup()
     state = reduce(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.5, y: 0.7 } })
     state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-4' })
@@ -128,19 +128,19 @@ describe('atomic qualitative dropper transfer', () => {
     state = reduce(state, { type: 'mount-container', containerEquipmentId: 'equipment-2', lampEquipmentId: 'equipment-5' })
     state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-5' })
     const pending = state.containers[0]!.heatEvaluation
-    if (pending.status !== 'pending') throw new Error('Expected source pending')
+    expect(pending.status).toBe('idle')
     const unrelated = state.containers[1]
     const sampled = fill(state)
-    expect(sampled.containers[0]?.heatEvaluation).not.toEqual(pending)
+    expect(sampled.containers[0]?.thermal.kind).toBe('unsupported')
     expect(sampled.containers[1]).toBe(unrelated)
-    expect(reduce(sampled, { type: 'evaluate-heat', equipmentId: 'equipment-1', requestId: pending.requestId })).toBe(sampled)
+    expect(reduce(sampled, { type: 'evaluate-heat', equipmentId: 'equipment-1', requestId: -1 })).toBe(sampled)
     const emptied = fill(dispense(sampled, 'equipment-2'))
     expect(emptied.containers[0]?.contents).toEqual([])
     expect(emptied.containers[0]?.heatEvaluation.status).toBe('idle')
     expect(emptied.containers[0]?.heatingState.status).toBe('heating')
   })
 
-  it('starts a fresh guarded Heat wait for an edited destination without performing Mix', () => {
+  it('marks edited destination thermal history unsupported without Mix or a replacement timeout', () => {
     let state = fill(setup())
     state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-2', chemicalId: 'sodium-hydroxide', quantity: 1 })
     state = reduce(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.5, y: 0.7 } })
@@ -148,17 +148,17 @@ describe('atomic qualitative dropper transfer', () => {
     state = reduce(state, { type: 'move', id: 'equipment-2', position: { x: 0.5, y: 0.48 } })
     state = reduce(state, { type: 'mount-container', containerEquipmentId: 'equipment-2', lampEquipmentId: 'equipment-4' })
     const old = state.containers[1]!.heatEvaluation
-    if (old.status !== 'pending') throw new Error('Expected destination pending')
+    expect(old.status).toBe('idle')
     const evaluate = vi.spyOn(engine, 'evaluateReaction')
     const edited = dispense(state)
     expect(evaluate).not.toHaveBeenCalled()
     expect(edited.containers[1]?.reactionResult).toBeNull()
     const fresh = edited.containers[1]!.heatEvaluation
-    if (fresh.status !== 'pending') throw new Error('Expected fresh Heat wait')
-    expect(fresh.requestId).not.toBe(old.requestId)
-    expect(reduce(edited, { type: 'evaluate-heat', equipmentId: 'equipment-2', requestId: old.requestId })).toBe(edited)
-    const checked = reduce(edited, { type: 'evaluate-heat', equipmentId: 'equipment-2', requestId: fresh.requestId })
-    expect(checked.containers[1]?.reactionResult).toMatchObject({ status: 'no-reaction', trigger: 'heat' })
+    expect(edited.containers[1]!.thermal.kind).toBe('unsupported')
+    expect(fresh.status).toBe('idle')
+    expect(reduce(edited, { type: 'evaluate-heat', equipmentId: 'equipment-2', requestId: -1 })).toBe(edited)
+    const checked = reduce(edited, { type: 'evaluate-heat', equipmentId: 'equipment-2', requestId: -1 })
+    expect(checked.containers[1]?.reactionResult).toBeNull()
     expect(reduce(checked, { type: 'mix', equipmentId: 'equipment-2' }).containers[1]?.reactionResult).toMatchObject({ reactionId: 'R6' })
   })
 })

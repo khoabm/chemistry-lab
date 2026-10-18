@@ -8,7 +8,7 @@ function portions(ids: readonly ChemicalId[], quantity = 1) {
   return ids.map((chemicalId) => ({ chemicalId, quantity }))
 }
 const cases = [
-  { id: 'R7', chemical: 'copper-carbonate', color: 'black', products: ['CuO', 'CO2'], equation: 'CuCO3 → CuO + CO2↑' },
+  { id: 'R7', chemical: 'copper-carbonate', color: 'black', products: ['CuO', 'CO2', 'H2O'], equation: 'Cu2CO3(OH)2 → 2CuO + CO2↑ + H2O' },
   { id: 'R8', chemical: 'copper-sulfate-pentahydrate', color: 'pale-white', products: ['CuSO4', 'H2O'], equation: 'CuSO4·5H2O → CuSO4 + 5H2O' },
 ] as const
 

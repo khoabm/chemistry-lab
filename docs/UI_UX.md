@@ -427,32 +427,38 @@ This is presentation only: never override the heating prop used by reaction
 animation synchronization or mutate committed heating/mount state. Status text
 changes at lift/end transitions, not on every pointer coordinate.
 
-M6 extends this interaction with a short illustrative wait for filled containers.
-Show pending/completed heat evaluation separately from physical Heating. R7 changes
-the solid toward black with low outlined gas particles rising above the solid;
-R8 changes blue solid toward pale/white without inventing gas or liquid. Clearly
-label the particles as an illustration of colorless gas release, not boiling or
-steam. The returned equation and explanation appear in the existing observation
-panel and update an already-open close-up modal.
+Thermometer B+ replaces the former illustrative Heat wait with nominal sample
+thermal evolution at fixed 6x speed. A mounted lit lamp supplies power; a lifted or
+removed sample retains residual heat and cools. Cancellation restores contact and
+committed mounting, not an old temperature. Hidden tabs pause without catch-up.
+R7/R8 each show one final result at experimental teaching milestones 350°C/240°C;
+these are uncalibrated conventions, not universal reaction/completion thresholds.
+Black CuO and anhydrous CuSO4 remain final states, with finite M9 effects and Replay.
+No multistage dehydration or fixed 2000ms fallback is used.
 
-The 2000ms wait is illustrative, not reaction kinetics. Each container/request has
-its own deadline. Only lifting a mounted sample beyond the existing drag threshold
-pauses its pending wait. Cancellation and same-support return resume its remaining
-duration; pointerdown, assembly movement, palette and unrelated equipment drags
-never pause it. Detach/extinction invalidates pending work. Rebind to a lit lamp
-starts a fresh eligible wait; contents edits, including Dropper Fill/Dispense,
-invalidate only the edited sample's generation. Reset invalidates all work.
-Keep successful solid color after cooling, with gas motion only while heated
-and within the finite M9 reaction-presentation window. Reheating an already
-completed result does not replay its activity.
-Completed heat samples cannot Mix their retained starting portions as fresh
-reactants; clear/add begins another simplified experiment. Unsupported heat sets
-show No observable reaction. Do not calculate temperature, kinetics or yields.
+Ordinary fresh single allowlisted aqueous solutions can be measured immediately
+using disclosed nominal vessel defaults, without Prepare. No portion unit becomes
+a mass/volume. Changed, mixed, empty, solid-only or unknown-transfer samples explain
+why numerical measurement is unavailable. Explicit Prepare R6 on an empty eligible
+vessel supplies a reference acid/base recipe; Mix releases a finite budget once.
+It does not reset a warm vessel to ambient or rearm a spent nonempty batch.
 
-Explicit Mix supersedes a pending heat check and shows its cancellation status.
-Do not let the older delayed Heat result overwrite the user's newer Mix result.
-Changing contents or remounting/rebinding a sample without a completed Heat result
-can start a fresh eligible check; harmless movement never restarts a cancelled Mix wait.
+An independent glass-liquid thermometer has a Celsius scale and lagging sensor
+reading. Drag its bulb into eligible liquid for a subtle target and snapped preview;
+release alone commits attachment. One sensor per container. Drag out to detach or
+into another available liquid to rebind. Attached sensors follow containers and
+lamp assemblies, preserving independent focus and SVG identity. Both Beaker and
+Test tube support the declared 25mm-immersion reference configuration. Do not imply
+that the SVG proves physical calibration or that this device measures heated solids.
+
+Enter picks up/drops a focused thermometer; Arrows and Shift move the draft, Escape
+or Tab cancels. The native pickup action also supports clicking/tapping a target
+container and an explicit Remove action, without a primary combobox. Focus-driven
+scroll re-anchors keyboard drafts; pointer scroll/resize/blur/hidden/capture loss
+cancels without changing committed attachment. Invalid/occupied targets retain it.
+Reading changes are not an aria-live stream. EN/VI disclose nominal assumptions and
+experimental milestones. Sensor lag is preserved at reaction trigger time.
+
 
 ---
 

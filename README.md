@@ -100,14 +100,14 @@ Dependencies should be introduced only when required by the current milestone.
 ## Current status
 
 M11 extends the delivered M9 dynamics and M10 localization: place and move beakers,
-test tubes, droppers and alcohol lamps through the explicit paletteEquipmentTypes list.
+test tubes, droppers, alcohol lamps and thermometers through the explicit paletteEquipmentTypes list.
 Select a Dropper, choose a single-liquid source and Fill one simplified unit;
 choose a destination and Dispense, then select that container and explicitly Mix.
 Source material decreases; each Dropper owns one payload and cannot refill while
 loaded. Empty, solid, multi-entry and successfully reacted sources are unavailable;
 products are never sampled. Payloads survive movement/selection/language changes;
-Reset clears them. Transfer edits clear stale results and refresh normal guarded
-Heat waits, without automatically mixing. No measured volume or stoichiometry is implied.
+Reset clears them. Transfer edits clear stale results and invalidate unsupported numerical
+thermal history without automatically mixing. No measured volume or stoichiometry is implied.
 Drag equipment from the palette onto the bench or click to add it.
 Drag placed equipment directly: the same button/SVG follows a transient draft,
 with one committed move on valid release. Palette placement keeps its preview.
@@ -154,20 +154,28 @@ ellipse or replacement effect. Flame and textual Heating feedback identify heati
 During a mounted-container lift, its normal Heating badge/description is replaced
 by lifted feedback; committed Heat and reaction animation state are unchanged.
 
-Filled mounted samples wait an illustrative 2000ms for guarded Heat evaluation.
-Only an actual mounted-container lift pauses that sample's timer; cancellation or
-return to its support resumes the remaining time. Assembly/palette/unrelated drags
-retain deadlines. Detach, rebind, extinction, contents edits and Reset invalidate
-stale requests/tokens; eligible new source/material lifecycles start a fresh wait.
-Explicit Mix supersedes pending Heat, including after toggling the same lamp.
-Remove/remount, rebind or material edits can start another eligible check.
-R7 produces black solid and finite low solid-gas release; R8 becomes pale/white.
-Unsupported sets return No observable reaction. Gas particles are illustrative,
-not boiling or visible carbon dioxide. Completed results retain identity through
-movement, cooling, remounting and locale changes, without restarting finite effects.
-Mix remains unavailable for transformed Heat samples until contents change.
-Starting quantities remain recorded; products are semantic data, without measured
-kinetics, consumption/chaining, yields, exact temperatures or real safety procedures.
+Thermometer B+ supplies a nominal educational thermal model at fixed 6x speed,
+paused while the tab is hidden with no catch-up. A mounted lit lamp supplies power;
+lift/unmount stops power while residual heat cools. R7/R8 each produce one final
+result at experimental uncalibrated 350°C/240°C teaching milestones, not universal
+reaction thresholds. No fixed 2000ms fallback or general kinetics is used. Completed
+results and M9 finite effects/Replay retain their existing identity and timing.
+
+A glass-liquid thermometer is independent equipment with its own lagging reading.
+Drag its bulb into eligible liquid to preview/attach; drag out to detach or rebind.
+It follows its Beaker/Test tube and lamp assembly. Enter/Arrows/Shift/Escape support
+keyboard pickup/drop; native pickup then click/tap and Remove provide alternatives.
+Both vessels support the declared short-immersion reference configuration. Empty,
+solid-only and unknown/changed samples explain unavailable readings. This liquid
+thermometer does not measure R7/R8 solids.
+
+A fresh single allowlisted aqueous solution automatically uses disclosed fixed
+nominal load/heat-capacity defaults without Prepare. Quantities remain qualitative,
+never mL/g/mol. Prepare R6 on an empty known-temperature vessel supplies an explicit
+reference recipe and preserves residual vessel heat; only its first explicit Mix
+releases the finite energy budget. Repeated Mix/Replay never replenishes it. Add and
+Dropper edits invalidate unsupported numerical history without changing material
+conservation or explicit Mix semantics. These models are not experimentally calibrated.
 
 Open How to use this lab for a short, non-blocking Mix/Heat guide, keyboard
 controls and sample labels. Closing/reopening Help does not change experiments.
@@ -181,8 +189,8 @@ share returned equations, explanations and product names/formulas, with ↓/↑
 legend text for precipitate/gas effects. No observable reaction remains a neutral
 outcome; additional guidance explains that no registered demonstration matches
 the selected trigger, without claiming real-world chemical impossibility.
-Exact temperature/concentration and real laboratory procedures remain outside
-the virtual model. M7 changes presentation only; chemistry and state transitions
+Experimentally exact temperature/concentration and real laboratory procedures
+remain outside the virtual model; B+ values are explicitly nominal. M7 changes presentation only; chemistry and state transitions
 are unchanged.
 
 M8 refines the existing UI: chemical actions describe their formula/sample state,

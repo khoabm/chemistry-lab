@@ -403,3 +403,14 @@ At minimum verify:
 
 Implementation details and affected source files are intentionally left to the
 M9 ExecPlan after repository inspection.
+
+## Thermometer B+ integration boundary
+
+The nominal sixfold thermal clock qualifies supported Heat in application/simulation;
+it does not accelerate M9 presentation, Replay or Auto Replay. R6 numerical energy
+is a finite prepared-batch budget, independent of result occurrence and replay clicks.
+Temperature/sensor ticks preserve contents and ReactionResult references. Experimental
+350°C/240°C single-final-result milestones do not introduce intermediate visual chemistry
+or claim measured completion. The new sensor reading is not the existing qualitative
+temperature-rise effect and never triggers a reaction. Reduced motion changes effects,
+not sample/sensor evolution. Scientific profile limits are defined in the B+ ExecPlan.

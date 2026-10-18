@@ -33,17 +33,17 @@ export interface SupportProjection {
   containerPosition: Point
 }
 
-export function projectSupport(requested: Point, type: EquipmentType, bounds: BenchBounds): SupportProjection | null {
+export function projectSupport(requested: Point, type: EquipmentType, bounds: BenchBounds, extraTop = 0): SupportProjection | null {
   if (!isContainerEquipment(type)
     || ![requested.x, requested.y, bounds.left, bounds.top, bounds.width, bounds.height].every(Number.isFinite)) return null
   const offset = supportOffset(type)
   const halfWidth = equipmentFootprint.width / 2 + clearance
   const halfHeight = equipmentFootprint.height / 2 + clearance
-  if (bounds.width < halfWidth * 2 || bounds.height < halfHeight * 2 + offset) return null
+  if (bounds.width < halfWidth * 2 || bounds.height < halfHeight * 2 + offset + extraTop) return null
   const center = equipmentCenter(requested, bounds)
   const lampCenter = {
     x: Math.max(bounds.left + halfWidth, Math.min(bounds.left + bounds.width - halfWidth, center.x)),
-    y: Math.max(bounds.top + halfHeight + offset, Math.min(bounds.top + bounds.height - halfHeight, center.y)),
+    y: Math.max(bounds.top + halfHeight + offset + extraTop, Math.min(bounds.top + bounds.height - halfHeight, center.y)),
   }
   return {
     lampPosition: projectedPosition(lampCenter, bounds),

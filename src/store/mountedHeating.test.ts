@@ -20,7 +20,7 @@ function request(s: LabWorkspaceState, index = 0) {
 const detach = (s: LabWorkspaceState) => reduce(s, { type: 'remove-from-support', containerEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-3', position: { x: 0.9, y: 0.5 } })
 
 describe('mounted-only persistent Heat', () => {
-  it('retains Mix cancellation through same-source toggles/movement but permits an explicit new support', () => {
+  it('retains thermal eligibility and result through Mix and source changes', () => {
     let state = light(light(mount(fill(setup()))), 'equipment-4')
     const id = request(state)
     state = reduce(state, { type: 'mix', equipmentId: 'equipment-1' })
@@ -28,9 +28,9 @@ describe('mounted-only persistent Heat', () => {
     const nextRequest = state.nextHeatRequestId
     for (let cycle = 0; cycle < 2; cycle++) state = light(state)
     state = reduce(state, { type: 'move-lamp-assembly', lampEquipmentId: 'equipment-3', containerEquipmentId: 'equipment-1', position: { x: 0.7, y: 0.7 } })
-    expect(state.containers[0]!.heatEvaluation.status).toBe('cancelled')
+    expect(state.containers[0]!.heatEvaluation.status).toBe('pending')
     expect(state.containers[0]!.reactionResult).toBe(result)
-    expect(state.nextHeatRequestId).toBe(nextRequest)
+    expect(state.nextHeatRequestId).toBeGreaterThan(nextRequest)
     expect(reduce(state, { type: 'evaluate-heat', equipmentId: 'equipment-1', requestId: id })).toBe(state)
     const rebound = reduce(state, { type: 'rebind-container', containerEquipmentId: 'equipment-1', fromLampEquipmentId: 'equipment-3', lampEquipmentId: 'equipment-4' })
     expect(request(rebound)).toBeGreaterThan(id)
@@ -107,7 +107,7 @@ describe('mounted-only persistent Heat', () => {
   })
   it('retains successful Heat occurrence and contents across detach/remount/movement/toggles', () => {
     const state = mount(light(fill(setup())))
-    const done = reduce(state, { type: 'evaluate-heat', equipmentId: 'equipment-1', requestId: request(state) })
+    const done = reduce(state, { type: 'advance-thermal', epoch: state.thermalEpoch, time: 400, liftedContainerId: null, liftedThermometerId: null })
     const changed = light(light(mount(detach(done))))
     expect(changed.containers[0]!.reactionResult).toBe(done.containers[0]!.reactionResult)
     expect(changed.containers[0]!.contents).toBe(done.containers[0]!.contents)

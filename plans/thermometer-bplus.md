@@ -12,8 +12,8 @@ reading from the sample temperature. The sample evolves without a thermometer.
 Supported future Heat events must depend on the sample's qualified thermal history,
 not a sensor, an animation, or a fixed waiting period. Explicit Mix remains required.
 
-Status on 2026-10-18: **conditional planning only; no implementation authorized by
-this plan**. The initial user authorization followed the GO section of
+Status on 2026-10-18: **implementation authorized on feature-thermometer; no release
+or merge into main authorized**. The initial user authorization followed the GO section of
 `THERMOMETER_BPLUS_SCIENTIFIC_APPROVAL_REVIEW.md`, supplied at
 `D:/hoctap/chemical-codex-prompts/THERMOMETER_BPLUS_SCIENTIFIC_APPROVAL_REVIEW.md`.
 The subsequent user review authorizes updating this plan on the existing
@@ -49,8 +49,9 @@ chemistry teacher's signature or experimental calibration.
 
 ## Non-goals
 
-No code, branch, commit, PR, dependency installation, milestone update, or production
-Heat change in the current task. No automatic approval of the future implementation.
+No new branch, dependency installation, milestone update, PR, release, or merge into
+main. The user now authorizes source implementation and synchronization of main into
+the existing feature branch. Scientific calibration is not implied.
 
 No new store, simulation framework, physics engine, scene graph, generic attachment
 or event system, persistence, arbitrary quantitative chemistry, fluid simulation,
@@ -64,15 +65,14 @@ power increase solely to force a reaction endpoint.
 
 ## Existing system
 
-The current branch is `feature-thermometer`, HEAD
-`e5bc4c601350866ad6ec4b3e9dc6ceaf7725a90e`, which adds this plan to the accepted
-render-polish source baseline `29497502ef6d79c280b1cce9fd3d2c4dfa79ab92`.
-Remote main is `958fa96bf6b7226885a057cb32c5a62333d85f04`: GitHub comparison
-reports feature ahead 1 / behind 3, with that render-polish commit as merge base.
-The differences are this plan on the feature side and three closeout-document
-commits on main; source is identical. Local main/origin-main refs are stale at
-`15158f9`; do not mistake their ahead-17 comparison for current remote state.
-The Git section gives the future safe synchronization procedure; no refs change here.
+Implementation started from clean feature-thermometer HEAD
+3419043bcbef2fc38047da39ef65714d77274ae2. Authorized fetch/merge incorporated
+origin/main 958fa96bf6b7226885a057cb32c5a62333d85f04, producing merge HEAD
+963e60b468060262047ab663d809321fe0409cb4. Only the three upstream documentation
+commits were merged; this ExecPlan was preserved. The original source baseline is
+render-polish 29497502ef6d79c280b1cce9fd3d2c4dfa79ab92. Existing-system bullets
+below describe that baseline; the implementation and outcomes sections supersede
+its timer/type limitations.
 
 - Root `AGENTS.md`, `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/CHEMISTRY.md`,
   `docs/UI_UX.md`, and `docs/MILESTONES.md` define the project boundaries.
@@ -126,12 +126,12 @@ The following gates are deliberately independent. Recording them is not satisfyi
 
 | Gate | Evidence and responsible reviewer | What remains blocked |
 | --- | --- | --- |
-| Implementation authorization and base synchronization | Branch feature-thermometer exists and is user-designated; separately authorize code and safe synchronization with remote main | All source implementation; branch designation itself is resolved |
+| Implementation authorization and base synchronization | Resolved: user authorized implementation; fetched and merged origin/main into feature-thermometer before source edits | No code-authorization blocker; merge into main/release remain unauthorized |
 | Product reference workflow | Owner confirms automatic ordinary aqueous defaults versus explicit R6 preparation, invalidation rules, exact disclosure, and intended release scope | Final public reference workflow and release acceptance |
-| R7 teaching identity | Chemistry teacher confirms basic copper(II) carbonate, corrected formula/equation/products, and learner copy | R7 metadata correction and scientific approval |
+| R7 teaching identity | Basic carbonate metadata/equation/products implemented under approved engineering direction; teacher confirmation remains pending | Scientific teaching sign-off and release, not a claim that source was left unchanged |
 | R7/R8 teaching policy | Teacher/product owner accept the single-final-result abstraction, proposed experimental 350°C/240°C milestones, disclosure, and temperature-only trigger below | Public use of the proposed teaching policy; no assertion of real completion at these temperatures |
 | Sensor/vessel applicability | Selected reference: Chemglass CG-3508-N-01, 25mm immersion; verify the proposed two-vessel fixtures, full bulb envelope and loading; lag remains nominal | Measurement validity claims; a release cannot silently omit Test tube |
-| Separate solid heating profile | Choose and review a bounded uncalibrated solid/apparatus curve with reachable milestones and an accepted classroom wait; keep it separate from aqueous profiles | A working R7/R8 thermal implementation; do not fill missing parameters with a timeout |
+| Separate solid heating profile | Implemented and analytically tested: Beaker C/P/K=48/96/0.24, Test tube 16/32/0.08; both have equilibrium 425°C, time constant 200s and reachable teaching milestones | Teacher/product acceptance of the nominal classroom curve; not experimental calibration |
 | Calibration claim | Compare AQ/R6/sensor parameters against appropriate experiments with reviewed tolerances | The words calibrated/validated; a disclosed nominal model does not require pretending calibration |
 | Release decision | Nominal AQ/R6/sensor and experimental single-result solid policy accepted with honest limits, or owner explicitly approves a different scope | Merge/release of the replacement Heat policy; scientific calibration is a separate claim |
 
@@ -352,6 +352,37 @@ it is not a claim made by the proposed teaching policy.
 
 ### Reference lifecycle and R6 anti-retrigger contract
 
+Implementation clarification approved for engineering by the latest request:
+R6 Prepare is a single native action on an empty container, loading the explicit
+25mL+25mL (Beaker) or 2mL+2mL (Test tube) reference recipe as qualitative display
+portions, without deriving those amounts from portions. It never prepares over a
+nonempty or reacted sample. It adds no reaction energy; only the first explicit Mix
+can consume its budget. Repeated preparation and Mix cannot replenish that budget.
+An explicit Empty ends the batch; Fill removing the last portion alone does not
+rearm preparation. Reset clears all batches with a new epoch.
+
+Retain the empty vessel's modeled temperature after Empty and cool it toward ambient.
+Reference reagents enter at declared ambient 25°C. At Prepare, calculate initial
+temperature from (m cp Ta + Cv Tv)/(m cp + Cv), where Tv is the retained vessel
+temperature, rather than resetting a warm vessel to 25°C. Fresh equipment begins at
+ambient. Unknown/inactivated sample temperature means unknown vessel temperature;
+reject quantitative preparation honestly until a fresh vessel/reset is used. These
+are explicitly nominal assumptions, not measured cooling or new quantity semantics.
+
+The revised solid teaching profile includes nominal vessel capacity plus an explicitly
+assumed 8J/K solid reference load, independent of qualitative quantities. Beaker:
+C=48J/K, P=96W, K=0.24W/K. Test tube: C=16J/K, P=32W, K=0.08W/K. Both use
+ambient 25°C and domain 20–450°C, hence T∞=425°C and τ=200s. The original
+common C=8J/K proposal was rejected because it was smaller than the Beaker vessel
+capacity 40J/K. Scaling C/P/K together preserves the same uncalibrated teaching
+curve without changing the aqueous profile or inferring a solid mass. Absorbed power
+and loss values are nominal choices, not real apparatus performance measurements.
+R7 crosses 350°C at 334.795 simulated seconds (55.80 active real seconds); R8 crosses
+240°C at 154.226 simulated seconds (25.70 real seconds). These classroom waits are
+proposed acceptance targets, not calibrated apparatus rates. Never reuse this profile
+for aqueous measurement. Unit tests must check the analytical crossings and cooling,
+and runtime must preserve one final result and honest experimental-milestone labels.
+
 Provide a small native “Chuẩn bị mẫu tham chiếu” action for the explicit R6 reference
 recipe in compatible sample details, outside the drag path. Ordinary aqueous profiles
 initialize automatically under the rules above. The explicit recipe, not portion
@@ -491,22 +522,25 @@ Keep one authoritative collection per physical relation and the existing reducer
 - Add a readonly thermometerAttachments collection with thermometerEquipmentId and
   containerEquipmentId. Enforce one-to-one eligibility, existence, no self-binding,
   and no duplication. Do not add writable reverse maps to containers or lamp mounts.
-- Add typed sample thermal state to ContainerState: unavailable-with-reason or a
-  nominal-aqueous / explicit-R6-reference / experimental-solid profile, with stable
-  sample ID, optional R6 batch identity/budget, profile ID/version, epoch/generation,
-  temperature and last simulated time. Solids need only a one-shot completion marker,
-  not intermediate hydration/progress state. Preserve an ended or
-  invalidated batch's anti-retrigger marker until the explicit sample-end boundary.
-- Store one sensor state per thermometer: current internal reading, contact/model
-  applicability, and last simulated time. Current contact is derived from relation
-  plus active lift, not another writable attachment ID on the sensor.
+- ContainerState.thermal stores kind (empty/aqueous/r6/r7/r8/unsupported), nullable
+  temperature, referenceUsed, energyRemaining, batchId and completed. The container
+  instance is the stable sample anchor; explicit R6 batches have epoch/counter IDs.
+  Kind selects the fixed v1 profile data in code; there is no mutable profile version
+  or persistence migration. Preserve invalidated batch anti-retrigger markers until
+  explicit Empty/Reset. Solids need one completion marker, not progress stages.
+- Each ThermometerState stores equipmentInstanceId and its internal reading. Current
+  contact/measurement applicability is derived from relation, sample status and active
+  lift. Unknown readings are not published as measurements. One workspace simulationTime
+  advances all samples/sensors together; no redundant per-sensor timestamp is stored.
 - Store one workspace simulation epoch/time anchor contract; the hook owns browser
   scheduling handles, not thermal truth. Keep transient placement/contact drafts in
   the existing interaction hook. Simulation functions consume plain typed snapshots.
 - Initialize an automatic eligible profile within the existing first Add transition;
   no new user action or generic initialization event framework is needed.
-- Narrow actions cover prepare-reference-batch for R6, atomic add/attach, attach/rebind,
-  detach-and-place, epoch-guarded advance-to-time, and qualified Heat completion.
+- Implemented actions are prepare-r6, add with optional attachTo, attach-thermometer
+  (including atomic rebind), detach-thermometer with free position, and advance-thermal
+  with epoch/absolute time/contact inputs. Qualified Heat completes inside the guarded
+  advance transition itself; no independent action can bypass it.
   Extend current Mix, Add, Clear, Fill/Dispense, source, and Reset transitions at their
   existing boundaries. Exact identifiers may follow local conventions.
 - Pure functions validate reference eligibility/parameters, advance sample and sensor,
@@ -519,8 +553,9 @@ positions to atomic actions as M11 already does.
 
 ## Implementation steps
 
-Implementation steps below are **pending**, not permission to begin them. Re-read all
-applicable AGENTS.md instructions and this living plan when code is authorized.
+The user authorized these engineering steps on feature-thermometer. Progress and
+actual validation below record execution; external scientific and release gates are
+not marked complete by engineering tests.
 
 1. **Close initial authorization/product gates.** Recheck feature-thermometer and remote
    main, obtain code and synchronization authorization, and preserve the plan while
@@ -599,38 +634,23 @@ animation-sync change must be small, justified, and recorded in the decision log
 
 ### Git state
 
-- Local active milestone document still names M11; remote main has later closeout
-  reconciliation. The owner designates an auxiliary feature branch, not a new milestone.
-- Current and user-designated future feature branch: **feature-thermometer**; HEAD
-  **e5bc4c601350866ad6ec4b3e9dc6ceaf7725a90e** (docs: execplan for thermometer).
-  Its upstream origin/feature-thermometer and live remote head match this SHA.
-- Local main and origin/main tracking refs: **15158f9**, stale. Local comparison is
-  ahead 17 / behind 0, which does not represent the current canonical main.
-- Live remote main from git ls-remote: **958fa96bf6b7226885a057cb32c5a62333d85f04**.
-  That object is not in the local object database. Without fetching, the read-only
-  [GitHub comparison](https://github.com/khoabm/chemistry-lab/compare/958fa96bf6b7226885a057cb32c5a62333d85f04...e5bc4c601350866ad6ec4b3e9dc6ceaf7725a90e)
-  reports divergence: **feature ahead 1 / behind 3**, merge base
-  **29497502ef6d79c280b1cce9fd3d2c4dfa79ab92**.
-- Feature-only commit adds plans/thermometer-bplus.md. Main-only commits a6e6577,
-  f87a23a, and 958fa96 update docs/M11_CLOSEOUT.md, docs/MILESTONES.md, and
-  plans/m11-dropper-transfer-material-presentation.md. Forward/reverse API comparisons
-  show no source changes on either side; this is documentation divergence.
-- Working tree before this revision: **clean**. This task changes only the existing
-  plans/thermometer-bplus.md. Recheck before implementation; do not assume later status.
-- No branch creation, commit, push, merge, history rewrite, or milestone modification
-  is included in this revision authorization. No fetch, checkout, or synchronization
-  was performed; remote checks used ls-remote and read-only GitHub API comparison.
-
-Safe synchronization **for later separately authorized work**, not commands to run now:
-preserve this plan revision through a user-approved commit or other explicitly agreed
-preservation method first; inspect status and verify feature-thermometer. Fetch origin
-when authorized and compare origin/main...HEAD again, since main may have moved.
-For this already published feature branch, prefer a normal merge of origin/main
-after explicit merge authorization, preserving its history; do not rebase/force-push it
-by default. Review any conflict in the plan and current-contract docs without rewriting
-historical milestones, verify accepted Heat contracts and tree scope, then re-record
-base/HEAD and run required validation when source implementation starts. Do not reset
-the branch or use stale local main as the implementation base.
+- User-designated branch: **feature-thermometer**. No new branch or milestone created.
+- Starting HEAD: **3419043bcbef2fc38047da39ef65714d77274ae2**, clean working tree.
+  The preceding review had observed e5bc4c6; the user's later plan revision commit
+  was already present at implementation start and was not overwritten.
+- Authorized git fetch origin refreshed the previously stale tracking refs. Before
+  merge the feature had two plan commits and lacked three main documentation commits.
+- Authorized git merge --no-edit origin/main produced **963e60b468060262047ab663d809321fe0409cb4**,
+  incorporating **958fa96bf6b7226885a057cb32c5a62333d85f04**. The changes from main
+  were only docs/M11_CLOSEOUT.md, docs/MILESTONES.md and
+  plans/m11-dropper-transfer-material-presentation.md. No conflict or lost plan.
+- After synchronization origin/main...HEAD is **behind 0 / ahead 3** (two plan commits
+  plus this merge). Source implementation and current docs remain uncommitted for review.
+- Initial sandbox permissions prevented writing .git/FETCH_HEAD and ORIG_HEAD. The
+  first attempts failed without changing HEAD; approved elevated fetch/merge succeeded.
+  No reset, rebase, force-push, push, PR, merge into main, release or milestone advance.
+- Future synchronization must recheck status/remote state and preserve the existing
+  plan/source changes. Do not use stale local main or rewrite published feature history.
 
 ### Existing technology stack
 
@@ -744,11 +764,18 @@ do not weaken assertions, silently skip tests, or increase timeouts without evid
 Inspect the entire diff for prohibited scope and missing scientific gates. Update
 current docs only for delivered behavior. No hosted CI claim without an actual run.
 
-For this **plan-only task**, verify required heading order, checkboxes confined to
-Progress, whitespace, scientific blockers, branch/HEAD preservation, and a diff/status
-limited to this file. Runtime tests are not run or claimed for unchanged source.
+The earlier plan-only checks are historical. During authorized implementation verify
+required section order, checkboxes only in Progress, diff whitespace/scope, scientific
+limits, and current feature branch. Run runtime validation and browser QA as below.
 
 ## Progress
+
+- [x] Receive explicit implementation authorization and merge three main documentation commits safely (merge HEAD 963e60b468060262047ab663d809321fe0409cb4); plan preserved.
+- [x] Specify empty-vessel R6 preparation, energy-conserving nominal initial temperature and one-shot budget; propose and calculate reachable nominal solid parameters.
+- [x] Implement pure analytical sample/sensor model and R6 lifecycle; initial focused validation: 10 tests passed.
+- [x] Implement independent thermometer relation, SVG, bulb-aware placement, pointer cancellation, native/keyboard pickup and assembly projection/bounds; focused interaction/clock validation: 19 tests passed.
+- [x] Replace production 2000ms dispatch path with one sixfold thermal clock, hidden pause/no catch-up and qualified single-result Heat; legacy evaluate-heat is an explicit no-op for stale callbacks.
+- [x] Complete full automated regression (531 tests / 42 files), real-browser viewport QA and current-contract documentation; release/scientific gates remain open.
 
 - [x] Read the supplied approval review and repository planning/instruction contracts.
 - [x] Inspect the accepted source baseline, actual stack, mounting/Heat/interaction boundaries.
@@ -756,22 +783,50 @@ limited to this file. Runtime tests are not run or claimed for unchanged source.
 - [x] Validate this plan's structure, whitespace, and final change scope.
 - [x] Verify existing feature-thermometer branch, clean starting status, and live main divergence without changing refs.
 - [x] Revise automatic AQ workflow, short-immersion two-vessel proposal, and experimental single-final-result R7/R8 policy.
-- [ ] Obtain code/synchronization authorization and product workflow/release confirmation.
+- [x] Obtain code/synchronization authorization; release approval remains separate.
 - [ ] Validate selected reference sensor's full fit/loading/lag and both proposed vessel fixtures.
 - [ ] Obtain teacher confirmation of R7 identity, R8 final outcome, and experimental 350°C/240°C teaching convention.
-- [ ] Select/review separate nominal solid-curve parameters, reachability and acceptable classroom wait.
-- [ ] Implement and test pure nominal AQ/R6/sensor models and lifecycle invariants.
-- [ ] Implement atomic sensor relations, geometry, accessible controls, and assembly bounds.
-- [ ] Replace Heat orchestration on the authorized development branch with one coherent policy.
-- [ ] Complete scientific qualification, regression validation, browser QA, and current-doc updates.
-- [ ] Prepare an evidence-backed implementation review without advancing a milestone.
+- [x] Select and analytically verify nominal solid-curve parameters and classroom waits; teacher acceptance remains pending.
+- [x] Implement and test pure nominal AQ/R6/sensor models and lifecycle invariants.
+- [x] Implement atomic sensor relations, geometry, accessible controls, and assembly bounds.
+- [x] Replace Heat orchestration on the authorized development branch with one coherent policy.
+- [ ] Complete external scientific qualification and release sign-off (engineering validation recorded separately).
+- [x] Prepare evidence-backed engineering review without advancing a milestone or releasing.
 
 ## Surprises and discoveries
 
+- Nominal solid capacity 8J/K was smaller than the Beaker vessel assumption 40J/K.
+  It was corrected to vessel capacity plus an explicit nominal 8J/K solid load:
+  Beaker C/P/K=48/96/0.24 and Test tube 16/32/0.08. All maintain τ=200s and
+  equilibrium 425°C. These are chosen educational parameters, not fabricated measurements.
+- Prepare R6 is restricted to empty known-temperature vessels. Warm-vessel energy
+  balance and immediate out-of-domain invalidation after R6 energy release are pure
+  simulation functions. A newly loaded aqueous sample also accounts for retained
+  vessel temperature. Unknown histories never silently reset to 25°C.
+- Keyboard target feedback updates only on target/eligibility changes. A separate
+  thermometer palette preview now uses the same fixed SVG slot as the committed
+  equipment, avoiding a preview/contact offset without changing other palette types.
+
+- The first full migration run reported 51 failed / 471 passed tests. Most failures
+  asserted the deliberately replaced fixed timer, whole-container reference identity
+  despite changing temperature, automatic Heat no-reaction for aqueous samples, or
+  four palette items. Expectations were migrated to temperature qualification while
+  preserving contents/result/payload identity and existing interaction assertions.
+- Browser QA found native pickup was cancelled by the browser scrolling the focused
+  thermometer into view. Keyboard drafts now re-anchor their viewport coordinates to
+  the bench on scroll; pointer drafts cancel. No reducer relation is changed by this.
+- Thermometer labels extend 36px above the button. Bounds now include that visible
+  extension, rather than validating only the original equipment rectangle.
+- Two new focused implementation files beyond the initial list are
+  src/store/thermalLifecycle.ts (application orchestration of pure sample/sensor
+  evolution) and tests/thermal.ts (test-only rounded teaching wait). Neither introduces
+  an event framework, another store, or a production timeout.
+
 - AQ lamp power/loss assumptions imply finite asymptotic limits, 58.33°C and 45°C;
   acceleration cannot make an otherwise unreachable thermal condition occur.
-- The current green R7 sample is named/formulated as CuCO₃; the approved scientific
-  direction is basic carbonate. Data cannot be borrowed across those identities.
+- The original green R7 sample was named/formulated as CuCO₃; implementation now
+  uses the approved basic carbonate identity under the same stable chemical ID.
+  Data cannot be borrowed across those identities.
 - R8's anhydrous final product is stronger than an initial color-change observation.
   The latest review chooses one pedagogical final outcome, not a 99% extent model.
 - A 25mm-immersion design reference and a declared 12mm-bore Test tube provide a
@@ -779,9 +834,10 @@ limited to this file. Runtime tests are not run or claimed for unchanged source.
   physical fit or sensor perturbation. A positive Test tube workflow is mandatory.
 - Existing per-container waiting guards are useful regression references, but residual
   thermal energy cannot be modeled by simply renaming the 2000ms timer.
-- feature-thermometer adds one plan commit but lacks three remote main documentation
-  commits. Local main/origin-main are older still. Read-only API comparison was needed
-  because the live main SHA is absent from the local object database; no fetch occurred.
+- At the plan-only review, feature-thermometer lacked three remote main documentation
+  commits and a read-only API comparison was needed. Subsequent implementation
+  authorization allowed fetch and merge; merge 963e60b now contains those commits
+  without losing the ExecPlan. This earlier divergence is no longer outstanding.
 
 ## Decision log
 
@@ -798,28 +854,81 @@ limited to this file. Runtime tests are not run or claimed for unchanged source.
 | 2026-10-18, user revision | Auto-select a disclosed fixed AQ profile for a fresh single allowlisted solution; retain explicit preparation for R6 energy | Ordinary measurement must not require a recipe flow; qualitative quantities cannot become physical amounts |
 | 2026-10-18, user revision | Select CG-3508-N-01 and propose compatible Beaker/Test tube fixtures; require both positive workflows | Short immersion addresses the prior 76mm/4mL mismatch without silently deleting Test tube support |
 | 2026-10-18, user revision | Keep feature-thermometer; describe future authorized fetch/merge synchronization but execute neither | Preserve the existing published branch and the user's plan-only scope |
+| 2026-10-18, implementation authorization | Fetch and merge origin/main into feature-thermometer; preserve the ExecPlan and leave source changes uncommitted | The user explicitly approved safe synchronization and implementation; merge 963e60b has no missing origin/main commits |
+| 2026-10-18, implementation | Use solid-reference C/P/K of 48/96/0.24 for Beaker and 16/32/0.08 for Test tube | Include nominal vessel capacity while preserving the proposed 425°C asymptote and 200 simulated-second time constant; these remain uncalibrated teaching assumptions |
+| 2026-10-18, implementation | Prepare R6 only in an eligible empty known-temperature vessel; retain vessel heat and spend the budget even if the resulting temperature leaves the supported domain | Preparation must not reset thermal history or allow repeated Mix to manufacture energy; out-of-domain readings become explicitly unavailable |
+| 2026-10-18, browser verification | Preserve native Prepare focus with aria-disabled; return Remove focus to Pickup; re-anchor keyboard drafts on scroll | Real-browser focus and scrolling exposed issues that automated geometry alone did not show; pointer scroll cancellation remains intact |
+| 2026-10-18, final validation | Record 531 passing tests in 42 files and three actual browser viewport checks; retain external scientific and release gates | Engineering evidence supports review, not experimental calibration, physical-device certification or milestone approval |
 
 ## Outcomes and retrospective
 
-The current deliverable is the **revised existing ExecPlan** on feature-thermometer,
-not a thermometer implementation or an approved scientific calibration. Plan validation
-passed required section order, checkbox placement, whitespace, and single-file scope;
-git diff --check passed. The existing attachment/accessibility, single-policy Heat
-migration, and technology-stack sections were compared against HEAD and are unchanged.
-Branch/HEAD remained unchanged. No runtime test, build, or application browser QA
-is claimed for this document-only revision. Manufacturer web research and read-only
-GitHub comparison are evidence gathering, not application QA.
-No production Heat change, branch, dependency, commit, PR, merge, or milestone
-advancement is part of this task. Implementation, runtime validation, browser QA,
-teacher evidence, and release acceptance remain pending.
-Record actual outcomes here as authorized work proceeds; do not replace missing
-scientific evidence with passing automated tests.
+Engineering implementation is delivered on feature-thermometer for user review.
+React/TypeScript, useReducer, the reaction matcher, M11 lamp mounts/Dropper, M9 finite
+presentation and Replay remain structurally intact. No dependency, store, physics
+engine, scene graph, generic event system or new reaction was introduced. The R7
+material identity/equation/products are corrected under stable IDs. No simulation
+React/DOM imports or chemical validity decisions in rendering were introduced.
 
-Planning readiness: **7/10 overall**, with a localized engineering design ready for
-review and no need for project redesign. Remaining decisions are: teacher/product
-acceptance of the experimental single-result milestones and R7 identity/copy; actual
-nominal solid C/P/K/range and acceptable wait; confirmation of the automatic AQ
-allowlist/assumptions and R6 preparation workflow; and full sensor/fixture fit plus
-disclosed non-invasive/lag approximations. Experimental calibration is required only
-for a calibrated claim. Code and safe base synchronization still require separate
-authorization. Do not describe the feature or the scientific validation as complete.
+Delivered: nominal independent sample/sensor evolution; 6x hidden-pausing clock;
+automatic ordinary aqueous profiles; explicit one-shot R6 preparation/budget; Celsius
+SVG; bulb-aware valid-drop attach/rebind/free detach; stable sibling equipment;
+pointer cancellation and stale-release protection; full lamp/container/sensor bounds;
+native click/tap and keyboard pickup/Arrow/Shift/drop/cancel; meaningful quiet feedback;
+working declared Beaker and Test tube measurement; one temperature-qualified Heat path
+for experimental single-final R7/R8 milestones. Legacy evaluate-heat cannot bypass it.
+
+Validation evidence on 2026-10-18: full npm test -- --maxWorkers=2 passed 531 tests
+in 42 files; typecheck, lint and build passed. Focused stages included 10 pure/model
+lifecycle tests, 19 interaction/clock tests and a later 23-test thermal/keyboard set.
+The first 51-failure migration run and subsequent obsolete timer/copy expectations
+were investigated; no timeout increase or test skipping was used. Exact result,
+contents and Dropper identity checks remain; obsolete whole-container-reference
+expectations were replaced where temperature now necessarily changes. Last scoped
+preview/copy changes passed 43 affected UI tests; additional container-detach focus
+assertions passed 11 thermometer tests, and native Remove focus passed a 21-test UI set.
+The final full validation also includes these corrections.
+No hosted CI claim: nothing was pushed.
+
+Actual browser QA used the existing in-app browser with viewport overrides (not
+physical devices):
+
+| Viewport | Observed evidence |
+| --- | --- |
+| 1440×960 | Positive Beaker and Test tube insertion/reading, native pickup and atomic rebind; actual pointer rebind by bulb; actual pointer lamp-assembly drag carrying the container/sensor; R6 Prepare/Mix nominal rise with a lagging sensor; natural R7/R8 single final products, Replay and Auto Replay; dialog focus return; Dropper Fill, loaded Arrow/Shift movement and Dispense retained one qualitative unit without Mix; palette thermometer drag created/attached a new instance |
+| 390×844 | Beaker and Test tube positive liquid measurement, Enter/Escape, native click rebind after scroll, EN→VI retained attachment/reading, readable long instructions, no horizontal overflow by DOM dimensions |
+| 844×390 | VI target/focus/cancel, readable two-vessel scene, expanded palette after deep scrolling is position:static and above the visible bench (palette bottom −18.56px, bench top 74.24px), no horizontal overflow |
+
+Screenshots were saved outside the repository in
+C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/:
+thermometer-beaker-desktop.png, thermometer-tube-desktop.png,
+thermometer-tube-assembly-desktop.png, thermometer-beaker-portrait.png,
+thermometer-tube-portrait-vi.png, thermometer-landscape-vi.png and
+thermometer-r7-r8-final.png and thermometer-final-desktop.png. Full-page captures were used for portrait because the
+browser's viewport wrapper capture was scaled incorrectly; DOM viewport dimensions
+and the direct screenshot API confirmed the intended responsive layout.
+The tool provides complete drag gestures; no visual mid-drag capture is claimed.
+Draft-only state is covered by reducer-backed tests. Native Remove returned focus to Pickup on the real browser; Prepare R6 retained focus
+with aria-disabled after preparing and did not automatically Mix. The viewport override
+was reset and a clean two-equipment VI example was left open for review.
+No physical touch-device,
+assistive screen-reader certification or browser reduced-motion emulation was done;
+existing automated reduced-motion/Replay regressions passed.
+
+Remaining limits: profiles, lag, sensor non-invasive loading and vessel dimensions
+are explicit nominal assumptions, not experimental calibration. Ordinary measurement
+v1 covers one fresh allowlisted dilute solution; later Add/Fill/Dispense and unsupported
+mixtures invalidate numerical history, with honest unavailable readings. Only an
+explicit new eligible reference batch can supply R6 energy. Empty/unsupported samples
+may retain a physical sensor relation but never show a valid liquid measurement;
+high-temperature solids cannot be measured by this thermometer. Hardware immersion,
+loading/lag and THCS teaching-content acceptance still require the teacher/product
+review recorded in the gate table. There is no multistage dehydration, kinetic rate,
+boiling model, universal threshold or claim that a real alcohol lamp is calibrated.
+
+README.md, docs/ARCHITECTURE.md, docs/CHEMISTRY.md, docs/UI_UX.md and
+REACTION_DYNAMICS.md describe the branch's current contract; historical milestone
+plans/closeout documents were not rewritten by implementation. HEAD remains the
+explicitly authorized synchronization merge 963e60b; source/doc changes are uncommitted.
+No push, PR, merge into main, official milestone completion, release or deployment.
+The implementation is ready for technical user review; scientific/release approval
+is deliberately separate and remains pending.

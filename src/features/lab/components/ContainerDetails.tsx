@@ -22,9 +22,10 @@ interface ContainerDetailsProps {
   presentation?: ReactionPresentation | undefined
   visible?: boolean
   mountControls?: ReactNode
+  thermalDetails?: ReactNode
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails }: ContainerDetailsProps) {
   const { t } = useTranslation()
   const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
@@ -64,6 +65,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
       </div>
       {container.contents.length > 0 && <p id="empty-container-hint" className="empty-caption">{t('sample.emptyHint')}</p>}
       {mountControls}
+      {thermalDetails}
       {container.contents.length > 0 && <figure className="sample-closeup" aria-label={t('sample.closeup')}>
         <button type="button" disabled={disabled} aria-label={t('sample.enlarge')} aria-haspopup="dialog"
           onClick={onEnlarge}>

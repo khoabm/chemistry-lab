@@ -63,7 +63,7 @@ describe('M2 chemical and container interactions', () => {
     // A keyboard-generated native button click has detail 0.
     fireEvent.click(liquid, { detail: 0 })
     fireEvent.click(liquid)
-    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Basic copper(II) carbonate' }))
     const contents = screen.getByRole('list', { name: 'Container contents' })
     expect(within(contents).getByText('2 units · Solution')).toBeInTheDocument()
     expect(within(contents).getByText('1 unit · Solid')).toBeInTheDocument()
@@ -81,7 +81,7 @@ describe('M2 chemical and container interactions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Silver nitrate' }))
     fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
     expect(screen.getByText(/This container is empty/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Basic copper(II) carbonate' }))
     const tube = screen.getByRole('button', { name: 'Test tube 1' })
     expect(tube.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
     const tubeClip = tube.querySelector('clipPath')?.id
@@ -93,7 +93,7 @@ describe('M2 chemical and container interactions', () => {
     expect(beaker.querySelector('[data-content-state]')).not.toBeInTheDocument()
     expect(tube.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
     fireEvent.click(tube)
-    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText(/Copper\(II\) carbonate/)).toBeInTheDocument()
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText(/[Cc]opper\(II\) carbonate/)).toBeInTheDocument()
   })
 
   it('retains separate starting substances without gas or reaction output, and resets all contents', () => {
@@ -239,7 +239,7 @@ describe('M5 alcohol lamp interaction', () => {
     expect(sample).toHaveAccessibleDescription(expect.stringContaining('Heating over a lit alcohol lamp.'))
     expect(within(sample).getByText('Heating', { exact: true })).toBeVisible()
     expect(within(bench()).getAllByText('Heating', { exact: true })).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Basic copper(II) carbonate' }))
     expect(sample.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', '#609d73')
     expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
     expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()
