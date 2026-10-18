@@ -246,3 +246,29 @@ Known intentionally deferred work:
 - liquid slosh/fluid physics
 - 3D visualization
 - any additional loaded-Dropper visual emphasis unless future feedback justifies it
+
+
+## M11 render-polish integration — 2026-10-18
+
+The user reviewed and accepted the visual/interaction changes on auxiliary branch
+`M11-render-polish`. That branch was fast-forwarded into `M11` from the original
+reviewed product baseline `06607c67913c55cc61554ae78e7348d89c10a2c6`, through
+render-polish commit `29497502ef6d79c280b1cce9fd3d2c4dfa79ab92`.
+
+The auxiliary ExecPlan `plans/m11-render-polish.md` records its implementation,
+validation, decisions and browser QA. It supersedes the original M11 heating-zone
+interaction with **mounted-only heating**: a Beaker/Test tube mounts to one alcohol
+lamp support, with an explicit application-state relationship as sole source of Heat.
+Direct equipment dragging, assembly movement, detach/rebind, native Mount/Remove
+controls, and per-container lift/timer behavior were implemented. The registered
+R1–R8 chemistry and Mix/Dropper boundaries remain unchanged.
+
+Documentation now follows the delivered mounted-only contract in `README.md`,
+`docs/UI_UX.md` and `docs/ARCHITECTURE.md`; earlier heating-zone language in the
+original M11 plan/closeout above remains **historical implementation-stage context**.
+The auxiliary branch's final hosted CI on `29497502...` passed Typecheck, Lint,
+**518 tests across 37 files**, and Build (run `39090561234`). The user also
+confirmed actual UI QA was completed. No further loaded-Dropper visual emphasis was
+requested; future visual changes remain evidence-driven.
+
+Milestone merge to `main` is tracked separately from the auxiliary fast-forward.
