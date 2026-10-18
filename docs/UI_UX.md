@@ -435,6 +435,9 @@ R7/R8 each show one final result at experimental teaching milestones 350°C/240�
 these are uncalibrated conventions, not universal reaction/completion thresholds.
 Black CuO and anhydrous CuSO4 remain final states, with finite M9 effects and Replay.
 No multistage dehydration or fixed 2000ms fallback is used.
+After qualification, committed temperature stops at 350°C/240°C while powered.
+Loss of power still cools the sample; reheating approaches the same cap without
+repeating the result. This disclosed classroom convention is not a physical maximum.
 
 Ordinary fresh single allowlisted aqueous solutions can be measured immediately
 using disclosed nominal vessel defaults, without Prepare. No portion unit becomes
@@ -444,9 +447,11 @@ vessel supplies a reference acid/base recipe; Mix releases a finite budget once.
 It does not reset a warm vessel to ambient or rearm a spent nonempty batch.
 
 An independent glass-liquid thermometer has a Celsius scale and lagging sensor
-reading. Drag its bulb into eligible liquid for a subtle target and snapped preview;
+reading. Drag its bulb into a compatible vessel for a subtle target and snapped preview;
 release alone commits attachment. One sensor per container. Drag out to detach or
-into another available liquid to rebind. Attached sensors follow containers and
+into another available vessel to rebind. Empty, unsupported and solid samples permit
+attachment but not a numerical liquid measurement. Empty/solid poses hang above
+the material bed; liquid-only contents retain immersion clearance. Attached sensors follow containers and
 lamp assemblies, preserving independent focus and SVG identity. Both Beaker and
 Test tube support the declared 25mm-immersion reference configuration. Do not imply
 that the SVG proves physical calibration or that this device measures heated solids.
@@ -458,6 +463,14 @@ scroll re-anchors keyboard drafts; pointer scroll/resize/blur/hidden/capture los
 cancels without changing committed attachment. Invalid/occupied targets retain it.
 Reading changes are not an aria-live stream. EN/VI disclose nominal assumptions and
 experimental milestones. Sensor lag is preserved at reaction trigger time.
+Thermometers expose a 44×44px upper grip and narrow stem target; transparent wrapper
+areas do not intercept vessel clicks. Vessel labels remain selectable, sensor labels
+and readings are stacked above the grip, and Heating sits beside mounted vessels.
+Shared assembly headroom prevents resize/content-change clipping. Palette dragging
+hides empty-bench artwork after the threshold and shows one stable instruction
+outside the bench; preview contains only visual/name. Cancel/invalid drop restores
+the empty introduction without adding equipment. Target feedback changes only on
+eligibility transitions, not pointer coordinates.
 The solid details panel shows current simulated temperature separately from the
 fixed teaching milestone, explicitly excluding liquid-thermometer measurement.
 Unsupported samples explain how Empty plus a retained cooling vessel estimate can

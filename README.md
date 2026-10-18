@@ -160,14 +160,24 @@ lift/unmount stops power while residual heat cools. R7/R8 each produce one final
 result at experimental uncalibrated 350°C/240°C teaching milestones, not universal
 reaction thresholds. No fixed 2000ms fallback or general kinetics is used. Completed
 results and M9 finite effects/Replay retain their existing identity and timing.
+After qualification, powered sample temperature is capped at its teaching milestone;
+it cools without power and reheats only toward that same cap, without another result.
+This is a classroom convention, not a physical maximum or a changed model domain.
 
 A glass-liquid thermometer is independent equipment with its own lagging reading.
-Drag its bulb into eligible liquid to preview/attach; drag out to detach or rebind.
+Drag its bulb into a compatible Beaker/Test tube to preview/attach; drag out to detach
+or rebind. Empty, unsupported and solid samples also allow physical attachment;
+only supported aqueous/R6 samples provide a liquid measurement. Empty/solid vessels
+use a hanging pose clear of the sample bed, walls and bottom.
 It follows its Beaker/Test tube and lamp assembly. Enter/Arrows/Shift/Escape support
 keyboard pickup/drop; native pickup then click/tap and Remove provide alternatives.
 Both vessels support the declared short-immersion reference configuration. Empty,
 solid-only and unknown/changed samples explain unavailable readings. This liquid
 thermometer does not measure R7/R8 solids.
+Use the upper 44px grip or narrow stem to select/drag the thermometer; vessel bodies
+and labels remain independent selection targets. Assembly clearances include the
+sensor information through resizing. Palette drag hides the empty introduction and
+uses one external drop instruction; the preview contains only equipment and name.
 
 A fresh single allowlisted aqueous solution automatically uses disclosed fixed
 nominal load/heat-capacity defaults without Prepare. Quantities remain qualitative,

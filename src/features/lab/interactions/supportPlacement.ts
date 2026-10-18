@@ -1,10 +1,10 @@
-import { fitFreeSample, sensorExtension } from './thermometerPlacement'
+import { fitFreeSample, fitFreeThermometer, thermometerClearances, workspacePositions } from './thermometerPlacement'
 import type { LabWorkspaceAction, LabWorkspaceState } from '../../../store/labWorkspace'
 import { findContainerMount, findLampMount, getMountTargetIssue } from '../../../store/mounting'
 import type { Point } from '../../../types/equipment'
 import { isContainerEquipment } from '../../../types/container'
 import { benchPosition, equipmentFootprint, type BenchBounds } from './workspaceGeometry'
-import { equipmentCenter, mountedPositions, projectSupport, resolveSupportTarget, type SupportDropTarget } from './supportGeometry'
+import { equipmentCenter, projectSupport, resolveSupportTarget, type SupportDropTarget } from './supportGeometry'
 
 export interface SupportDragPlacement {
   position: Point
@@ -22,7 +22,8 @@ export function prepareSupportMount(state: LabWorkspaceState, containerEquipment
   if (!container || !lamp) return null
   const current = findContainerMount(state.mounts, containerEquipmentId)
   if (current?.lampEquipmentId === lampEquipmentId) return null
-  const projection = projectSupport(lamp.position, container.equipmentType, bounds, sensorExtension(state, containerEquipmentId))
+  const extra = thermometerClearances(state).get(containerEquipmentId)
+  const projection = projectSupport(lamp.position, container.equipmentType, bounds, extra?.top, extra?.side)
   if (!projection) return null
   return current ? { type: 'rebind-container', containerEquipmentId, fromLampEquipmentId: current.lampEquipmentId,
     lampEquipmentId, lampPosition: projection.lampPosition }
@@ -45,7 +46,7 @@ function prepareRemovalAt(state: LabWorkspaceState, containerEquipmentId: string
   if (issue) return { issue: issue === 'invalidLamp' ? 'invalidLamp' : 'invalidContainer', action: null }
   if (![bounds.left, bounds.top, bounds.width, bounds.height].every(Number.isFinite)
     || bounds.width <= equipmentFootprint.width || bounds.height <= equipmentFootprint.height) return { issue: 'noRoom', action: null }
-  const position = mountedPositions(state, bounds).get(containerEquipmentId)
+  const position = workspacePositions(state, bounds).get(containerEquipmentId)
   if (!position) return { issue: 'invalidContainer', action: null }
   const center = equipmentCenter(position, bounds)
   const candidate = fitFreeSample(state, containerEquipmentId, benchPosition({ x: center.x + offset.x, y: center.y + offset.y }, bounds), bounds)
@@ -57,7 +58,7 @@ function prepareRemovalAt(state: LabWorkspaceState, containerEquipmentId: string
   // Classify the final free workspace, including any source support projection
   // change after removal. This is a draft query, never a committed detach/undo.
   const detached = { ...state, mounts: state.mounts.filter((mount) => mount !== current) }
-  if (resolveSupportTarget(detached, containerEquipmentId, placed, bounds).kind !== 'free-bench') return { issue: 'noRoom', action: null }
+  if (resolveSupportTarget(detached, containerEquipmentId, placed, bounds, thermometerClearances(state)).kind !== 'free-bench') return { issue: 'noRoom', action: null }
   return { issue: null, action: { type: 'remove-from-support', containerEquipmentId,
     lampEquipmentId: current.lampEquipmentId, position: candidate, ...(selectContainer ? { selectContainer } : {}) } }
 }
@@ -78,7 +79,8 @@ function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds
   const assembly = findLampMount(state.mounts, id)
   if (assembly) {
     const type = state.equipment.find((item) => item.id === assembly.containerEquipmentId)?.equipmentType
-    const projection = type ? projectSupport(position, type, bounds, sensorExtension(state, assembly.containerEquipmentId)) : null
+    const extra = thermometerClearances(state).get(assembly.containerEquipmentId)
+    const projection = type ? projectSupport(position, type, bounds, extra?.top, extra?.side) : null
     return { position: projection?.lampPosition ?? position, valid: projection !== null,
       ...(!projection ? { target: { kind: 'invalid' as const, reason: 'assembly-too-large' as const } } : {}),
       action: projection ? { type: 'move-lamp-assembly', lampEquipmentId: id,
@@ -87,7 +89,7 @@ function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds
   if (!instance || !isContainerEquipment(instance.equipmentType)) {
     return { position, valid: true, action: { type: 'move', id, position } }
   }
-  const target = resolveSupportTarget(state, id, center, bounds)
+  const target = resolveSupportTarget(state, id, center, bounds, thermometerClearances(state))
   const current = findContainerMount(state.mounts, id)
   if (target.kind === 'invalid') return { position, valid: false, action: null, target }
   if (target.kind === 'free-bench') {
@@ -100,7 +102,8 @@ function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds
   }
   const prepared = prepareSupportMount(state, id, target.lampEquipmentId, bounds)
   if (target.kind !== 'same-support' && !prepared) return { position, valid: false, action: null }
-  const fittedSupport = projectSupport(target.projection.lampPosition, instance.equipmentType, bounds, sensorExtension(state, id))
+  const extra = thermometerClearances(state).get(id)
+  const fittedSupport = projectSupport(target.projection.lampPosition, instance.equipmentType, bounds, extra?.top, extra?.side)
   if (!fittedSupport) return { position, valid: false, action: null }
   return { position: fittedSupport.containerPosition, valid: true, target,
     lampDraft: { id: target.lampEquipmentId, position: fittedSupport.lampPosition },
@@ -109,13 +112,14 @@ function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds
 
 function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds: BenchBounds): LabWorkspaceAction | null {
   if (bounds.width <= equipmentFootprint.width || bounds.height <= equipmentFootprint.height) return null
-  const position = mountedPositions(state, bounds).get(id)
+  const position = workspacePositions(state, bounds).get(id)
   if (!position) return null
   const requested = { x: position.x + delta.x, y: position.y + delta.y }
   const assembly = findLampMount(state.mounts, id)
   if (assembly) {
     const type = state.equipment.find((item) => item.id === assembly.containerEquipmentId)?.equipmentType
-    const projection = type ? projectSupport(requested, type, bounds, sensorExtension(state, assembly.containerEquipmentId)) : null
+    const extra = thermometerClearances(state).get(assembly.containerEquipmentId)
+    const projection = type ? projectSupport(requested, type, bounds, extra?.top, extra?.side) : null
     return projection ? { type: 'move-lamp-assembly', lampEquipmentId: id,
       containerEquipmentId: assembly.containerEquipmentId, position: projection.lampPosition } : null
   }
@@ -126,7 +130,8 @@ function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds
     x: Math.sign(delta.x) * removalClearance.x + delta.x * (bounds.width - equipmentFootprint.width),
     y: Math.sign(delta.y) * removalClearance.y + delta.y * (bounds.height - equipmentFootprint.height),
   }, true).action
-  const fitted = fitFreeSample(state, id, requested, bounds)
+  const fitted = state.equipment.find((item) => item.id === id)?.equipmentType === 'thermometer'
+    ? fitFreeThermometer(requested, bounds) : fitFreeSample(state, id, requested, bounds)
   return fitted ? { type: 'move', id, position: fitted } : null
 }
 

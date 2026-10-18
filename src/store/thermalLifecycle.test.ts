@@ -16,6 +16,36 @@ function heated(state: LabWorkspaceState) {
 }
 
 describe('thermal application lifecycle', () => {
+  it.each([['copper-carbonate', 350], ['copper-sulfate-pentahydrate', 240]] as const)('caps completed %s across large ticks, cooling and reheating without a new result', (chemicalId, marker) => {
+    let state = heated(reduce(vessel(), { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId, quantity: 1 }))
+    state = advance(state, 10000)
+    expect(state.containers[0]!.thermal.temperature).toBe(marker)
+    const result = state.containers[0]!.reactionResult
+    expect(result?.status).toBe('reaction')
+    state = advance(state, 10000)
+    expect(state.containers[0]!.thermal.temperature).toBe(marker)
+    expect(state.containers[0]!.reactionResult).toBe(result)
+    state = advance(state, 60, 'equipment-1')
+    expect(state.containers[0]!.thermal.temperature).toBeLessThan(marker)
+    state = advance(state, 10000)
+    expect(state.containers[0]!.thermal.temperature).toBe(marker)
+    expect(state.containers[0]!.reactionResult).toBe(result)
+    state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-2' })
+    state = advance(state, 60)
+    expect(state.containers[0]!.thermal.temperature).toBeLessThan(marker)
+    state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-2' })
+    state = advance(state, 10000)
+    expect(state.containers[0]!.thermal.temperature).toBe(marker)
+    expect(state.containers[0]!.reactionResult).toBe(result)
+    state = reduce(state, { type: 'remove-from-support', containerEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-2', position: { x: 0.2, y: 0.4 } })
+    state = advance(state, 60)
+    expect(state.containers[0]!.thermal.temperature).toBeLessThan(marker)
+    expect(state.containers[0]!.reactionResult).toBe(result)
+    state = reduce(state, { type: 'mount-container', containerEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-2' })
+    state = advance(state, 10000)
+    expect(state.containers[0]!.thermal.temperature).toBe(marker)
+    expect(state.containers[0]!.reactionResult).toBe(result)
+  })
   it.each(['beaker', 'test-tube'] as const)('prepares a new %s R6 batch after Clear with cooled vessel history, never a renewed old budget', (type) => {
     let state = reduce(vessel(type), { type: 'prepare-r6', equipmentId: 'equipment-1' })
     const oldBatch = state.containers[0]!.thermal.batchId

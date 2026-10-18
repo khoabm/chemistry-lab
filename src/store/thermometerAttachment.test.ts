@@ -2,6 +2,22 @@ import { describe, expect, it } from 'vitest'
 import { createLabWorkspaceState, labWorkspaceReducer as reduce } from './labWorkspace'
 
 describe('independent sensor state and atomic relation policy', () => {
+  it.each(['beaker', 'test-tube'] as const)('attaches to empty, supported, unsupported and solid %s samples without changing thermal state', (equipmentType) => {
+    for (const sample of ['empty', 'aqueous', 'r6', 'unsupported', 'r7', 'r8'] as const) {
+      let state = reduce(createLabWorkspaceState(), { type: 'add', equipmentType, position: { x: 0.5, y: 0.5 } })
+      if (sample === 'r6') state = reduce(state, { type: 'prepare-r6', equipmentId: 'equipment-1' })
+      else if (sample !== 'empty') {
+        const chemicalId = sample === 'r7' ? 'copper-carbonate' : sample === 'r8' ? 'copper-sulfate-pentahydrate' : 'sodium-chloride'
+        state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId, quantity: 1 })
+        if (sample === 'unsupported') state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'copper-sulfate', quantity: 1 })
+      }
+      state = reduce(state, { type: 'add', equipmentType: 'thermometer', position: { x: 0.2, y: 0.3 } })
+      const container = state.containers[0]
+      state = reduce(state, { type: 'attach-thermometer', thermometerId: 'equipment-2', containerId: 'equipment-1' })
+      expect(state.thermometerAttachments, sample).toEqual([{ thermometerEquipmentId: 'equipment-2', containerEquipmentId: 'equipment-1' }])
+      expect(state.containers[0]).toBe(container)
+    }
+  })
   it('has one sensor per liquid container, atomic rebind, preserved contents and detached cooling', () => {
     let state = createLabWorkspaceState()
     for (const equipmentType of ['beaker', 'test-tube', 'thermometer', 'thermometer', 'dropper'] as const) {

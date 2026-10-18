@@ -13,7 +13,7 @@ class TestPointer extends MouseEvent {
   readonly pointerId: number
   constructor(type: string, init: PointerEventInit = {}) { super(type, init); this.pointerId = init.pointerId ?? 1 }
 }
-const bounds = new DOMRect(100, 100, 650, 450)
+let bounds = new DOMRect(100, 100, 650, 450)
 function state(type: 'beaker' | 'test-tube') {
   let s = labWorkspaceReducer(createLabWorkspaceState(), { type: 'add', equipmentType: type, position: { x: 0.5, y: 0.5 } })
   s = labWorkspaceReducer(s, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'sodium-chloride', quantity: 1 })
@@ -25,6 +25,9 @@ function Harness({ initial, actions }: { initial: LabWorkspaceState; actions: (a
   return <><LabWorkspace state={s} interaction={interaction} presentations={new Map()} />
     <ThermometerDetails state={s} thermometer={s.thermometers[0]!}
       onPickup={() => interaction.pickupThermometer('equipment-2')} onRemove={() => interaction.removeThermometer('equipment-2')} />
+    <button onClick={() => dispatch({ type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'sodium-chloride', quantity: 1 })}>Add supported sample</button>
+    <button onClick={() => dispatch({ type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'copper-sulfate', quantity: 1 })}>Change sample</button>
+    <button onClick={() => dispatch({ type: 'clear-container', equipmentId: 'equipment-1' })}>Clear sample</button>
     <output data-testid="state">{JSON.stringify(s)}</output></>
 }
 function current(): LabWorkspaceState { return JSON.parse(screen.getByTestId('state').textContent!) as LabWorkspaceState }
@@ -40,6 +43,7 @@ function liquidPoint(s: LabWorkspaceState, containerId = 'equipment-1') {
   const point = center(get(containerId)); point.y += sensorOffset(s, containerId); return point
 }
 beforeEach(() => {
+  bounds = new DOMRect(100, 100, 650, 450)
   vi.stubGlobal('PointerEvent', TestPointer)
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
     if (this.classList.contains('workbench')) return bounds
@@ -50,6 +54,75 @@ beforeEach(() => {
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('independent thermometer interaction', () => {
+  it.each(['beaker', 'test-tube'] as const)('keeps %s attachment and valid continuous placement across Empty → liquid → unsupported → Clear', (type) => {
+    const initial = labWorkspaceReducer(state(type), { type: 'clear-container', equipmentId: 'equipment-1' })
+    const actions = vi.fn()
+    render(<Harness initial={initial} actions={actions} />)
+    const sensor = get('equipment-2'), visual = sensor.querySelector('svg'), beaker = get('equipment-1')
+    sensor.focus()
+    fireEvent.keyDown(sensor, { key: 'Enter' })
+    fireEvent.click(beaker)
+    expect(current().thermometerAttachments).toHaveLength(1)
+    expect(sensor.querySelector('.thermometer-reading')).toHaveTextContent('—')
+    fireEvent.keyDown(sensor, { key: 'Enter' })
+    expect(sensor.querySelector('.thermometer-reading')).toHaveTextContent('—')
+    fireEvent.keyDown(sensor, { key: 'Escape' })
+    const relation = current().thermometerAttachments
+    const parentStyle = beaker.getAttribute('style')
+    let previous = center(sensor)
+    for (const name of ['Add supported sample', 'Change sample', 'Clear sample']) {
+      fireEvent.click(screen.getByRole('button', { name }))
+      expect(current().thermometerAttachments).toEqual(relation)
+      expect(get('equipment-2')).toBe(sensor)
+      expect(sensor.querySelector('svg')).toBe(visual)
+      expect(beaker.getAttribute('style')).toBe(parentStyle)
+      const next = center(sensor)
+      expect(Math.abs(next.y - previous.y)).toBeLessThan(25)
+      expect(next.y - 63 - 44).toBeGreaterThanOrEqual(bounds.top)
+      expect(sensor.querySelector('.thermometer-reading')).toHaveTextContent(name === 'Add supported sample' ? '25.0' : '—')
+      previous = next
+    }
+    expect(actions.mock.calls.filter(([action]) => action.type === 'attach-thermometer')).toHaveLength(1)
+  })
+
+  it('does not turn a native pickup click on a lamp into an unintended detach', () => {
+    let initial = labWorkspaceReducer(state('beaker'), { type: 'attach-thermometer', thermometerId: 'equipment-2', containerId: 'equipment-1' })
+    initial = labWorkspaceReducer(initial, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.7, y: 0.7 } })
+    render(<Harness initial={initial} actions={vi.fn()} />)
+    fireEvent.keyDown(get('equipment-2'), { key: 'Enter' })
+    fireEvent.click(get('equipment-3'))
+    expect(current().thermometerAttachments).toEqual(initial.thermometerAttachments)
+    fireEvent.keyDown(get('equipment-2'), { key: 'Escape' })
+    expect(current().thermometerAttachments).toEqual(initial.thermometerAttachments)
+  })
+  it('provides independent grab and label targets while retaining native equipment nodes', () => {
+    const initial = labWorkspaceReducer(state('beaker'), { type: 'attach-thermometer', thermometerId: 'equipment-2', containerId: 'equipment-1' })
+    render(<Harness initial={initial} actions={vi.fn()} />)
+    const sensor = get('equipment-2'), beaker = get('equipment-1'), svg = sensor.querySelector('svg')
+    expect(sensor.querySelector('.thermometer-grip')).toBeInTheDocument()
+    fireEvent.click(beaker.querySelector('.equipment-label')!)
+    expect(current().selectedEquipmentId).toBe('equipment-1')
+    fireEvent.click(sensor.querySelector('.equipment-label')!)
+    expect(current().selectedEquipmentId).toBe('equipment-2')
+    expect(get('equipment-1')).toBe(beaker)
+    expect(sensor.querySelector('svg')).toBe(svg)
+  })
+
+  it('keeps mounted sensor information inside the bench after a responsive resize', () => {
+    let initial = state('beaker')
+    initial = labWorkspaceReducer(initial, { type: 'attach-thermometer', thermometerId: 'equipment-2', containerId: 'equipment-1' })
+    initial = labWorkspaceReducer(initial, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.85, y: 0.3 } })
+    initial = labWorkspaceReducer(initial, { type: 'mount-container', containerEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-3' })
+    render(<Harness initial={initial} actions={vi.fn()} />)
+    const node = get('equipment-2')
+    for (const size of [[343, 380], [780, 300]]) {
+      bounds = new DOMRect(100, 100, size[0]!, size[1]!)
+      fireEvent(window, new Event('resize'))
+      expect(center(node).y - 63 - 44).toBeGreaterThanOrEqual(bounds.top)
+      expect(current().thermometerAttachments).toEqual(initial.thermometerAttachments)
+      expect(get('equipment-2')).toBe(node)
+    }
+  })
   it('returns native Remove focus to pickup while retaining equipment selection', () => {
     const initial = labWorkspaceReducer(state('beaker'), { type: 'attach-thermometer', thermometerId: 'equipment-2', containerId: 'equipment-1' })
     render(<Harness initial={initial} actions={vi.fn()} />)
@@ -69,7 +142,7 @@ describe('independent thermometer interaction', () => {
     fireEvent.keyDown(thermometer, { key: 'ArrowRight' })
     fireEvent.keyDown(thermometer, { key: 'ArrowDown', shiftKey: true })
     fireEvent.keyDown(thermometer, { key: 'ArrowDown' })
-    expect(document.querySelector('.workspace-message')).toHaveTextContent('Liquid target available')
+    expect(document.querySelector('.workspace-message')).toHaveTextContent('Container target available')
     expect(current().thermometerAttachments).toHaveLength(0)
     fireEvent.keyDown(thermometer, { key: 'Enter' })
     expect(current().thermometerAttachments).toHaveLength(1)

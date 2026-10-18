@@ -43,7 +43,7 @@ describe('nominal thermal details', () => {
     state = reduce(state, { type: 'advance-thermal', epoch: state.thermalEpoch, time: 180, liftedContainerId: null, liftedThermometerId: null })
     expect(state.thermometers[0]!.reading).toBeLessThan(reading)
     render(<ThermometerDetails state={state} thermometer={state.thermometers[0]!} onPickup={vi.fn()} onRemove={vi.fn()} />)
-    expect(screen.getByText(createLocalization().t('thermal.unavailable'))).toBeInTheDocument()
+    expect(screen.getByText(createLocalization().t('thermometer.unavailableSample'))).toBeInTheDocument()
     expect(screen.queryByText(/Sensor: /)).not.toBeInTheDocument()
     expect(document.querySelector('.thermometer-column')).not.toBeInTheDocument()
   })

@@ -675,3 +675,13 @@ An attached sensor in unknown contact uses nominal ambient/air-lag relaxation
 internally while showing no measurement. Detach/rebind preserves that evolved
 reading; no reaction is caused by this fallback. These are v1 assumptions requiring
 the same external scientific review as the other nominal thermal parameters.
+
+The approved THCS single-result convention caps committed R7/R8 temperature at
+350°C/240°C after qualification while powered. A large time step cannot overshoot;
+the sample cools without power and reheats only toward the same cap, preserving
+its one result. The original 450°C supported-domain maximum remains distinct.
+This plateau is pedagogical, not a claim that real solids stop absorbing energy or
+cannot exceed a reaction temperature. No change to R6 energy budgets is implied.
+Physical thermometer attachment is allowed in any compatible vessel, including
+empty/unsupported/solid samples. Hanging in such a vessel is not a valid liquid
+measurement or a claim of real instrument compatibility with heated solids.

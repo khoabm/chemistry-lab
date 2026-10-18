@@ -10,6 +10,7 @@ import { describeReactionEffects } from '../renderers/reactionPresentation'
 import { findContainerMount, findLampMount } from '../../../store/mounting'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { findChemical } from '../../../simulation/chemicals/catalog'
+import { thermometerMeasurement } from '../../../store/thermometerAttachment'
 
 interface LabWorkspaceProps {
   state: LabWorkspaceState
@@ -20,7 +21,7 @@ interface LabWorkspaceProps {
 export function LabWorkspace({
   state,
   presentations,
-  interaction: { attachBench, drag, message, getEquipmentHandlers, renderedPositions, supportPlacement, liftedMountedContainerId, liftedThermometerId },
+  interaction: { attachBench, drag, message, getEquipmentHandlers, renderedPositions, supportPlacement, liftedMountedContainerId },
 }: LabWorkspaceProps) {
   const { t } = useTranslation()
   const { reactionName, chemicalName } = useChemistryCopy()
@@ -40,11 +41,12 @@ export function LabWorkspace({
     const thermometer = state.thermometers.find((item) => item.equipmentInstanceId === instance.id)
     const attachment = state.thermometerAttachments.find((item) => item.thermometerEquipmentId === instance.id)
     const measured = state.containers.find((item) => item.equipmentInstanceId === attachment?.containerEquipmentId)
-    const sensorAvailable = !attachment || instance.id === liftedThermometerId
-      || measured && ['aqueous', 'r6'].includes(measured.thermal.kind) && measured.thermal.temperature !== null
+    const measurement = thermometerMeasurement(measured)
+    const sensorAvailable = !attachment || measurement === 'available'
+    const hasThermometer = state.thermometerAttachments.some((item) => item.containerEquipmentId === instance.id)
     const supportApparatus = ['beaker', 'test-tube', 'alcohol-lamp'].includes(instance.equipmentType) && (supportPlacement
       || state.mounts.some((mount) => mount.containerEquipmentId === instance.id || mount.lampEquipmentId === instance.id))
-    return { instance, container, lamp, dropper, thermometer, sensorAvailable, mount, lifted, position, visibleHeating, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
+    return { instance, container, lamp, dropper, thermometer, attachment, measurement, sensorAvailable, hasThermometer, mount, lifted, position, visibleHeating, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
   })
 
   return (
@@ -58,22 +60,24 @@ export function LabWorkspace({
           {state.equipment.length === 0 ? t('workspace.empty') : t('workspace.count', { count: state.equipment.length })}
         </span>
       </div>
+      <div className="workspace-drop-slot" aria-live="polite" aria-atomic="true">
+        {drag && (
+          <p className="bench-drop-feedback">
+            {drag.thermometerTarget?.kind === 'invalid' ? t(drag.thermometerTarget.reason === 'occupied' ? 'thermometer.occupied' : 'thermometer.invalid')
+              : drag.thermometerTarget?.kind === 'container' ? t('thermometer.target')
+              : drag.placement?.target?.kind === 'invalid' && drag.placement.target.reason === 'occupied'
+              ? t('mount.occupied') : drag.placement?.target?.kind === 'invalid' && drag.placement.target.reason === 'assembly-too-large'
+                ? t('mount.noRoom') : drag.valid ? t('workspace.release') : t('workspace.moveOnto')}
+          </p>
+        )}
+      </div>
       <div
         ref={attachBench}
         className={`workbench${drag ? drag.valid ? ' is-drop-valid' : ' is-drop-invalid' : ''}`}
         role="group"
         aria-label={t('workspace.bench')}
       >
-        {drag && (
-          <p className="bench-drop-feedback">
-            {drag.thermometerTarget?.kind === 'invalid' ? t(drag.thermometerTarget.reason === 'occupied' ? 'thermometer.occupied' : 'thermometer.invalid')
-              : drag.thermometerTarget?.kind === 'liquid' ? t('thermometer.target')
-              : drag.placement?.target?.kind === 'invalid' && drag.placement.target.reason === 'occupied'
-              ? t('mount.occupied') : drag.placement?.target?.kind === 'invalid' && drag.placement.target.reason === 'assembly-too-large'
-                ? t('mount.noRoom') : drag.valid ? t('workspace.release') : t('workspace.moveOnto')}
-          </p>
-        )}
-        {state.equipment.length === 0 && <div className="workspace-empty">
+        {state.equipment.length === 0 && !drag && <div className="workspace-empty">
           <div className="workspace-emblem" aria-hidden="true">
             <span />
             <span />
@@ -83,14 +87,15 @@ export function LabWorkspace({
           <p>{t('workspace.emptyBody')}</p>
           <p className="empty-detail">{t('workspace.emptyHint')}</p>
         </div>}
-        {labeledEquipment.map(({ instance, label, container, lamp, dropper, thermometer, sensorAvailable, mount, lifted, position, visibleHeating, supportApparatus }) => (
+        {labeledEquipment.map(({ instance, label, container, lamp, dropper, thermometer, attachment, measurement, sensorAvailable, hasThermometer, mount, lifted, position, visibleHeating, supportApparatus }) => (
           <button
             key={instance.id}
             type="button"
-            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}${supportApparatus ? ` is-support-apparatus${lamp ? ' is-support-lamp' : ' is-support-container'}` : ''}${mount ? ` is-mounted${position.x > 0.5 ? ' label-on-left' : ''}` : ''}${lifted ? ' is-lifted' : ''}${drag?.placement?.lampDraft?.id === instance.id ? ' is-support-target' : ''}${drag?.thermometerTarget?.kind === 'liquid' && drag.thermometerTarget.containerId === instance.id ? ' is-thermometer-target' : ''}`}
+            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}${supportApparatus ? ` is-support-apparatus${lamp ? ' is-support-lamp' : ' is-support-container'}` : ''}${hasThermometer ? ' has-thermometer' : ''}${mount ? ` is-mounted${position.x > 0.5 ? ' label-on-left' : ''}` : ''}${lifted ? ' is-lifted' : ''}${drag?.placement?.lampDraft?.id === instance.id ? ' is-support-target' : ''}${drag?.thermometerTarget?.kind === 'container' && drag.thermometerTarget.containerId === instance.id ? ' is-thermometer-target' : ''}`}
             style={equipmentPositionStyle(position)}
             data-equipment-id={instance.id}
             data-equipment-type={instance.equipmentType}
+            data-attached-container={attachment?.containerEquipmentId}
             aria-label={label}
             aria-pressed={state.selectedEquipmentId === instance.id}
             aria-describedby={`equipment-movement-hint ${thermometer ? 'thermometer-movement-hint ' : ''}${instance.id}-result`}
@@ -102,13 +107,21 @@ export function LabWorkspace({
               contents={container?.contents} reactionResult={container?.reactionResult ?? null}
               presentation={container ? presentations.get(container.id) : undefined}
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
-            <span className="equipment-label">{label}</span>
-            {thermometer && <span className="thermometer-reading">{sensorAvailable ? thermometer.reading.toFixed(1) : '—'}°C</span>}
+            {thermometer ? <>
+              <span className="thermometer-grip" aria-hidden="true" />
+              <span className="thermometer-stem-target" aria-hidden="true" />
+              <span className="thermometer-info">
+                <span className="equipment-label">{label}</span>
+                <span className="thermometer-reading">{sensorAvailable ? thermometer.reading.toFixed(1) : '—'} °C</span>
+              </span>
+            </> : <span className="equipment-label">{label}</span>}
             {(lamp?.status === 'extinguished' || visibleHeating) && <span className="equipment-state" aria-hidden="true">
               {lamp ? t('workspace.off') : t('workspace.heating')}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
-              {thermometer && (sensorAvailable ? t('thermometer.reading', { temperature: thermometer.reading.toFixed(1) }) : t('thermal.unavailable'))}
+              {attachment && `${t('thermometer.attached', { container: labeledEquipment.find(({ instance: item }) => item.id === attachment.containerEquipmentId)?.label })}. `}
+              {thermometer && (sensorAvailable ? t('thermometer.reading', { temperature: thermometer.reading.toFixed(1) })
+                : t(measurement === 'empty' ? 'thermometer.unavailableEmpty' : measurement === 'solid' ? 'thermometer.unavailableSolid' : 'thermometer.unavailableSample'))}
               {mount && t('mount.onLamp', {
                 lamp: labeledEquipment.find(({ instance: item }) => item.id === mount.lampEquipmentId)?.label,
               })}
@@ -127,7 +140,7 @@ export function LabWorkspace({
       </div>
       <p id="equipment-movement-hint" className="visually-hidden">{t('workspace.movementHint')}</p>
       <p id="thermometer-movement-hint" className="visually-hidden">{t('thermometer.instructions')}</p>
-      <p className="workspace-message" role="status" aria-live={messageLive}>
+      <p className={`workspace-message${drag?.source.kind === 'palette' ? ' is-suppressed' : ''}`} role="status" aria-live={messageLive}>
         {t(message.key, { equipment: message.equipmentType ? t(`equipment.${message.equipmentType}`) : '' })}
       </p>
     </section>

@@ -23,6 +23,15 @@ export function evolveTemperature(start: number, seconds: number, profile: Therm
   return equilibrium + (start - equilibrium) * Math.exp(-seconds * profile.loss / profile.capacity)
 }
 
+// Classroom single-result convention, not a physical maximum or profile domain.
+export function evolveTeachingTemperature(start: number, seconds: number, profile: ThermalProfile, powered: boolean): number {
+  if (!Number.isFinite(seconds) || seconds < 0 || !validProfile(profile)) return start
+  const temperature = evolveTemperature(start, seconds, profile, powered)
+  const crossing = powered ? crossingTime(start, profile) : null
+  if (crossing !== null && crossing <= seconds + 1e-9) return profile.marker!
+  return powered && profile.marker !== undefined ? Math.min(temperature, profile.marker) : temperature
+}
+
 export function crossingTime(start: number, profile: ThermalProfile): number | null {
   if (!validProfile(profile) || profile.marker === undefined || !Number.isFinite(start)) return null
   if (start >= profile.marker) return 0

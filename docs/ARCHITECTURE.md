@@ -368,11 +368,24 @@ cannot bypass it. Completed result and contents references survive temperature t
 cooling, source changes, movement, sensor attachment and localization. Liquid
 thermometers cannot measure the high-temperature solids. See plans/thermometer-bplus.md
 for profile constants, assumptions, evidence limits and release gates.
+Powered solid evolution uses a pure teaching cap at the marker, including a large
+crossing tick. The cap is separate from profile.maximum=450°C; cooling remains the
+existing exponential and reheating preserves completed/result identity. AQ/R6 have
+no marker and keep their prior energy/evolution behavior.
 
 Bulb/interior targeting, insertion projection, drafts and full assembly bounds belong
 to interaction/presentation. Rendering remains keyed sibling buttons/SVGs. Pointer
 capture/cancellation, native pickup/click placement and keyboard Enter/Arrow/Escape
 share reducer semantics. No per-coordinate announcements or dependency additions.
+Physical eligibility is only compatible equipment/occupancy; thermometerMeasurement
+separately classifies available/empty/solid/unsupported output. Existing attach/rebind
+actions do not alter thermal state. Empty/solid hanging and liquid immersion are
+presentation geometry. workspacePositions uses shared parent clearances for render,
+targeting, draft attachment, native/keyboard movement and resize, without storing
+projected coordinates. A fixed worst-case headroom keeps parent position stable
+through contents changes; a necessary initial parent projection is previewed before
+commit. Native buttons/SVGs stay independent. Scoped thermometer grip/stem hit regions
+leave the vessel body accessible; palette feedback lives outside the usable bench.
 No actual flame temperature, general heat-transfer/kinetics solver or fluid physics.
 
 ---

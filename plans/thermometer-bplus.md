@@ -28,7 +28,7 @@ chemistry teacher's signature or experimental calibration.
 
 - One independent SVG thermometer Equipment, a Celsius scale, separate sample and
   sensor states, and explicit nominal/validated/unsupported measurement descriptions.
-- Bulb-aware liquid targeting, insertion preview, atomic attach/detach/rebind, and one
+- Bulb-aware vessel-interior targeting, insertion preview, atomic attach/detach/rebind, and one
   thermometer per Beaker/Test tube. Thermometer relations are separate from lamp mounts.
 - Existing direct bench dragging, pointer cancellation, stable equipment/button/SVG
   identity, and attached movement with a container or its lamp assembly.
@@ -301,8 +301,11 @@ an explicitly selected versioned solid teaching profile, a sample initially at t
 declared ambient, and a lamp-supplied heating trajectory. No Prepare action is needed
 for its nominal solid profile; it is not an R6 physical reagent recipe. At the first
 Ts crossing 350°C for R7 or 240°C for R8, call the existing engine once with heat and
-commit its single final result. No thermometer is required or eligible for this solid
-measurement. Store a completion marker tied to sample identity, so ticks, cooling,
+commit its single final result and clamp the modeled temperature to the marker.
+Continued power/reheating cannot exceed it; unpowered cooling remains active. This
+pedagogical cap is separate from the profile's supported-domain maximum. No thermometer
+is required; physical attachment is allowed but solid measurement is unavailable.
+Store a completion marker tied to sample identity, so ticks, cooling,
 remounting, repeated ignition, locale, and Replay cannot produce another occurrence.
 
 These temperatures are **user-proposed experimental simulation milestones**. They
@@ -430,8 +433,10 @@ Share small interior geometry data with the existing contents renderer. Transfor
 the thermometer's bulb and required immersed stem into bench coordinates using the
 rendered SVG transform, actual liquid surface, vessel walls, and curved Test tube
 bottom. Require bulb clearance from wall/bottom and the approved immersion depth.
-Semantic liquid eligibility is independent of decorative SVG classes. Empty and
-solid-only samples are invalid new measurement targets. Known liquid geometry is
+Physical attachment eligibility is independent of measurement and decorative SVG
+classes. Empty/solid vessels use a fixed hanging pose; unsupported liquid-only
+contents retain the immersed visual pose. All accept physical attachment but expose
+no valid liquid measurement when their numerical profile is unavailable. Known liquid geometry is
 necessary but not sufficient for scientifically valid measurement.
 
 Start with one deterministic upright insertion pose per compatible vessel, no rotation
@@ -772,6 +777,12 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 ## Progress
 
+- [x] Start four approved acceptance refinements at clean feature-thermometer HEAD 1f27196; reproduce all four with seven failing targeted regression cases before fixes.
+- [x] Decouple physical attachment from numerical measurement; add a fixed hanging pose, shared assembly clearances/projection, independent pointer targets and single palette-drag instruction.
+- [x] Implement pure single-result teaching cap for R7/R8, preserving domain maximum, cooling, reheating and result identity; targeted reducer/model/interaction tests pass.
+- [x] Complete EN/VI real-browser hit-testing and responsive QA for the four acceptance refinements; record actual limitations and screenshots.
+- [x] Complete final full validation and prepare the four acceptance refinements for authorized scoped commit/push; no main merge or milestone transition.
+
 - [x] Review correction at clean feature-thermometer HEAD 1367e33: reproduce P1-01/02/03 before fixes (5 new failing tests, 7 existing passing); reproduce P2-01 in EN/VI (4 failing UI cases).
 - [x] Correct Clear recovery using a separate passive nominal vessel estimate, fresh-solid initialization/admission, unavailable-sensor evolution, and separate current/milestone UI; preserve one clock, R6 budget and M11 interactions.
 - [x] Validate review corrections in 547 tests / 43 files, typecheck, lint, build and whitespace checks; actual browser QA at 1440×960, 390×844 and 844×390 recorded below.
@@ -801,6 +812,18 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 - [x] Prepare evidence-backed engineering review without advancing a milestone or releasing.
 
 ## Surprises and discoveries
+
+- Acceptance-refinement QA exposed a remaining Test tube name/heating-badge overlap.
+  Type-specific badge offsets now keep the two rectangles separate; real-browser
+  checks confirm the fix. A constant 64px external instruction slot also avoids a
+  wrapped target message changing bench geometry during drag.
+- Two additional regressions reproduced a numeric badge appearing when keyboard
+  pickup lifted an empty/unsupported committed attachment. Measurement availability
+  now follows that committed sample throughout the draft; internal air relaxation
+  still evolves independently. Both regression cases pass after the correction.
+- Arbitrarily placing two unrelated free tools directly over each other can still
+  obscure a portion of a label. This patch restores attached-vessel body/label and
+  sensor-grip targets; it intentionally does not add global overlap avoidance.
 
 - Nominal solid capacity 8J/K was smaller than the Beaker vessel assumption 40J/K.
   It was corrected to vessel capacity plus an explicit nominal 8J/K solid load:
@@ -850,6 +873,12 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 | Date | Decision | Reason |
 | --- | --- | --- |
+| 2026-10-18, approved acceptance refinements | Physical eligibility checks only compatible equipment and occupancy; measurement applicability remains a separate application query | Empty/unsupported/solid vessels can hold a sensor without inventing a liquid measurement; existing atomic actions and the single relation collection are sufficient |
+| 2026-10-18, approved acceptance refinements | Use schematic bulb y=52 for empty/solid hanging, retain immersed pose for liquid-only contents, and reserve the worst-case upper extent | Current solid beds remain below the hanging bulb; the approximately 20px pose adjustment on default liquid changes stays local, while constant parent clearance prevents sample edits from shifting the whole assembly |
+| 2026-10-18, approved acceptance refinements | Share vessel projection/clearances across rendering, drafts, native controls, movement and resize; preview any necessary parent projection before attachment commit | Prevent responsive clipping and preview/drop divergence without storing SVG pixels, synchronizing dormant positions or adding reducer actions |
+| 2026-10-18, approved acceptance refinements | Keep native thermometer button identity but expose an upper 44px grip and narrow stem hit region; make vessel labels selectable | Transparent rectangles must not consume most vessel clicks; focus, capture and grab offset remain on the original equipment button |
+| 2026-10-18, approved acceptance refinements | Cap powered R7/R8 evolution at their existing markers, separate from profile.maximum, and retain exact first-crossing qualification | One pedagogical final result and plateau without a new timer, reaction definition, kinetics model or effect/replay identity |
+| 2026-10-18, approved acceptance refinements | Hide empty content only during an actual draft; reserve an external instruction slot and remove preview feedback text | Avoid overlapping/duplicated instructions, keep bench hit-testing unchanged and announce target-state changes rather than pointer coordinates |
 | 2026-10-18, technical review correction | Preserve optional vesselTemperature only as a passive nominal estimate when sample temperature is invalidated; Empty recovers that estimate, never an invented ambient value | Unsupported sample temperature and retained vessel history are different facts. The estimate cools with the existing empty-vessel profile, with no unknown-material exchange or lamp input inferred. Truly unknown history still rejects quantitative preparation |
 | 2026-10-18, technical review correction | Initialize each fresh solid with (Cv Tv + 8 × 25)/(Cv + 8); reject the profile if its initial estimate reaches/exceeds its own milestone | Reuse declared capacities without copying the old sample temperature, modeling conduction, changing milestones or immediately emitting an unjustified new Heat result. Empty/cool/reload or a fresh vessel is the recovery path |
 | 2026-10-18, technical review correction | Evolve unknown-contact sensors toward ambient using existing air lag while keeping numerical measurement unavailable | An explicit v1 fallback avoids a frozen internal reading or a discontinuity on detach/rebind; it is not an estimate of the unknown sample and cannot trigger chemistry |
@@ -872,6 +901,75 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 | 2026-10-18, final validation | Record 531 passing tests in 42 files and three actual browser viewport checks; retain external scientific and release gates | Engineering evidence supports review, not experimental calibration, physical-device certification or milestone approval |
 
 ## Outcomes and retrospective
+
+Approved four acceptance refinements (2026-10-18), starting from clean
+feature-thermometer 1f27196: physical attachment now accepts both compatible vessel
+types independently from empty/aqueous/R6/unsupported/solid measurement eligibility.
+No new reducer action or relation was needed. Empty/solid hanging uses schematic
+bulb y=52; liquid-only contents retain immersion geometry. A constant worst-case
+upper clearance and one shared parent projection keep resize, movement, native
+mounting and draft/drop placement consistent. The original native button/SVG stays
+keyed; a 44×44 upper grip, narrow stem and independent information target replace
+the oversized transparent hit region. Mounted vessel labels and heating badges
+have separate type-specific vertical positions. Empty intro/preview duplication is
+removed only after the drag threshold; one external fixed-height feedback slot
+keeps pointer hit testing and bench geometry stable.
+
+R7/R8 powered evolution now stops exactly at 350°C/240°C using the existing
+analytical crossing. The domain maximum remains 450°C. Continued heating and
+reheating share the same cap; extinguishing, lifting or unmounting still cools.
+The existing completion marker/Heat pathway preserves ReactionResult identity.
+This is explicitly a classroom convention, not calibration or a physical maximum.
+AQ/R6 equations/budget, sixfold clock, Replay and reaction definitions are unchanged.
+
+Red/green evidence: before fixes, seven focused regression cases failed (two
+attachment, two cap, grip structure, resize clearance, empty-draft visibility).
+Two later empty/unsupported lifted-badge cases also reproduced numeric output
+before their presentation correction. The affected 42-test interaction/lifecycle/model
+run and four geometry tests pass. New cases additionally cover both vessel hanging
+targets, too-small bounds, material changes retaining relation/node/SVG, all initial
+palette cancellation paths plus stale release, exact/large/partitioned cap crossing,
+and completed-result identity through lamp-off, lift, unmount and reheating.
+Final validation passed npm run typecheck, npm run lint, npm test -- --maxWorkers=2
+(569 tests in 43 files, 148.88s), npm run build and git diff --check. No test was
+skipped and no timeout was increased. The complete diff contains only these
+corrections, focused regression tests and current-contract documentation; no new
+dependency, reaction definition, clock policy, reducer action or historical
+milestone edit. The remote feature branch was still 1f27196 before committing.
+The user explicitly authorizes a scoped commit/push after validation; Git history
+and remote HEAD are the evidence for that subsequent operation. No hosted CI run
+is claimed by this local validation.
+
+Actual in-app browser QA used viewport emulation, not physical touch hardware:
+
+| Viewport, both EN and VI | Actual observed result |
+| --- | --- |
+| 1440×960 | Beaker and Test tube assemblies readable; body/label/grip hit testing identifies the intended equipment; grip 44×44, no horizontal page overflow; physical attachment stays independent of solid measurement |
+| 390×844 | Names/readings remain inside the bench after resize; native controls remain usable through scrolling; vessel label and sensor grip remain independent targets; no horizontal overflow |
+| 844×390 | Same valid targets and in-bounds information; mounted Test tube name and heating badge no longer overlap; short-landscape palette does not cover the visible bench |
+
+Real pointer gestures exercised palette drop, invalid initial drop (empty state
+restored), one successful initial creation, detach/rebind to a solid Beaker, and
+lamp/container/sensor assembly motion with equal observed displacement. Native
+pickup rejected an occupied vessel without displacing its sensor. Empty, supported
+liquid, unsupported, Clear and solid attachment were exercised; unsupported/solid
+output remains unavailable. R7 visibly plateaued at 350.0°C; R8 reached 240.0°C,
+cooled to 235.1°C after extinguishing, then returned to 240.0°C when relit.
+Keyboard pickup/Escape retained attachment. Browser gestures are complete drags;
+the mid-drag empty-state/instruction contract is proven by component tests, not a
+claimed held-pointer screenshot. The saved lift-draft image is keyboard pickup.
+
+Screenshots are outside the repository under
+C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/:
+thermometer-polish-final-beaker-{en,vi}-{1440x960,390x844,844x390}.png,
+thermometer-polish-final-{en,vi}-{1440x960,390x844,844x390}.png (Test tube),
+thermometer-polish-r7-capped.png, thermometer-polish-r8-capped.png,
+thermometer-polish-empty-drop-final.png and thermometer-polish-lift-draft-en.png.
+An arbitrary unrelated free tool placed directly over another tool can still
+obstruct part of its target; no global collision/label solver is claimed. No
+screen-reader certification, physical touch test or new browser reduced-motion
+test was performed. Existing automated accessibility/reduced-motion tests remain.
+Historical outcomes below describe earlier work and do not replace this evidence.
 
 Technical review corrections from baseline 1367e33: all three P1 findings and the
 P2-01 UI finding were independently confirmed. Before source fixes, five new

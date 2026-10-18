@@ -6,6 +6,7 @@ import type { ContainerState } from '../../../types/container'
 import type { EquipmentType } from '../../../types/equipment'
 import { EquipmentVisual } from './EquipmentVisual'
 import { referenceStartingTemperature } from '../../../simulation/thermal/profiles'
+import { thermometerMeasurement } from '../../../store/thermometerAttachment'
 
 export function ThermalDetails({ container, equipmentType, disabled, onPrepare }: {
   container: ContainerState; equipmentType: EquipmentType; disabled: boolean; onPrepare: () => void
@@ -24,6 +25,7 @@ export function ThermalDetails({ container, equipmentType, disabled, onPrepare }
     {solid && <>
       <p>{t('thermal.solid', { temperature: thermal.kind === 'r7' ? 350 : 240 })}</p>
       <p className="empty-caption">{t('thermal.solidInitial')}</p>
+      <p className="empty-caption">{t('thermal.teachingCap')}</p>
     </>}
     {thermal.kind === 'unsupported' && <p className="empty-caption">{t('thermal.recovery')}</p>}
     {liquid && <p className="empty-caption">{t('thermal.assumptions', { mass: equipmentType === 'test-tube' ? 4 : 50 })}</p>}
@@ -42,12 +44,14 @@ export function ThermometerDetails({ state, thermometer, onPickup, onRemove }: {
   const pickupButton = useRef<HTMLButtonElement>(null)
   const attachment = state.thermometerAttachments.find((item) => item.thermometerEquipmentId === thermometer.equipmentInstanceId)
   const container = state.containers.find((item) => item.equipmentInstanceId === attachment?.containerEquipmentId)
-  const available = !attachment || container && ['aqueous', 'r6'].includes(container.thermal.kind) && container.thermal.temperature !== null
+  const measurement = thermometerMeasurement(container)
+  const available = !attachment || measurement === 'available'
   const target = state.equipment.find((item) => item.id === attachment?.containerEquipmentId)
   return <section className="thermometer-details">
     <h3>{t('equipment.thermometer')}</h3>
     <EquipmentVisual equipmentType="thermometer" reading={available ? thermometer.reading : null} />
-    <p>{available ? t('thermometer.reading', { temperature: thermometer.reading.toFixed(1) }) : t('thermal.unavailable')}</p>
+    <p>{available ? t('thermometer.reading', { temperature: thermometer.reading.toFixed(1) })
+      : t(measurement === 'empty' ? 'thermometer.unavailableEmpty' : measurement === 'solid' ? 'thermometer.unavailableSolid' : 'thermometer.unavailableSample')}</p>
     <p>{target ? t('thermometer.attached', { container: t(`equipment.${target.equipmentType}`) }) : t('thermometer.air')}</p>
     <div className="container-actions">
       <button ref={pickupButton} type="button" className="action-button action-button--primary" onClick={onPickup}>{t('thermometer.pickup')}</button>

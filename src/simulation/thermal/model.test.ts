@@ -1,8 +1,26 @@
 import { describe, expect, it } from 'vitest'
-import { crossingTime, evolveSensor, evolveTemperature, validProfile } from './model'
+import { crossingTime, evolveSensor, evolveTemperature, evolveTeachingTemperature, validProfile } from './model'
 import { emptyThermal, initialSample, thermalProfile } from './profiles'
 
 describe('nominal thermal model (not experimental calibration)', () => {
+  it.each(['r7', 'r8'] as const)('caps %s consistently across exact, large and partitioned time steps without changing the model domain', (kind) => {
+    for (const type of ['beaker', 'test-tube'] as const) {
+      const profile = thermalProfile(kind, type)!, marker = profile.marker!
+      const wait = crossingTime(25, profile)!
+      expect(evolveTeachingTemperature(25, wait - 0.01, profile, true)).toBeLessThan(marker)
+      expect(evolveTeachingTemperature(25, wait, profile, true)).toBe(marker)
+      expect(profile.maximum).toBe(450)
+      expect(evolveTeachingTemperature(25, 10000, profile, true)).toBe(marker)
+      let value = 25
+      for (let i = 0; i < 1000; i++) value = evolveTeachingTemperature(value, 1, profile, true)
+      expect(value).toBe(marker)
+      const cooled = evolveTeachingTemperature(value, 60, profile, false)
+      expect(cooled).toBeLessThan(marker)
+      expect(evolveTeachingTemperature(cooled, 10000, profile, true)).toBe(marker)
+    }
+    const aqueous = thermalProfile('aqueous', 'beaker')!
+    expect(evolveTeachingTemperature(25, 600, aqueous, true)).toBe(evolveTemperature(25, 600, aqueous, true))
+  })
   it.each(['beaker', 'test-tube'] as const)('initializes solid loads in %s by a disclosed lumped energy balance', (type) => {
     const vesselCapacity = type === 'beaker' ? 40 : 8
     for (const [chemicalId, kind] of [['copper-carbonate', 'r7'], ['copper-sulfate-pentahydrate', 'r8']] as const) {

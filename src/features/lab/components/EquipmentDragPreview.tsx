@@ -14,7 +14,6 @@ export function EquipmentDragPreview({ preview }: { preview: EquipmentDragDraft 
     >
       <EquipmentVisual equipmentType={preview.source.equipmentType} />
       <span>{t(`equipment.${preview.source.equipmentType}`)}</span>
-      <span className="equipment-drag-feedback">{preview.valid ? t('preview.release') : t('preview.moveOnto')}</span>
     </div>
   )
 }
