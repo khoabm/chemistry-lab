@@ -713,3 +713,20 @@ M11 is complete when:
 - M9 finite dynamics/replay and M10 localization/fallback behavior remain intact
 - relevant tests, typecheck, lint and build validation pass
 - the M11 ExecPlan and documentation match the delivered implementation
+
+
+## M11 accepted render-polish addendum — 2026-10-18
+
+The user accepted auxiliary branch `M11-render-polish` for integration into M11.
+Its final reviewed implementation is `29497502ef6d79c280b1cce9fd3d2c4dfa79ab92`.
+It adds direct bench dragging, mount/unmount/rebind of a Beaker/Test tube onto an
+alcohol-lamp support, assembly movement, native Mount/Remove controls and
+mounted-only Heat source determination. This **supersedes the pre-polish overlap
+heating-zone interaction**, without introducing a new chemistry trigger, altering
+registered R1–R8 reactions, automatic Dropper Mix, stoichiometry or fluid physics.
+
+The authoritative final interaction/design detail is in `plans/m11-render-polish.md`,
+`docs/UI_UX.md` and `docs/ARCHITECTURE.md`. Hosted CI for that branch's final
+product tree (run `39090561234`) passed typecheck, lint, 518 tests / 37 files and
+build. The user confirmed practical UI QA. This addendum does not authorize M12 or
+change the active milestone selection; final merge status is recorded in Git history.
