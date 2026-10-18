@@ -18,12 +18,13 @@ interface ContainerDetailsProps {
   onMix: () => void
   onEnlarge: () => void
   disabled: boolean
+  lifted?: boolean
   presentation?: ReactionPresentation | undefined
   visible?: boolean
   mountControls?: ReactNode
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, presentation, visible = true, mountControls }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls }: ContainerDetailsProps) {
   const { t } = useTranslation()
   const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
@@ -36,6 +37,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
         {contentsSummary ? t('sample.selectedSummary', { contents: contentsSummary }) : t('sample.emptySummary')}
       </p>
       <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation}
+        lifted={lifted}
         showInactive={isCompletedHeatReaction(container.reactionResult)} />
       {container.contents.length === 0 ? <p className="empty-caption">{t('sample.empty')}</p> : (
         <ul className="contents-list" aria-label={t('sample.contentsList')}>
@@ -51,7 +53,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
           })}
         </ul>
       )}
-      {container.contents.length > 0 && (container.heatEvaluation.status === 'pending'
+      {!lifted && container.contents.length > 0 && (container.heatEvaluation.status === 'pending'
         ? <p className="empty-caption">{t('sample.nextPending')}</p>
         : !container.reactionResult && <p className="empty-caption">{t('sample.nextReady')}</p>)}
       <div className="container-actions">

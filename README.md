@@ -109,8 +109,9 @@ products are never sampled. Payloads survive movement/selection/language changes
 Reset clears them. Transfer edits clear stale results and refresh normal guarded
 Heat waits, without automatically mixing. No measured volume or stoichiometry is implied.
 Drag equipment from the palette onto the bench or click to add it.
-Drag placed equipment to move it, or focus it and use arrow keys (Shift moves
-farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
+Drag placed equipment directly: the same button/SVG follows a transient draft,
+with one committed move on valid release. Palette placement keeps its preview.
+Focus equipment and use arrow keys (Shift moves farther). Escape cancels a drag; invalid drops leave equipment unchanged. Reset
 clears the bench without reloading the page.
 
 Select a beaker or test tube, then click/tap a chemical in the palette to add one
@@ -136,37 +137,42 @@ contents retain the starting substances and simplified quantities, without
 stoichiometric consumption or reaction chaining.
 
 Select an alcohol lamp and press Ignite lamp / Extinguish lamp in its details.
-Each new lamp starts extinguished. A lit lamp displays a flame and a marked zone
-above it. Place the center of a beaker or test tube in that zone using drag or
-arrow keys; it shows a warm glow and Heating status. Moving the container/source
-out of alignment or extinguishing the source stops heating. Empty containers can
-also heat. Multiple lamps are independent; reset removes all heating state.
-The lamp drawing includes a simplified tripod and sparse support gauze, shared
-by the palette, workspace, drag preview and details. They are decorative parts of
-the same alcohol-lamp equipment, with no separate state or interaction. The
-88×126 interaction footprint and heating zone are unchanged. Placement is
-qualitative rather than exact contact with the gauze; beakers and test tubes
-retain the shared simplified model, without a realistic test-tube holder.
-Filled containers wait approximately two seconds before heat evaluation. Copper
-carbonate shows R7 (black solid and low gas release); hydrated copper sulfate shows
-R8 (pale/white solid). Unsupported heated sets return No observable reaction.
-Solid gas particles are illustrative, not boiling bubbles or visible carbon dioxide.
-Moving away, changing source/contents, extinguishing or reset cancels stale waits;
-dragging pauses them. Selection/unrelated actions do not restart other deadlines.
-Explicit Mix cancels a pending heat check so an older callback cannot overwrite
-the new Mix result; re-entering a lit zone or changing contents starts another check.
-Each request evaluates once. Successful products retain their color after cooling
-and do not react again until contents change. Mix is unavailable for a transformed
-heat sample to avoid evaluating its retained starting portions as fresh reactants.
-Clear/add starts a new simplified experiment. Contents retain starting quantities;
-products are semantic data, without consumption/chaining or exact temperature.
-Internal dropper instances still support placement/movement only; hiding the
-palette entry does not remove their type, label, SVG or compatibility.
+New lamps start extinguished; lit lamps show a flame. Mount one Beaker or Test tube
+on a support by dragging, or choose a lamp and Mount on support in Sample details.
+Empty samples and off lamps can mount. Each lamp holds at most one sample; occupied
+supports reject placement. Remove from support is the native alternative to dragging
+away, with explicit feedback if the bench has insufficient free placement space.
+Only a valid mount to a lit lamp heats; free geometric overlap never starts Heat.
+Extinguishing retains the mount. The 88×126 equipment footprint and separate keyed
+buttons/SVGs stay stable. Lamp pointer/Arrow/Shift movement carries the assembly;
+container Arrow/Shift detaches clearly in that direction or rejects without changes.
+Support projection is responsive presentation geometry, not stored child positions.
+The tripod/gauze is part of the lamp, not another equipment or a realistic holder.
+Mounted names sit beside the silhouettes toward the bench interior, clear of the
+support/flame; lamp names stay below the stand. There is no decorative orange heat
+ellipse or replacement effect. Flame and textual Heating feedback identify heating.
+During a mounted-container lift, its normal Heating badge/description is replaced
+by lifted feedback; committed Heat and reaction animation state are unchanged.
+
+Filled mounted samples wait an illustrative 2000ms for guarded Heat evaluation.
+Only an actual mounted-container lift pauses that sample's timer; cancellation or
+return to its support resumes the remaining time. Assembly/palette/unrelated drags
+retain deadlines. Detach, rebind, extinction, contents edits and Reset invalidate
+stale requests/tokens; eligible new source/material lifecycles start a fresh wait.
+Explicit Mix supersedes pending Heat, including after toggling the same lamp.
+Remove/remount, rebind or material edits can start another eligible check.
+R7 produces black solid and finite low solid-gas release; R8 becomes pale/white.
+Unsupported sets return No observable reaction. Gas particles are illustrative,
+not boiling or visible carbon dioxide. Completed results retain identity through
+movement, cooling, remounting and locale changes, without restarting finite effects.
+Mix remains unavailable for transformed Heat samples until contents change.
+Starting quantities remain recorded; products are semantic data, without measured
+kinetics, consumption/chaining, yields, exact temperatures or real safety procedures.
 
 Open How to use this lab for a short, non-blocking Mix/Heat guide, keyboard
 controls and sample labels. Closing/reopening Help does not change experiments.
 Chemical labels distinguish liquid solutions and solid samples; units are
-illustrative, not mL or mol. Empty/ready samples and any existing internal dropper
+illustrative, not mL or mol. Empty/ready samples and Dropper controls
 show contextual next steps. Reset describes its full scope before use and still
 clears immediately; Empty container affects only the selected sample.
 
@@ -184,8 +190,9 @@ the selected sample announces updated quantities politely, and reaction equation
 are named keyboard-focusable regions with local horizontal scrolling. Controls
 have comfortable hit areas and contained focus rings; restrained color/border
 transitions honor reduced-motion. On narrow landscape screens the bench uses a
-300px height without changing logical equipment/heating positions. The existing
-sticky tool bar and independently scrolling panels remain.
+300px height without changing logical equipment/heating positions. The tools remain collapsible and independently scrollable; in short landscape
+(up to 900px wide and 500px high), the palette stays in normal page flow so it
+cannot cover the bench.
 
 Window blur or a hidden document cancels an interrupted drag rather than committing
 it; unmount releases pointer capture. The shared SVG drawing uses React.memo with
@@ -233,7 +240,7 @@ lint, `npm test -- --maxWorkers=2` and build.
 - `src/types/container.ts`: container associations and chemical portions.
 - `src/types/heating.ts`: lamp status and source-associated container heating state.
 - `src/features/lab/hooks/useHeatReactions.ts`: cancellable per-container delay orchestration.
-- `src/simulation/heating/`: pure logical zone evaluation.
+- `src/store/mounting.ts`: shared mount eligibility, occupancy queries and mounted Heat source resolution.
 - `src/simulation/chemicals/`: the specified catalog and pure portion additions.
 - `src/simulation/reactions/`: typed R1–R8 rules, products and semantic effects.
 - `src/simulation/engine/`: pure deterministic reaction evaluation and unit tests.
@@ -254,7 +261,7 @@ bench has its own bounded height so changing selection or reaction details does
 not resize it. Equations stay on one line with local scrolling when necessary.
 At widths up to 900px,
 the Equipment & Chemicals palette becomes a collapsible sticky bar above the
-bench. Its content has a bounded height and scrolls internally for longer lists;
+bench, except at heights up to 500px, where it scrolls with the page. Its content has a bounded height and scrolls internally for longer lists;
 The chemical catalog shares this scrollable panel. Tap/click or Enter adds
 equipment; on narrow touch screens vertical swipes scroll tools, and dragging
 on the bench moves placed equipment. Escape closes the tools and restores toggle
@@ -262,7 +269,8 @@ focus when no drag is active. The bench is a single flat surface with a subtle
 square grid. The shell includes semantic landmarks, a keyboard skip link,
 visible focus styles, and readable empty states. Equipment positions adapt to
 the bench size and stay within its bounds. Overlapping equipment is allowed;
-the selected instance appears above other equipment. Liquid portions use separate
+selection stays subtle, and keyboard focus has an independent visible outline.
+Mounted containers stay in front of their lamp/support; focus stays visible on either. Liquid portions use separate
 representative bands, and solids use textured sample shapes. These do not represent
 reaction products or physically accurate layering. Visual levels are capped;
 the details panel retains the simplified quantity counts. After a successful Mix,
@@ -344,3 +352,8 @@ lifecycle system was added.
 Tool configuration references: [Vite](https://vite.dev/guide/),
 [Vitest](https://vitest.dev/guide/), and
 [typescript-eslint](https://typescript-eslint.io/getting-started/).
+
+The auxiliary render-polish implementation/QA record is in
+`plans/m11-render-polish.md`. It supersedes the original geometry Heat interaction;
+`docs/M11_CLOSEOUT.md` and the original milestone plans remain historical records.
+This branch does not advance the official M11 milestone.

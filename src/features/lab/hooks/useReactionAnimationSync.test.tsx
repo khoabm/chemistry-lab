@@ -45,9 +45,9 @@ it('resynchronizes heated-solid gas revealed by reheating without an unrelated r
 it('seeks new/revealed views to the shared age and leaves operating heating animations alone', () => {
   vi.useFakeTimers()
   const gas = { animationName: 'gas-development', currentTime: 0 }
-  const glow = { animationName: 'heating-glow', currentTime: 42 }
+  const flame = { animationName: 'flame-flicker', currentTime: 42 }
   const original = Object.getOwnPropertyDescriptor(SVGElement.prototype, 'getAnimations')
-  Object.defineProperty(SVGElement.prototype, 'getAnimations', { configurable: true, value: () => [gas, glow] })
+  Object.defineProperty(SVGElement.prototype, 'getAnimations', { configurable: true, value: () => [gas, flame] })
   try {
     const contents = [{ chemicalId: 'hydrochloric-acid', quantity: 1 }, { chemicalId: 'sodium-bicarbonate', quantity: 1 }] as const
     const reactionResult = evaluateReaction({ contents, trigger: 'mix' })
@@ -55,7 +55,7 @@ it('seeks new/revealed views to the shared age and leaves operating heating anim
     act(() => vi.advanceTimersByTime(2500))
     const { rerender, unmount } = render(<EquipmentVisual equipmentType="beaker" contents={contents} reactionResult={reactionResult} presentation={presentation} />)
     expect(gas.currentTime).toBe(2500)
-    expect(glow.currentTime).toBe(42)
+    expect(flame.currentTime).toBe(42)
     rerender(<EquipmentVisual equipmentType="beaker" contents={contents} reactionResult={reactionResult} presentation={presentation} visible={false} />)
     act(() => vi.advanceTimersByTime(2000))
     rerender(<EquipmentVisual equipmentType="beaker" contents={contents} reactionResult={reactionResult} presentation={presentation} />)

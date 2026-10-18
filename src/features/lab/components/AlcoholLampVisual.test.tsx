@@ -20,6 +20,17 @@ function expectSetup(root: Element) {
 }
 
 describe('shared decorative alcohol-lamp heating station', () => {
+  it.each(['beaker', 'test-tube'] as const)('omits decorative Heat ellipses from %s without changing its vessel or contents', (equipmentType) => {
+    const contents = [{ chemicalId: 'copper-carbonate', quantity: 1 }] as const
+    const { container, rerender } = render(<EquipmentVisual equipmentType={equipmentType} contents={contents} heating />)
+    const svg = container.querySelector('svg')
+    expect(container.querySelector('.container-heat-glow')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
+    rerender(<EquipmentVisual equipmentType={equipmentType} contents={contents} heating={false} />)
+    expect(container.querySelector('svg')).toBe(svg)
+    expect(container.querySelector('.container-heat-glow')).not.toBeInTheDocument()
+  })
+
   it('retains support/body across off, lit and extinguished states without new accessible equipment', () => {
     const { container, rerender } = render(<EquipmentVisual equipmentType="alcohol-lamp" />)
     expectSetup(container)

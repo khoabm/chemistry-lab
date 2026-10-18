@@ -6,7 +6,6 @@ import type { ReactionResult } from '../../../simulation/reactions/types'
 import { ReactionEffectsVisual } from '../renderers/ReactionEffectsVisual'
 import { getContentsLayout } from '../renderers/contentsPresentation'
 import type { AlcoholLampState } from '../../../types/heating'
-import { isContainerEquipment } from '../../../types/container'
 import { solidProductColors } from '../renderers/reactionPresentation'
 import { completedPresentation, type ReactionPresentation, type ReplayStage } from '../renderers/reactionDynamics'
 import { useReactionAnimationSync } from '../hooks/useReactionAnimationSync'
@@ -33,8 +32,6 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
   return (
     <svg ref={svgRef} className="equipment-visual" viewBox="0 0 100 100" fill="none" aria-hidden="true" data-replay-stage={replayStage}>
       <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {heating && isContainerEquipment(equipmentType) && <ellipse className="container-heat-glow"
-          cx="50" cy="79" rx={equipmentType === 'beaker' ? 28 : 17} ry="11" fill="#e7b15d" fillOpacity="0.25" stroke="#b37c34" strokeOpacity="0.5" strokeWidth="1" />}
         {equipmentType === 'beaker' && <>
           <path fill="#fffefa90" d="M24 20h47l6 7-5 4v48a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6Z" />
           <defs><clipPath id={clipId}><path d="M26 32h44v47a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4Z" /></clipPath></defs>

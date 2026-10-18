@@ -20,7 +20,7 @@ interface LabWorkspaceProps {
 export function LabWorkspace({
   state,
   presentations,
-  interaction: { attachBench, drag, message, getEquipmentHandlers, renderedPositions, supportPlacement },
+  interaction: { attachBench, drag, message, getEquipmentHandlers, renderedPositions, supportPlacement, liftedMountedContainerId },
 }: LabWorkspaceProps) {
   const { t } = useTranslation()
   const { reactionName, chemicalName } = useChemistryCopy()
@@ -33,9 +33,13 @@ export function LabWorkspace({
     const container = state.containers.find((item) => item.equipmentInstanceId === instance.id)
     const lamp = state.lamps.find((item) => item.equipmentInstanceId === instance.id)
     const dropper = state.droppers.find((item) => item.equipmentInstanceId === instance.id)
+    const mount = findContainerMount(state.mounts, instance.id)
+    const lifted = instance.id === liftedMountedContainerId
+    const position = renderedPositions.get(instance.id) ?? instance.position
+    const visibleHeating = container?.heatingState.status === 'heating' && !lifted
     const supportApparatus = instance.equipmentType !== 'dropper' && (supportPlacement
       || state.mounts.some((mount) => mount.containerEquipmentId === instance.id || mount.lampEquipmentId === instance.id))
-    return { instance, container, lamp, dropper, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
+    return { instance, container, lamp, dropper, mount, lifted, position, visibleHeating, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
   })
 
   return (
@@ -72,13 +76,14 @@ export function LabWorkspace({
           <p>{t('workspace.emptyBody')}</p>
           <p className="empty-detail">{t('workspace.emptyHint')}</p>
         </div>}
-        {labeledEquipment.map(({ instance, label, container, lamp, dropper, supportApparatus }) => (
+        {labeledEquipment.map(({ instance, label, container, lamp, dropper, mount, lifted, position, visibleHeating, supportApparatus }) => (
           <button
             key={instance.id}
             type="button"
-            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}${supportApparatus ? ` is-support-apparatus${lamp ? ' is-support-lamp' : ' is-support-container'}` : ''}${drag?.placement?.lampDraft?.id === instance.id ? ' is-support-target' : ''}`}
-            style={equipmentPositionStyle(renderedPositions.get(instance.id) ?? instance.position)}
+            className={`workspace-equipment${state.selectedEquipmentId === instance.id ? ' is-selected' : ''}${drag?.source.kind === 'workspace' && drag.source.id === instance.id ? ' is-moving' : ''}${supportApparatus ? ` is-support-apparatus${lamp ? ' is-support-lamp' : ' is-support-container'}` : ''}${mount ? ` is-mounted${position.x > 0.5 ? ' label-on-left' : ''}` : ''}${lifted ? ' is-lifted' : ''}${drag?.placement?.lampDraft?.id === instance.id ? ' is-support-target' : ''}`}
+            style={equipmentPositionStyle(position)}
             data-equipment-id={instance.id}
+            data-equipment-type={instance.equipmentType}
             aria-label={label}
             aria-pressed={state.selectedEquipmentId === instance.id}
             aria-describedby={`equipment-movement-hint ${instance.id}-result`}
@@ -89,19 +94,19 @@ export function LabWorkspace({
               contents={container?.contents} reactionResult={container?.reactionResult ?? null}
               presentation={container ? presentations.get(container.id) : undefined}
               lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
-            <span>{label}</span>
-            {(lamp?.status === 'extinguished' || container?.heatingState.status === 'heating') && <span className="equipment-state" aria-hidden="true">
+            <span className="equipment-label">{label}</span>
+            {(lamp?.status === 'extinguished' || visibleHeating) && <span className="equipment-state" aria-hidden="true">
               {lamp ? t('workspace.off') : t('workspace.heating')}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
-              {container && findContainerMount(state.mounts, instance.id) && t('mount.onLamp', {
-                lamp: labeledEquipment.find(({ instance: item }) => item.id === findContainerMount(state.mounts, instance.id)?.lampEquipmentId)?.label,
+              {mount && t('mount.onLamp', {
+                lamp: labeledEquipment.find(({ instance: item }) => item.id === mount.lampEquipmentId)?.label,
               })}
               {lamp && (findLampMount(state.mounts, instance.id) ? t('mount.supportOccupied', {
                 container: labeledEquipment.find(({ instance: item }) => item.id === findLampMount(state.mounts, instance.id)?.containerEquipmentId)?.label,
               }) : t('mount.supportEmpty'))}
               {dropper ? dropper.payload ? t('dropper.loaded', { name: chemicalName(dropper.payload.chemicalId), formula: findChemical(dropper.payload.chemicalId)?.formula }) : t('dropper.empty') : ''}
-              {lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : container?.heatingState.status === 'heating' ? `${t('heat.heating')} ` : ''}
+              {' '}{lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : lifted ? `${t('heat.lifted')} ` : visibleHeating ? `${t('heat.heating')} ` : ''}
               {container?.reactionResult?.status === 'reaction'
                 ? `${reactionName(container.reactionResult.reactionId, container.reactionResult.name)}. ${describeReactionEffects(container.reactionResult.effects, t)}`
                 : container?.reactionResult ? t('result.noReaction') : null}

@@ -129,6 +129,7 @@
   "heat.containerStatus": "Container heating",
   "heat.evaluationStatus": "Heat evaluation",
   "heat.heating": "Heating over a lit alcohol lamp.",
+  "heat.lifted": "Lifted from the support.",
   "heat.off": "Not heating.",
   "heat.pending": "Waiting for heat reaction…",
   "heat.evaluated": "Heat evaluation complete.",

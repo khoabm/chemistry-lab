@@ -66,6 +66,58 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(
 // StrictMode calls the pure reducer twice per action; two engine calls represent
 // one committed Heat result. Hook tests separately assert one timer dispatch.
 describe('production mounted heating and pointer timer integration', () => {
+  it.each(['Beaker', 'Test tube'])('keeps mounted %s label, button and SVG identity through EN/VI and lift cancellation', (name) => {
+    const { containers } = setup()
+    const lamp = add('Alcohol lamp')
+    const sample = add(name)
+    mountSelectedSample(lamp.dataset.equipmentId!)
+    expect(sample).toHaveClass('is-mounted', 'is-support-container')
+    expect(sample).toHaveAttribute('data-equipment-type', name === 'Beaker' ? 'beaker' : 'test-tube')
+    const label = sample.querySelector('.equipment-label')!
+    const svg = sample.querySelector('svg')
+    expect(label).toHaveTextContent(`${name} 1`)
+    const original = containers()[0]
+    fireEvent.change(screen.getByRole('combobox', { name: 'Language' }), { target: { value: 'vi' } })
+    expect(label).toHaveTextContent(name === 'Beaker' ? 'Cốc thủy tinh 1' : 'Ống nghiệm 1')
+    const status = screen.getByRole('status', { name: 'Trạng thái đun mẫu' })
+    pointer(sample, 'down'); pointer(sample, 'move', { x: 700, y: 420 })
+    expect(status).toHaveTextContent('Đang nhấc khỏi giá đỡ.')
+    expect(status).toHaveAttribute('aria-live', 'polite')
+    const description = status.textContent
+    pointer(sample, 'move', { x: 710, y: 430 })
+    expect(screen.getByRole('status', { name: 'Trạng thái đun mẫu' })).toBe(status)
+    expect(status.textContent).toBe(description) // No coordinate-driven announcement.
+    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument()
+    fireEvent.keyDown(sample, { key: 'Escape' })
+    expect(containers()[0]).toBe(original)
+    expect(sample.querySelector('.equipment-label')).toBe(label)
+    expect(sample.querySelector('svg')).toBe(svg)
+    expect(document.querySelectorAll(`[data-equipment-id="${sample.dataset.equipmentId}"]`)).toHaveLength(1)
+    expect(sample).not.toHaveClass('is-lifted')
+    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument() // Lamp remains off.
+  })
+
+  it('keeps actual R7 reaction heating and finite presentation age while only draft feedback is lifted', () => {
+    const { containers } = setup()
+    const { sample } = firstAssembly()
+    tick(2000)
+    const result = containers()[0]!.reactionResult
+    const gas = sample.querySelector('[data-reaction-effect="gas"]')
+    expect(gas).toBeInTheDocument()
+    pointer(sample, 'down'); pointer(sample, 'move', { x: 700, y: 420 })
+    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument()
+    expect(sample.querySelector('[data-reaction-effect="gas"]')).toBe(gas)
+    expect(containers()[0]!.reactionResult).toBe(result)
+    expect(containers()[0]!.heatingState.status).toBe('heating')
+    tick(8000)
+    expect(sample.querySelector('[data-reaction-effect="gas"]')).not.toBeInTheDocument()
+    fireEvent.keyDown(sample, { key: 'Escape' })
+    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
+    expect(sample.querySelector('[data-reaction-effect="gas"]')).not.toBeInTheDocument()
+    expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
+    expect(containers()[0]!.reactionResult).toBe(result)
+  })
+
   it.each([
     ['Beaker', 'Copper(II) carbonate', 'R7'],
     ['Test tube', 'Copper(II) sulfate pentahydrate', 'R8'],
@@ -150,7 +202,8 @@ describe('production mounted heating and pointer timer integration', () => {
     fireEvent.click(lamp)
     expect(screen.getByRole('status', { name: 'Lamp support occupancy' })).toHaveTextContent('Support holds Beaker 1.')
     click('Ignite lamp')
-    expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
+    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
+    expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
     expect(containers()[0]!.heatEvaluation.status).toBe('idle')
     tick(4000)
     expect(evaluate).not.toHaveBeenCalled()
@@ -171,6 +224,7 @@ describe('production mounted heating and pointer timer integration', () => {
     tick(1000)
     pointer(source, 'down', kind === 'palette' ? { x: 0, y: 0 } : center(source))
     if (kind !== 'pointerdown') pointer(source, 'move', { x: 650, y: 400 })
+    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
     if (kind === 'lamp') pointer(source, 'up', { x: 650, y: 400 })
     tick(999)
     expect(evaluate).not.toHaveBeenCalled()
@@ -189,7 +243,14 @@ describe('production mounted heating and pointer timer integration', () => {
     const request = containers()[0]!.heatEvaluation
     tick(1000)
     pointer(sample, 'down')
+    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
     pointer(sample, 'move', reason === 'occupied' ? center(other) : { x: 700, y: 420 })
+    expect(sample).toHaveClass('is-mounted', 'is-lifted')
+    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument()
+    expect(sample).toHaveAccessibleDescription(expect.stringContaining('Lifted from the support.'))
+    expect(sample).not.toHaveAccessibleDescription(expect.stringContaining('Heating over a lit'))
+    expect(screen.getByRole('status', { name: 'Container heating' })).toHaveTextContent('Lifted from the support.')
+    expect(containers()[0]!.heatingState.status).toBe('heating')
     tick(1000)
     expect(evaluate).toHaveBeenCalledTimes(2) // Only the second setup completes.
     expect(containers()[0]!.heatEvaluation).toBe(request)
@@ -206,6 +267,9 @@ describe('production mounted heating and pointer timer integration', () => {
     if (reason === 'occupied') pointer(sample, 'up', center(other))
     if (reason === 'same-support') pointer(sample, 'up', original)
     pointer(sample, 'up', { x: 700, y: 420 }) // Stale pointerup after cancellation.
+    expect(sample).not.toHaveClass('is-lifted')
+    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
+    expect(containers()[0]!.heatEvaluation).toBe(request)
     tick(999)
     expect(evaluate).toHaveBeenCalledTimes(2)
     tick(1)
@@ -234,12 +298,14 @@ describe('production mounted heating and pointer timer integration', () => {
     pointer(sample, 'down'); pointer(sample, 'move', target2)
     expect(containers()[0]!.heatEvaluation).toBe(request)
     pointer(sample, 'up', target2)
+    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
     expect(containers()[0]!.heatingState).toEqual({ status: 'heating', lampId: second.dataset.equipmentId })
     expect(containers()[0]!.heatEvaluation).not.toEqual(request)
     tick(1999)
     expect(evaluate).not.toHaveBeenCalled()
     pointer(sample, 'down'); pointer(sample, 'move', { x: 650, y: 430 }); pointer(sample, 'up', { x: 650, y: 430 })
     expect(containers()[0]!.heatingState.status).toBe('not-heating')
+    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument()
     tick(5000)
     expect(evaluate).not.toHaveBeenCalled()
     expect(document.querySelectorAll(`[data-equipment-id="${sample.dataset.equipmentId}"]`)).toHaveLength(1)
@@ -253,6 +319,9 @@ describe('production mounted heating and pointer timer integration', () => {
     pointer(sample, 'down'); pointer(sample, 'move', { x: 700, y: 420 })
     fireEvent.change(screen.getByRole('combobox', { name: 'Language' }), { target: { value: 'vi' } })
     expect(containers()[0]).toBe(initial)
+    expect(sample).toHaveAccessibleDescription(expect.stringContaining('Đang nhấc khỏi giá đỡ.'))
+    expect(screen.getByRole('status', { name: 'Trạng thái đun mẫu' })).toHaveTextContent('Đang nhấc khỏi giá đỡ.')
+    expect(screen.getByRole('status', { name: 'Trạng thái đun mẫu' })).toHaveAttribute('aria-live', 'off')
     tick(4000)
     expect(evaluate).not.toHaveBeenCalled()
     fireEvent.keyDown(sample, { key: 'Escape' })

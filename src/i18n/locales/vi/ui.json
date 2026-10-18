@@ -121,6 +121,7 @@
   "heat.containerStatus": "Trạng thái đun mẫu",
   "heat.evaluationStatus": "Kiểm tra khi đun",
   "heat.heating": "Đang đun trên đèn cồn đang cháy.",
+  "heat.lifted": "Đang nhấc khỏi giá đỡ.",
   "heat.off": "Không đun.",
   "heat.pending": "Đang chờ phản ứng khi đun…",
   "heat.evaluated": "Đã kiểm tra khi đun.",

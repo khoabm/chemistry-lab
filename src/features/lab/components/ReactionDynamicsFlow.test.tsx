@@ -102,7 +102,7 @@ describe('M9 reaction dynamics across existing views', () => {
     expect(sample.querySelector('.is-transforming')).not.toBeInTheDocument()
     expect(sample.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', color)
     expect(sample.querySelector('[data-reaction-effect="gas"]')).not.toBeInTheDocument()
-    expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
+    expect(sample.querySelector('.equipment-state')).toBeInTheDocument()
     click('Alcohol lamp 1'); click('Extinguish lamp'); click('Ignite lamp'); fireEvent.click(sample)
     expect(sample.querySelector('[data-reaction-effect="gas"]')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab', { name: 'Sample' })); click('Enlarge selected sample')

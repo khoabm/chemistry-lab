@@ -282,6 +282,12 @@ Do not force the user through modal dialogs for normal laboratory actions.
 
 ## 9. Drag-and-drop feedback
 
+At widths up to 900px and heights up to 500px, the collapsible palette uses normal
+page flow instead of sticky positioning, so deep scrolling cannot put tools over
+the usable bench. Expanded tools retain their bounded internal scroll, native
+toggle/keyboard behavior and Escape focus return. Portrait sticky and desktop
+panels remain unchanged. Visible-surface hit testing still rejects covered drops.
+
 When dragging an object:
 
 - clearly show the dragged object
@@ -371,12 +377,10 @@ The flame should be animated but restrained.
 A compatible container should show clear heating feedback when correctly
 positioned.
 
-Heating feedback may include:
-
-- subtle warm glow
-- small motion
-- heat-wave effect
-- heating status indicator
+Heating feedback uses the lamp flame and a textual Heating status. Render-polish
+Pass 5 removes the decorative orange container ellipse without replacement.
+Actual reaction warmth, gas, precipitate and solid transformations remain distinct
+semantic reaction effects with the existing finite lifecycle.
 
 Do not use a complex temperature dashboard.
 
@@ -408,7 +412,20 @@ No mounting occurs before a valid release. Pointer movement has no per-coordinat
 live announcements. Native Mount/Remove are alternatives to dragging. Selection
 is subtle; keyboard focus remains a separate visible outline above adjacent
 selected apparatus. Close-up/modal share physical Heat and result feedback.
-Reduced-motion retains static flame/glow shapes and text while disabling motion.
+Reduced-motion retains static flame, reaction cues and text while disabling motion.
+
+Mounted container names sit beside their silhouettes, facing the bench interior;
+Beaker/Test tube labels use separate vertical slots to remain readable in narrow
+two-assembly layouts. Names wrap within a bounded text width and do not intercept
+pointer input. Lamp names remain below the stand. No support contact, button
+footprint, target geometry or focus order is changed for text placement.
+
+During an active mounted-container lift, hide its normal Heating badge and show
+localized lifted feedback in the accessible description and Sample status instead.
+Cancel/same-support return restores the badge; assembly dragging keeps it visible.
+This is presentation only: never override the heating prop used by reaction
+animation synchronization or mutate committed heating/mount state. Status text
+changes at lift/end transitions, not on every pointer coordinate.
 
 M6 extends this interaction with a short illustrative wait for filled containers.
 Show pending/completed heat evaluation separately from physical Heating. R7 changes

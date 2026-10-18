@@ -14,8 +14,8 @@ it away or using a keyboard-accessible action, and understand why that sample is
 This is an explicitly authorized auxiliary branch within the official active milestone
 `M11 — Dropper Transfer & 2D Material Presentation`. It neither renames M11 nor creates
 another milestone. The completed M11 transfer/material work is the baseline, not work to
-reimplement. Passes 1–3 foundations and Pass 4 production integration are delivered
-below; Pass 5 remains planned. The production mounting integration gate is now open
+reimplement. All five implementation passes and local acceptance are complete,
+ready for user review. The production mounting integration gate is open
 with mounts as the sole Heat source. Earlier gate/geometry records below describe
 their historical pass baselines, not the current production contract.
 
@@ -413,6 +413,9 @@ deliberately deferred until relation, projection and heating can agree.
 
 ### Pass 5 — Affordance, browser QA and closeout
 
+Remove the decorative container Heat ellipse without replacing it; correct mounted
+labels beside silhouettes without moving SVG anchors; show lifted-only presentation
+feedback without changing semantic Heat; keep short-landscape tools in normal flow.
 Inspect actual snap discoverability, occupied/available feedback, alignment, selection,
 focus and hit/paint ordering. Begin with the simple two-layer apparatus; require concrete
 QA evidence before any decorative front support layer. Check EN/VI and responsive bounds,
@@ -605,11 +608,29 @@ QA claimed by this planning task.
   All four stages completed; full local validation passed 513 tests / 37 files,
   typecheck, lint, production build and diff whitespace checks. Browser evidence
   and explicit QA limitations are recorded in the Pass 4 outcome below.
-- [ ] Pass 5: visual affordance/browser QA and scoped documentation closeout.
-- [ ] Run final cross-pass validation, inspect final diff and hand off the complete polish implementation.
+- [x] Pass 5: visual affordance/browser QA and scoped documentation closeout.
+  Started 2026-10-18 on clean `M11-render-polish`, HEAD `fcd05ae` (approved Pass 4).
+  Inspect final Passes 1–4; remove decorative heat ellipse only, place mounted names
+  beside apparatus with inward-facing CSS labels, separate lifted feedback from
+  committed reaction heating, and disable sticky palette only at short landscape.
+  Validate with focused/full tests, EN/VI and real-browser QA before closeout.
+  Completed: five new focused cases plus adapted presentation assertions, browser
+  evidence at all requested viewports/boundaries, current contracts and full validation.
+- [x] Run final cross-pass validation, inspect final diff and hand off the complete polish implementation.
+  518/518 tests in 37 files, typecheck/lint/build/diff checks PASS. No official
+  milestone approval/advancement, commit, push or merge; changes await user review.
 
 ## Surprises and discoveries
 
+- Pass 5 browser QA reproduced the baseline 844x390 sticky palette covering the
+  upper assembly after deep scrolling. Changing only short/narrow palette position
+  to static removed the obstruction; expanded internal scrolling and drag-add work.
+- Pass 5: both compatible names can use the existing label span beside the vessel,
+  inward from bench edges. Distinct Beaker/Test tube vertical slots avoid the names
+  meeting in typical narrow two-assembly layouts. SVG anchors need no adjustment.
+- Pass 5: the decorative ellipse is not the only consumer of `heating`.
+  Heated-solid gas filtering and animation synchronization still depend on it;
+  lifted feedback must be a separate presentation signal through Sample details.
 - Pass 4: enabling real support geometry requires old jsdom interaction tests to
   supply bench/button measurements. A zero-size bench correctly rejects preparation;
   a zero-size source button produces an unrealistic grab offset and invalid center.
@@ -664,6 +685,22 @@ QA claimed by this planning task.
 
 ## Decision log
 
+- 2026-10-18, Pass 5: remove the decorative Heat ellipse, its keyframes/selector and
+  reduced-motion reference without replacing it. Keep `heating` and reaction warmth,
+  finite gas, precipitate, solid products and lamp flame unchanged.
+- 2026-10-18, Pass 5: name the existing label span and scope mounted-only side labels
+  to it, 80px wrapping width with Beaker/Test tube vertical slots (64px/24px). Choose
+  the inward-facing side from the already rendered normalized x; make annotations
+  pointer-transparent. Lifted drafts use the normal free label slot. This needs no
+  text measurement/layout engine or support/bounds/footprint changes.
+- 2026-10-18, Pass 5: reuse liftedMountedContainerId for the workspace badge/description
+  and a default-false presentation prop through ExperimentPanel/ContainerDetails to
+  HeatingStatus. Add one EN/VI lifted message, hide contradictory pending guidance
+  during lift, and use semantic lift/end changes for polite status. Never override
+  EquipmentVisual.heating, committed HeatingState, mounts or timer inputs/policy.
+- 2026-10-18, Pass 5: set only .lab-palette position:static inside the existing
+  max-width:900px/max-height:500px rule. Keep all disclosure, scroll, hit-test and
+  cancellation code; portrait sticky and desktop layouts retain their existing rules.
 - 2026-10-18, Pass 4: resolve Heat from validated mount pairs and lit lamp state in
   the application layer. Synchronize mount/rebind even without an anchor adjustment,
   and validate the current source again at delayed evaluation. Remove the obsolete
@@ -1287,3 +1324,139 @@ contracts are updated in docs/ARCHITECTURE.md and docs/UI_UX.md; M11_CLOSEOUT is
 untouched. Pass 4 is complete, the mounting integration gate is open, and Pass 5
 and whole-branch closeout remain incomplete. No commit, push, merge or official
 milestone advancement was performed.
+
+
+### Pass 5 final presentation and review preparation, 2026-10-18
+
+Baseline: clean `M11-render-polish`, HEAD `fcd05ae` (`refine: pass 4`), with approved
+Passes 1–4 and focused Pass 3 correction in history. Read AGENTS.md, .agent/PLANS.md,
+this plan and relevant current contracts/source/tests before editing. Official M11
+is unchanged. No dependency installation or Git mutation is part of this pass.
+
+Delivered presentation corrections:
+
+- EquipmentVisual no longer renders container-heat-glow for either container. Its
+  CSS/keyframe/reduced-motion entry are removed, without a replacement effect.
+  Keep the heating prop, heated-solid gas gating and useReactionAnimationSync input.
+- Existing keyed container buttons/SVGs/labels remain independent. Mounted labels
+  face the bench interior beside the vessel; lamp labels remain below the stand.
+  EN/VI names fit the representative layouts, wrap without moving contact anchors
+  and are pointer-transparent. No front gauze overlay or new decorative layer.
+- A real mounted-container lift hides the normal badge and supplies localized lifted
+  feedback to its accessible description and selected Sample status. Off lamps show
+  no Heating badge. Cancel/invalid/same-support return restores the committed badge;
+  free detach removes it, lit rebind restores it, assembly movement retains it.
+  Actual Heat state and reaction presentation remain committed, including finite
+  R7 gas continuing its existing age while lifted. No reducer, support helper,
+  useEquipmentInteraction or useHeatReactions implementation changed.
+- Only short/narrow palette positioning becomes static. Tools remain native,
+  collapsible and internally scrollable. Existing overlay rejection remains valid
+  for other covered surfaces and portrait sticky tools.
+
+Tests: add two no-ellipse vessel cases, two EN/VI mounted-label/button/SVG identity
+cases and a live R7 lift/finite-gas case. Extend real LabPage timer/cancellation
+coverage with visual badge/description assertions, including all nine cancellation/
+return paths, assembly/unrelated drags, lit rebind, detach and paused locale switch.
+Retain original pending request/time assertions. Migrate only old decorative-glow
+assertions to current badge/status or explicit absence; keep all reaction-specific
+assertions. Animation synchronization tests now use flame-flicker as the unrelated
+operating animation instead of the removed heating-glow name.
+
+Initial six-file focused run passed 104/106: the two new label tests incorrectly
+expected aria-live to turn off on each unchanged coordinate update. The existing
+live-region policy retains polite but does not update unchanged text. Correct the
+new tests to assert the same status node and identical text through movement;
+no live-region hook or existing assertion was weakened. Focused rerun of actual
+production mounted workflow and unchanged timer hook passed 36/36 in two files.
+Typecheck and lint passed before the final standalone regression run.
+
+Real-browser QA used the production Vite page in the in-app browser, not an internal
+harness. Viewport emulation: 1440x960, 390x844, 844x390, plus 900x500, 900x501 and
+901x500 boundaries. Observed/exercised:
+
+- Both mounted Beaker/Test tube names are clear of gauze, flame and contents in EN/VI;
+  lamp names remain readable. No orange ellipse; flames remain. No horizontal page
+  overflow or name clipping observed. Simple lamp-behind/container-front layering
+  remains sufficient, including independent click/grab targets.
+- Native Remove by Enter keeps focus on the same now-Mount button. Tab from the
+  native lamp selector reaches Mount; Enter mounts and retains focus as Remove.
+  Occupied options explain rejection. Focus-visible on a lamp remains visible above
+  its selected mounted container without changing selection (verified separately).
+- Pointer occupied rejection, native removal, atomic pointer rebind, free pointer
+  mount and lamp assembly movement work. Arrow/Shift retains assembly alignment;
+  top/right edge and resize projection remain aligned. Geometry is unchanged.
+- R7 completed black solid and R8 completed pale solid remain after removal/remount
+  and rebind. R7 Replay/Auto Replay works through EN/VI change; Escape dismisses
+  the dialog and restores focus to View reaction. No new live reaction is created.
+- Fill a Dropper from a fresh two-unit HCl sample, then move it by Shift+Arrow and
+  pointer and switch EN/VI: the loaded one-unit payload and visual remain present.
+  Material conservation/Dispense/no automatic Mix are retained automated tests.
+- At 844x390 the former overlay was reproduced and captured before changes. After
+  the fix, deep scrolling moves the palette offscreen. Pointer access/movement in
+  the upper bench works. Expanded tools keep overflow-y:auto and a bounded ~136px
+  content region; palette drag-add succeeds, Escape collapses and restores toggle
+  focus. At 900x500 position is static, 900x501 sticky, 901x500 normal desktop static;
+  all three boundary checks had no page overflow. Portrait remains sticky.
+- No browser warning/error logs were captured.
+
+QA artifacts outside the repository, in
+`C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/`:
+`pass5-before-landscape.png`, `pass5-desktop-assemblies.png`,
+`pass5-desktop-focus.png`, `pass5-portrait-vi.png`,
+`pass5-landscape-after-scroll.png`.
+
+QA limits: whole-gesture browser drag cannot capture a held mid-drag state or an
+exact timed cancellation; automated real-LabPage tests verify lifted-only feedback,
+all cancel/return paths and preserved remainder, and the R7 gas case verifies the
+semantic heating prop is unchanged. No physical touch-device or screen-reader
+certification is claimed. Available browser capabilities did not offer reduced-motion
+emulation; retained reduced-motion/Replay tests cover those contracts. Arbitrary
+unrelated equipment overlap remains allowed (a free loaded Dropper near another
+free Beaker was observed); no general collision or label-layout engine is introduced.
+Moving those free objects remains available. No remaining sticky obstruction was
+observed in the scoped short-landscape layout.
+
+Current contracts in README, docs/UI_UX.md and docs/ARCHITECTURE.md now describe the
+complete direct-drag/native/pointer mounted workflow, source/timer model, lifted
+feedback, label treatment and landscape exception. README obsolete overlap-only
+instructions, old removed helper path and hidden-Dropper claims are corrected.
+Historical M11_CLOSEOUT, original milestone plans and official MILESTONES remain
+untouched. Final full validation and acceptance outcome follow below.
+
+
+Pass 5 changed-file manifest (19 existing files, no new dependency/files):
+
+- Production presentation: src/features/lab/components/EquipmentVisual.tsx,
+  LabWorkspace.tsx, LabPage.tsx, ExperimentPanel.tsx, ContainerDetails.tsx and
+  HeatingStatus.tsx in the same components directory; src/styles/global.css.
+- Generic copy: src/i18n/locales/en/ui.json and src/i18n/locales/vi/ui.json.
+- Tests: AlcoholLampVisual.test.tsx, LabPage.test.tsx, MountedHeatFlow.test.tsx,
+  ReactionDynamicsFlow.test.tsx and SampleDetailDialog.test.tsx in the components
+  directory; src/features/lab/hooks/useReactionAnimationSync.test.tsx.
+- Current docs/record: README.md, docs/UI_UX.md, docs/ARCHITECTURE.md and this plan.
+
+Final standalone Pass 5 validation, 2026-10-18:
+
+| Command | Result |
+| --- | --- |
+| npm run typecheck | PASS |
+| npm run lint | PASS, zero warnings |
+| npm test -- --maxWorkers=2 | PASS, 518 tests / 37 files, 143.93s |
+| npm run build | PASS, 91 modules, Vite production output |
+| git diff --check | PASS |
+
+Final review confirms no store/reducer, mounting policy, support geometry/placement,
+useEquipmentInteraction, useHeatReactions, reaction definition, reaction animation
+owner, Dropper transfer algorithm, package/lockfile or official milestone change.
+No replacement glow, front support layer, new dependency, generic collision/layout
+framework or unrelated product feature was added. Actual browser evidence and its
+limits are above; reduced-motion and exact draft/timer behavior remain protected
+by automated tests rather than unperformed browser modes. No hosted CI is claimed.
+
+All Pass 5 acceptance criteria are satisfied within the available testing modes.
+The render-polish implementation and local acceptance are complete and ready for
+user review. Arbitrary free-equipment overlap and the explicitly unperformed
+physical touch/screen-reader/mid-gesture browser modes are documented limitations,
+not hidden certifications. Historical milestone records stay intact. This closes
+the auxiliary ExecPlan's implementation/validation work, not the official M11
+milestone or a Git merge. No commit, push, merge or milestone advance was performed.

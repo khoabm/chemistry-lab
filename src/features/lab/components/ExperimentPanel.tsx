@@ -17,6 +17,7 @@ interface ExperimentPanelProps {
   container: ContainerState | null
   lamp: AlcoholLampState | null
   disabled: boolean
+  lifted?: boolean
   onMix: () => void
   onClear: () => void
   onToggleLamp: () => void
@@ -26,7 +27,7 @@ interface ExperimentPanelProps {
   lampSupportStatus?: ReactNode
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -76,6 +77,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, onMix, o
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-sample-panel`} aria-labelledby={`${id}-sample-tab`}
         tabIndex={0} hidden={activeTab !== 'sample'}>
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
+          lifted={lifted}
           mountControls={mountControls}
           presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}

@@ -50,6 +50,7 @@ function Laboratory() {
         <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}
+          lifted={!!selectedContainer && interaction.liftedMountedContainerId === selectedContainer.equipmentInstanceId}
           mountControls={selectedContainer && <ContainerMountControls state={state}
             containerEquipmentId={selectedContainer.equipmentInstanceId} disabled={interaction.dragActive}
             onMount={(lampId) => interaction.mountOnSupport(selectedContainer.equipmentInstanceId, lampId)}

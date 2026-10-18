@@ -356,6 +356,15 @@ replacement. Callbacks check entry identity, request, token, handle and pause/
 completion state; unmount clears all work. Time values never drive chemistry or
 React rendering. Locale changes do not recreate requests or reset timers.
 
+Pass 5 consumes the existing lifted-container ID for presentation feedback only.
+Workspace badges/descriptions and the selected Sample status distinguish a lifted
+draft from supported heating, without changing HeatingState or the `heating` prop
+used by reaction rendering/animation synchronization. No per-coordinate live-region
+updates or timer policy changes are introduced. Fixed SVG anchors remain unchanged;
+CSS positions wrapping mounted labels beside silhouettes and disables sticky tools
+only for short narrow layouts. The decorative container Heat ellipse is removed;
+flame and genuine reaction effects keep their existing lifecycle.
+
 Do not introduce:
 
 - specific heat capacity
