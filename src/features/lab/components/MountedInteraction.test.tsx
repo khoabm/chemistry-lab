@@ -5,7 +5,7 @@ import { I18nextProvider } from 'react-i18next'
 import { createLocalization } from '../../../i18n'
 import { createLabWorkspaceState, labWorkspaceReducer as reduce, type LabWorkspaceAction, type LabWorkspaceState } from '../../../store/labWorkspace'
 import { evaluateReaction } from '../../../simulation/engine/evaluateReaction'
-import { equipmentCenter, mountedPositions, projectSupport } from '../interactions/supportGeometry'
+import { equipmentCenter, mountedPositions, projectSupport, resolveSupportTarget } from '../interactions/supportGeometry'
 import { prepareSupportMount, prepareSupportRemoval, supportPlacement } from '../interactions/supportPlacement'
 import { equipmentPositionStyle } from '../interactions/workspaceGeometry'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
@@ -40,7 +40,11 @@ function Harness({ initial, onAction }: { initial: LabWorkspaceState; onAction: 
     <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
     <ContainerMountControls state={state} containerEquipmentId="equipment-1" disabled={interaction.dragActive}
       onMount={(lampId) => send(prepareSupportMount(state, 'equipment-1', lampId, bounds))}
-      onRemove={() => send(prepareSupportRemoval(state, 'equipment-1', bounds))} />
+      onRemove={() => {
+        const prepared = prepareSupportRemoval(state, 'equipment-1', bounds)
+        if (prepared.issue === null) send(prepared.action)
+        return prepared.issue
+      }} />
     <output data-testid="presentation">{JSON.stringify([...presentations])}</output>
   </>
 }
@@ -248,7 +252,7 @@ describe('internal Pass 3 reducer-backed apparatus integration', () => {
   })
 
   it.each([false, true])('uses Arrow/Shift (shift=%s) to move assemblies once and detach containers from their visible position, retaining focus', (shiftKey) => {
-    const view = setup()
+    const view = setup(reduce(fixture(), { type: 'move', id: 'equipment-5', position: { x: 0.95, y: 0.95 } }))
     const lamp = view.button('equipment-4')
     lamp.focus()
     const origin = observed.equipment[3]!.position
@@ -262,12 +266,112 @@ describe('internal Pass 3 reducer-backed apparatus integration', () => {
     sample.focus()
     fireEvent.keyDown(sample, { key: 'ArrowRight', shiftKey })
     expect(observed.mounts).toEqual([])
-    expect(observed.equipment[0]!.position.x).toBeCloseTo(projected.x + (shiftKey ? 0.12 : 0.04))
+    expect(observed.equipment[0]!.position.x).toBeCloseTo(projected.x + 100 / (bounds.width - 88) + (shiftKey ? 0.12 : 0.04))
     expect(observed.equipment[0]!.position.y).toBeCloseTo(projected.y)
     expect(view.changes().map((action) => action.type)).toEqual(['move-lamp-assembly', 'remove-from-support'])
     expect(sample).toHaveFocus()
     expect(sample).toBe(view.button())
     expect(sample).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  const detachCases = (['beaker', 'test-tube'] as const).flatMap((type) =>
+    [false, true].flatMap((shiftKey) => ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].map((key) => ({ type, shiftKey, key }))))
+  it.each(detachCases)('detaches $type with $key (Shift=$shiftKey) clearly beyond support targets and retains node/focus/selection', ({ type, shiftKey, key }) => {
+    bounds = new DOMRect(300, 100, 800, 600)
+    let initial = reduce(fixture(true, type), { type: 'move', id: 'equipment-4', position: { x: 0.5, y: 0.7 } })
+    initial = reduce(initial, { type: 'move', id: 'equipment-5', position: { x: 0.95, y: 0.95 } })
+    const view = setup(initial)
+    const sample = view.button()
+    const svg = sample.querySelector('svg')
+    const origin = view.center()
+    sample.focus()
+    fireEvent.keyDown(sample, { key, shiftKey })
+    const placed = view.center()
+    const horizontal = key === 'ArrowLeft' || key === 'ArrowRight'
+    const sign = key === 'ArrowLeft' || key === 'ArrowUp' ? -1 : 1
+    const expected = (horizontal ? 100 : 138) + (shiftKey ? 0.12 : 0.04) * (horizontal ? bounds.width - 88 : bounds.height - 126)
+    expect((horizontal ? placed.x - origin.x : placed.y - origin.y) * sign).toBeCloseTo(expected)
+    expect(resolveSupportTarget(observed, 'equipment-1', placed, bounds).kind).toBe('free-bench')
+    expect(observed.mounts).toEqual([])
+    expect(view.changes().map((action) => action.type)).toEqual(['remove-from-support'])
+    expect(observed.containers).toBe(initial.containers)
+    expect(observed.droppers).toBe(initial.droppers)
+    expect(view.button()).toBe(sample)
+    expect(sample.querySelector('svg')).toBe(svg)
+    expect(sample).toHaveFocus()
+    expect(sample).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it.each(['beaker', 'test-tube'] as const)('rejects %s detachment on an insufficient bench without changing selection, relation or position', (type) => {
+    bounds = new DOMRect(300, 100, 96, 212)
+    const initial = reduce(fixture(true, type), { type: 'select', id: 'equipment-1' })
+    const view = setup(initial)
+    const sample = view.button()
+    const style = sample.getAttribute('style')
+    sample.focus()
+    for (const key of ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown']) {
+      fireEvent.keyDown(sample, { key })
+      fireEvent.keyDown(sample, { key, shiftKey: true })
+      expect(observed).toBe(initial)
+      expect(view.changes()).toEqual([])
+      expect(sample).toHaveAttribute('style', style)
+      expect(sample).toHaveFocus()
+      expect(sample).toHaveAttribute('aria-pressed', 'true')
+      expect(document.querySelector('.workspace-message')).toHaveTextContent('There is not enough room on the bench for this setup.')
+    }
+  })
+
+  it.each(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'])('rejects clamped %s detachment at an edge, without redirecting the requested direction', (key) => {
+    const position = { x: key === 'ArrowLeft' ? 0 : key === 'ArrowRight' ? 1 : 0.5,
+      y: key === 'ArrowUp' ? 0 : key === 'ArrowDown' ? 1 : 0.7 }
+    const initial = reduce(reduce(fixture(), { type: 'move', id: 'equipment-4', position }), { type: 'select', id: 'equipment-1' })
+    const view = setup(initial)
+    view.button().focus()
+    fireEvent.keyDown(view.button(), { key })
+    expect(observed).toBe(initial)
+    expect(view.changes()).toEqual([])
+    expect(view.button()).toHaveFocus()
+  })
+
+  it.each([false, true])('rejects keyboard detach into another support target (occupied=%s)', (occupied) => {
+    let initial = reduce(fixture(), { type: 'move', id: 'equipment-5', position: { x: 0.25 + 100 / 512 + 0.04, y: 0.7 } })
+    if (occupied) initial = reduce(initial, { type: 'mount-container', containerEquipmentId: 'equipment-2', lampEquipmentId: 'equipment-5' })
+    initial = reduce(initial, { type: 'select', id: 'equipment-1' })
+    const view = setup(initial)
+    view.button().focus()
+    fireEvent.keyDown(view.button(), { key: 'ArrowRight' })
+    expect(observed).toBe(initial)
+    expect(view.changes()).toEqual([])
+    expect(view.button()).toHaveFocus()
+    expect(view.button()).toHaveAttribute('aria-pressed', 'true')
+    expect(document.querySelector('.workspace-message')).toHaveTextContent('There is not enough room on the bench for this setup.')
+  })
+
+  it('handles native Remove failure explicitly, announces the reason, and retries without replacing the focused action', () => {
+    bounds = new DOMRect(300, 100, 600, 300)
+    let initial = reduce(fixture(), { type: 'move', id: 'equipment-5', position: { x: 0.25 + 100 / 512, y: 0.7 } })
+    initial = reduce(initial, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.25 - 100 / 512, y: 0.7 } })
+    initial = reduce(initial, { type: 'select', id: 'equipment-1' })
+    expect(prepareSupportRemoval(initial, 'equipment-1', bounds)).toEqual({ issue: 'noRoom', action: null })
+    const view = setup(initial)
+    const action = screen.getByRole('button', { name: 'Remove from support' })
+    action.focus()
+    fireEvent.click(action)
+    expect(observed).toBe(initial)
+    expect(view.changes()).toEqual([])
+    expect(action).toHaveFocus()
+    expect(action).toHaveAccessibleDescription('There is not enough room on the bench for this setup.')
+    expect(screen.getByRole('status', { name: 'Container mounting' })).toHaveTextContent('There is not enough room on the bench for this setup.')
+    expect(screen.getByRole('status', { name: 'Container mounting' })).toHaveAttribute('aria-live', 'polite')
+    bounds = new DOMRect(300, 100, 600, 500)
+    fireEvent(window, new Event('resize'))
+    fireEvent.click(action)
+    expect(observed.mounts).toEqual([])
+    expect(view.changes().map((item) => item.type)).toEqual(['remove-from-support'])
+    expect(screen.getByRole('button', { name: 'Mount on support' })).toBe(action)
+    expect(action).toHaveFocus()
+    expect(screen.getByRole('status', { name: 'Container mounting' })).not.toHaveTextContent('not enough room')
+    expect(resolveSupportTarget(observed, 'equipment-1', view.center(), bounds).kind).toBe('free-bench')
   })
 
   it('prepares native Mount and Remove through shared geometry without historical-position teleport', () => {

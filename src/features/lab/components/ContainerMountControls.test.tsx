@@ -1,5 +1,5 @@
 import { useReducer } from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { createLocalization } from '../../../i18n'
@@ -31,6 +31,7 @@ function Harness({ initialState, disabled = false }: { initialState: LabWorkspac
         onRemove={() => {
           if (mount) dispatch({ type: 'remove-from-support', containerEquipmentId: equipment.id,
             lampEquipmentId: mount.lampEquipmentId, position: equipment.position })
+          return null
         }} />} />
     {state.lamps[0] && <LampDetails lamp={state.lamps[0]} disabled={disabled} onToggle={() => {}}
       supportStatus={<LampSupportStatus state={state} lampEquipmentId={state.lamps[0].equipmentInstanceId} />} />}
@@ -42,6 +43,27 @@ function Harness({ initialState, disabled = false }: { initialState: LabWorkspac
 afterEach(() => vi.restoreAllMocks())
 
 describe('Pass 2 native mounting foundations, isolated from production orchestration', () => {
+  it('exposes removal failure in EN/VI while retaining the mounted action and suppressing locale-only announcements', async () => {
+    const state = reduce(setupState(), { type: 'mount-container', containerEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-3' })
+    const i18n = createLocalization()
+    const onRemove = vi.fn(() => 'noRoom' as const)
+    render(<I18nextProvider i18n={i18n}><ContainerMountControls state={state} containerEquipmentId="equipment-1" disabled={false}
+      onMount={vi.fn()} onRemove={onRemove} /></I18nextProvider>)
+    const action = screen.getByRole('button', { name: 'Remove from support' })
+    action.focus()
+    fireEvent.click(action)
+    expect(onRemove).toHaveBeenCalledOnce()
+    expect(action).toHaveFocus()
+    expect(action).toHaveAccessibleDescription('There is not enough room on the bench for this setup.')
+    expect(screen.getByRole('status', { name: 'Container mounting' })).toHaveAttribute('aria-live', 'polite')
+    await act(async () => { await i18n.changeLanguage('vi') })
+    expect(screen.getByRole('button', { name: 'Nhấc khỏi giá đỡ' })).toBe(action)
+    expect(action).toHaveFocus()
+    expect(action).toHaveAccessibleDescription('Bàn không đủ chỗ cho bộ dụng cụ này.')
+    expect(screen.getByRole('status', { name: 'Trạng thái đặt dụng cụ trên giá' })).toHaveAttribute('aria-live', 'off')
+    expect(state.mounts).toHaveLength(1)
+  })
+
   it('uses a labeled native selector and the same action button/focus through Mount and Remove, even on an off lamp', () => {
     render(<Harness initialState={setupState()} />)
     const select = screen.getByRole('combobox', { name: 'Alcohol lamp support' })

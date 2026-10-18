@@ -28,21 +28,46 @@ export function prepareSupportMount(state: LabWorkspaceState, containerEquipment
     : { type: 'mount-container', containerEquipmentId, lampEquipmentId, lampPosition: projection.lampPosition }
 }
 
-export function prepareSupportRemoval(state: LabWorkspaceState, containerEquipmentId: string,
-  bounds: BenchBounds): LabWorkspaceAction | null {
-  if (bounds.width <= equipmentFootprint.width || bounds.height <= equipmentFootprint.height) return null
+export type SupportRemovalIssue = 'noRoom' | 'invalidContainer' | 'invalidLamp'
+type RemoveAction = Extract<LabWorkspaceAction, { type: 'remove-from-support' }>
+export type SupportRemovalPreparation =
+  | { issue: null; action: RemoveAction }
+  | { issue: SupportRemovalIssue; action: null }
+
+const removalClearance = { x: equipmentFootprint.width + 12, y: equipmentFootprint.height + 12 }
+
+function prepareRemovalAt(state: LabWorkspaceState, containerEquipmentId: string,
+  bounds: BenchBounds, offset: Point, selectContainer?: true): SupportRemovalPreparation {
   const current = findContainerMount(state.mounts, containerEquipmentId)
+  if (!current) return { issue: 'invalidContainer', action: null }
+  const issue = getMountTargetIssue(state, containerEquipmentId, current.lampEquipmentId)
+  if (issue) return { issue: issue === 'invalidLamp' ? 'invalidLamp' : 'invalidContainer', action: null }
+  if (![bounds.left, bounds.top, bounds.width, bounds.height].every(Number.isFinite)
+    || bounds.width <= equipmentFootprint.width || bounds.height <= equipmentFootprint.height) return { issue: 'noRoom', action: null }
   const position = mountedPositions(state, bounds).get(containerEquipmentId)
-  if (!current || !position) return null
+  if (!position) return { issue: 'invalidContainer', action: null }
   const center = equipmentCenter(position, bounds)
+  const candidate = benchPosition({ x: center.x + offset.x, y: center.y + offset.y }, bounds)
+  const placed = equipmentCenter(candidate, bounds)
+  // Clamping must not turn an outward Arrow into a tiny, ambiguous unmount.
+  if (offset.x && (placed.x - center.x) * Math.sign(offset.x) < removalClearance.x - 1e-9
+    || offset.y && (placed.y - center.y) * Math.sign(offset.y) < removalClearance.y - 1e-9) return { issue: 'noRoom', action: null }
+  // Classify the final free workspace, including any source support projection
+  // change after removal. This is a draft query, never a committed detach/undo.
+  const detached = { ...state, mounts: state.mounts.filter((mount) => mount !== current) }
+  if (resolveSupportTarget(detached, containerEquipmentId, placed, bounds).kind !== 'free-bench') return { issue: 'noRoom', action: null }
+  return { issue: null, action: { type: 'remove-from-support', containerEquipmentId,
+    lampEquipmentId: current.lampEquipmentId, position: candidate, ...(selectContainer ? { selectContainer } : {}) } }
+}
+
+export function prepareSupportRemoval(state: LabWorkspaceState, containerEquipmentId: string,
+  bounds: BenchBounds): SupportRemovalPreparation {
   // Deterministic nearby free placement; never teleport to the dormant position.
-  for (const delta of [{ x: 100, y: 0 }, { x: -100, y: 0 }, { x: 0, y: 100 }]) {
-    const candidate = benchPosition({ x: center.x + delta.x, y: center.y + delta.y }, bounds)
-    const target = resolveSupportTarget(state, containerEquipmentId, equipmentCenter(candidate, bounds), bounds)
-    if (target.kind === 'free-bench') return { type: 'remove-from-support', containerEquipmentId,
-      lampEquipmentId: current.lampEquipmentId, position: candidate }
+  for (const offset of [{ x: removalClearance.x, y: 0 }, { x: -removalClearance.x, y: 0 }, { x: 0, y: removalClearance.y }]) {
+    const prepared = prepareRemovalAt(state, containerEquipmentId, bounds, offset)
+    if (prepared.issue !== 'noRoom') return prepared
   }
-  return null
+  return { issue: 'noRoom', action: null }
 }
 
 function resolveDrag(state: LabWorkspaceState, id: string, center: Point, bounds: BenchBounds): SupportDragPlacement {
@@ -84,10 +109,13 @@ function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds
       containerEquipmentId: assembly.containerEquipmentId, position: projection.lampPosition } : null
   }
   const current = findContainerMount(state.mounts, id)
-  // Arrow movement is an explicit free move, never an implicit snap/rebind.
-  return current ? { type: 'remove-from-support', containerEquipmentId: id, lampEquipmentId: current.lampEquipmentId,
-    position: benchPosition(equipmentCenter(requested, bounds), bounds), selectContainer: true }
-    : { type: 'move', id, position: requested }
+  // First leave the support clearly in the requested direction, then apply the
+  // usual Arrow/Shift step. Rejection keeps the committed relation untouched.
+  if (current) return prepareRemovalAt(state, id, bounds, {
+    x: Math.sign(delta.x) * removalClearance.x + delta.x * (bounds.width - equipmentFootprint.width),
+    y: Math.sign(delta.y) * removalClearance.y + delta.y * (bounds.height - equipmentFootprint.height),
+  }, true).action
+  return { type: 'move', id, position: requested }
 }
 
 // Concrete composition dependency for the closed Pass 2–4 integration gate.

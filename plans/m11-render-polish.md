@@ -14,7 +14,7 @@ it away or using a keyboard-accessible action, and understand why that sample is
 This is an explicitly authorized auxiliary branch within the official active milestone
 `M11 — Dropper Transfer & 2D Material Presentation`. It neither renames M11 nor creates
 another milestone. The completed M11 transfer/material work is the baseline, not work to
-reimplement. Pass 1 and Pass 2 foundations are delivered below; Passes 3–5 remain
+reimplement. Passes 1–3 internal foundations are delivered below; Passes 4–5 remain
 planned. The production mounting integration gate remains closed until Pass 4.
 
 ## Scope
@@ -228,8 +228,13 @@ feedback rather than clip or alter unrelated objects. No collision solver is req
 
 Arrow movement of a mounted lamp moves the assembly using existing steps and group
 bounds. Arrow movement of a mounted container detaches and moves it from its visible
-derived position in one transition; it must not use its dormant free position. Preserve
-Shift's existing larger step. Free arrows do not require snap discovery or auto-mount;
+derived position in one transition; it must not use its dormant free position. The
+first detach adds an adjacent-footprint clearance in the requested direction before
+the normal .04/.12 Arrow/Shift step. Reject candidates that lose that clearance at
+an edge or land within any support target; keep the original relation and report
+failure. Native Remove returns an explicit preparation issue if its preferred nearby
+positions are unavailable; controls must display that failure. Preserve Shift's
+larger step. Free arrows do not require snap discovery or auto-mount;
 the native controls are the accessible precise mounting path. Suppress move/activation
 keys during active pointer drag as before. No new hotkeys or modal.
 
@@ -584,6 +589,12 @@ QA claimed by this planning task.
   Production composition remains closed: `LabPage` does not supply the concrete
   support-placement policy or native mount controls. Internal reducer-backed tests
   supply that policy to the existing Pointer Events hook.
+- [x] Pass 3 correction (2026-10-18): clearly free keyboard detach and explicit native
+  removal failure. Baseline `M11-render-polish` / `5b70d2d`, working tree clean.
+  Keep directional Arrow/Shift intent, use an adjacent-footprint clearance plus the
+  existing movement step, and reject bounded positions that still touch a support target
+  or cannot provide that clearance. Reuse removal preparation for native controls;
+  return a typed issue and display it in the unwired controls rather than ignoring null.
 - [ ] Pass 4: coherent mounted-only integration and per-container timer policy.
 - [ ] Pass 5: visual affordance/browser QA and scoped documentation closeout.
 - [ ] Run final cross-pass validation, inspect final diff and hand off the complete polish implementation.
@@ -632,6 +643,15 @@ QA claimed by this planning task.
 
 ## Decision log
 
+- 2026-10-18, focused Pass 3 correction: a mounted-container Arrow first leaves one
+  footprint plus a 12px gap along that Arrow, then applies the normal/Shift step.
+  Check bounded clearance and final free-workspace target classification, returning
+  no action if blocked. Reason: make detachment unambiguous without redirecting a
+  directional key, changing free movement or adding a collision/search system.
+- 2026-10-18, focused Pass 3 correction: native removal returns a discriminated
+  issue/action result; its callback returns an issue or null, and the unwired native
+  controls announce/describe failure. Reason: prevent future integration from silently
+  dropping a null preparation while retaining focus, relation and localized feedback.
 - 2026-10-17, Pass 3: use a concrete optional support-placement composition dependency
   in the existing pointer hook, supplied by internal reducer-backed harnesses only.
   Reason: test complete mounting without exposing a second production Heat truth;
@@ -1041,3 +1061,80 @@ the browser certification and impossible-fit clipping/native error-composition l
 above remain explicit. Passes 4–5 are incomplete, and the product integration gate remains
 closed. The temporary dev server was stopped. Changes remain uncommitted on
 `M11-render-polish`; no push, merge, hosted CI claim or milestone advancement.
+
+### Focused Pass 3 detach correction, 2026-10-18
+
+Started from clean `M11-render-polish` HEAD `5b70d2d` after reading AGENTS, this
+ExecPlan, `.agent/PLANS.md`, relevant architecture/UI boundaries and the existing
+placement, geometry, native controls and mounted tests. The earlier .04 normalized
+keyboard detach could remain inside the 36×28px half-extent snap region. Native
+Remove's nullable action could also be ignored by its caller. These are corrected
+here without opening the Pass 4 product integration gate.
+
+`prepareRemovalAt` now shares focused candidate validation between keyboard and
+native removal. A mounted-container Arrow requests 100px horizontal / 138px vertical
+clearance (the existing button footprint plus 12px), then adds its usual .04 step or
+.12 with Shift. The current rendered position remains the origin. After bounding,
+the move must retain the clearance in that direction and classify as free bench
+against all supports in the proposed post-removal workspace. Rejection returns no
+action and the existing localized `mount.noRoom` feedback. It never silently changes
+direction or unmounts within a support target. Normal/Shift remain different where
+bounds permit; subsequent free movement and mounted-lamp assembly movement retain
+their original steps. This is an adjacent-placement rule, not a collision solver or
+an exhaustive search for every free point on the bench.
+
+Native Remove retains deterministic right, left, then down preference, using the
+same footprint clearance. `prepareSupportRemoval` now returns `SupportRemovalPreparation`:
+either `{ issue: null, action }`, or `{ issue: 'noRoom' | 'invalidContainer' |
+'invalidLamp', action: null }`. It no longer returns a silently ignorable bare null.
+`ContainerMountControls.onRemove` explicitly returns an issue or null; failures appear
+in the existing accessible description and polite status, using existing EN/VI copy.
+The action node/focus is retained for retry. Failure is tied to the container/lamp
+pair and clears on successful removal; locale-only error translation stays quiet.
+This supersedes the nullable native-removal preparation and small-step keyboard
+detach documented in the original Pass 3 delivery above.
+
+The same existing remove reducer action commits relation plus free position once.
+No reducer, geometry projection/target rule, pointer hook, CSS, production composition,
+Heat synchronization/timer, simulation, dependency or milestone changes were needed.
+The original pointer detach/cancellation and assembly-movement paths are unchanged.
+
+Added 26 regression cases: both silhouettes, all four Arrow directions with normal
+and Shift steps, insufficient-bench and edge rejection, available/occupied support
+target rejection, unchanged committed references/selection on failure, same button/SVG
+and focus on success, explicit native preparation failure/retry, and localized EN/VI
+failure status with locale-only announcement suppression. Adapted the previous small-
+step detach expectation and nullable preparation consumers to the corrected contract.
+The successful group/keyboard test places an unrelated lamp clear of the intended
+detach destination; dedicated new cases verify rejection when that target is blocked.
+
+Focused validation passed 74 tests / 3 files (34.92s). Complete validation is below.
+No new browser QA is claimed for this internal-only correction: mounting controls
+remain absent from normal LabPage and no served internal browser harness exists.
+
+The requested default full run (`npm test -- --maxWorkers=2`) completed with 480/484
+passing in 305.50s: three existing LabPage/Teaching Replay/ReactionDynamics tests
+exceeded the 5000ms wall timeout, and the existing SampleDetailDialog heat test observed
+zero bubbles instead of three. All 26 new cases passed. The production JS/CSS build
+hashes remain unchanged, and no affected old implementation/test expectation was edited.
+Those files were rerun without file parallelism, keeping the same assertions and
+default timeout; no runner/dependency/configuration change was made. That isolated
+rerun passed all 95 tests / 4 files in 80.15s. The exact requested full-suite command
+was then rerun alone, without concurrent lint/typecheck/build work, and passed all
+484 tests / 36 files in 172.38s. The initial timing-sensitive failures were not
+reproduced; no Replay, dialog, Heat test or timeout was changed to obtain the pass.
+
+| Command | Final result |
+| --- | --- |
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS, zero warnings |
+| `npm test -- --maxWorkers=2` | PASS on standalone retry, 484 tests / 36 files; initial run and isolated verification recorded above |
+| `npm run build` | PASS, 91 modules; unchanged production JS/CSS hashes |
+| `git diff --check` | PASS |
+
+The correction and its validation are complete. Native failure composition is now
+implemented and tested internally, resolving that specific limitation from the original
+Pass 3 handoff. The general mounted-browser QA limitation remains. Production mounting
+stays integration-gated, current geometry heating/global timer policy are unchanged,
+and Passes 4–5 remain incomplete. Changes remain uncommitted; no push, merge, dependency
+installation, hosted CI claim or milestone advancement.
