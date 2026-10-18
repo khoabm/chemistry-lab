@@ -16,7 +16,7 @@ interface ContainerDetailsProps {
   container: ContainerState
   equipmentType: EquipmentType
   onClear: () => void
-  onRemoveChemical: (id: ChemicalId) => void
+  onRemoveChemical?: (id: ChemicalId) => void
   onMix: () => void
   onEnlarge: () => void
   disabled: boolean
@@ -52,7 +52,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onRemoveCh
                 <strong>{chemical.formula} · {chemicalName(chemical.id)}</strong>
                 <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
               </div>
-              {container.reactionResult?.status !== 'reaction' && <button type="button" className="chemical-remove-button" disabled={disabled} aria-label={t('sample.removeChemical', { name: chemicalName(chemical.id) })} onClick={() => onRemoveChemical(chemical.id)}>{t('sample.removeOne')}</button>}
+              {container.reactionResult?.status !== 'reaction' && <button type="button" className="chemical-remove-button" disabled={disabled} aria-label={t('sample.removeChemical', { name: chemicalName(chemical.id) })} onClick={() => onRemoveChemical?.(chemical.id)}>{t('sample.removeOne')}</button>}
             </li>
           })}
         </ul>
