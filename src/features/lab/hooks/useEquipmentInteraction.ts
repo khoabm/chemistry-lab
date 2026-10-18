@@ -8,6 +8,8 @@ import { benchPosition, isInsideBench } from '../interactions/workspaceGeometry'
 import type { BenchBounds } from '../interactions/workspaceGeometry'
 import { mountedPositions } from '../interactions/supportGeometry'
 import type { supportPlacement, SupportDragPlacement } from '../interactions/supportPlacement'
+import type { SupportRemovalIssue } from '../interactions/supportPlacement'
+import { findContainerMount } from '../../../store/mounting'
 
 export type EquipmentDragSource =
   | { kind: 'palette'; equipmentType: EquipmentType }
@@ -252,8 +254,25 @@ export function useEquipmentInteraction(
       ? { id: drag.source.id, position: drag.position, lifted: true } : undefined))
     : new Map(state.equipment.map((item) => [item.id, item.position]))
   if (drag?.placement?.lampDraft) renderedPositions.set(drag.placement.lampDraft.id, drag.placement.lampDraft.position)
+  const liftedMountedContainerId = drag?.source.kind === 'workspace'
+    && findContainerMount(state.mounts, drag.source.id) ? drag.source.id : null
+
+  function mountOnSupport(containerEquipmentId: string, lampEquipmentId: string) {
+    const bench = benchRef.current
+    const action = !drag && placement && bench
+      ? placement.prepareMount(state, containerEquipmentId, lampEquipmentId, bench.getBoundingClientRect()) : null
+    if (action) dispatch(action)
+    else setMessage({ key: 'mount.noRoom' })
+  }
+  function removeFromSupport(containerEquipmentId: string): SupportRemovalIssue | null {
+    const bench = benchRef.current
+    if (drag || !placement || !bench) return 'noRoom'
+    const prepared = placement.prepareRemoval(state, containerEquipmentId, bench.getBoundingClientRect())
+    if (prepared.issue === null) dispatch(prepared.action)
+    return prepared.issue
+  }
   return { attachBench, drag, dragActive: drag !== null, message, getEquipmentHandlers, cancelDrag, resetWorkspace,
-    renderedPositions, supportPlacement: placement }
+    renderedPositions, supportPlacement: placement, liftedMountedContainerId, mountOnSupport, removeFromSupport }
 }
 
 export type EquipmentInteraction = ReturnType<typeof useEquipmentInteraction>

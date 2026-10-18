@@ -107,27 +107,27 @@ describe('Pass 2 mounting application policy and reducer', () => {
     expect(remove(state, 'equipment-4', position)).toBe(state)
   })
 
-  it('does not infer mounting from overlap and does not change geometry Heat or its generation through relation-only edits', () => {
+  it('does not infer mounting from overlap; explicit relations alone resolve the Heat source', () => {
     let state = setup()
     state = reduce(state, { type: 'move', id: 'equipment-4', position: { x: 0.5, y: 0.7 } })
     state = reduce(state, { type: 'move', id: 'equipment-1', position: { x: 0.5, y: 0.48 } })
     state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'copper-carbonate', quantity: 1 })
     state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-4' })
     expect(state.mounts).toEqual([])
-    expect(state.containers[0]?.heatingState).toEqual({ status: 'heating', lampId: 'equipment-4' })
+    expect(state.containers[0]?.heatingState.status).toBe('not-heating')
     const evaluate = vi.spyOn(engine, 'evaluateReaction')
     const boundToOffLamp = mount(state, 'equipment-1', 'equipment-5')
     expect(boundToOffLamp.containers).toBe(state.containers)
     const rebound = rebind(boundToOffLamp, 'equipment-5', 'equipment-4')
     const removed = remove(rebound, 'equipment-4', state.equipment[0]!.position)
-    expect(removed.containers).toBe(state.containers)
-    expect(removed.nextHeatRequestId).toBe(state.nextHeatRequestId)
+    expect(removed.containers).toEqual(state.containers)
+    expect(removed.nextHeatRequestId).toBeGreaterThan(state.nextHeatRequestId)
     expect(evaluate).not.toHaveBeenCalled()
-    // A real supplied free-position change still uses M11's existing geometry rule.
+    // A free position never supplies Heat, even where a source used to overlap.
     expect(remove(rebound, 'equipment-4', { x: 0.1, y: 0.1 }).containers[0]?.heatingState.status).toBe('not-heating')
   })
 
-  it('keeps atomic assembly moves on legacy committed geometry until the production integration gate opens', () => {
+  it('keeps atomic assembly moves on the same mounted source regardless of dormant geometry', () => {
     let state = setup()
     state = reduce(state, { type: 'move', id: 'equipment-4', position: { x: 0.5, y: 0.7 } })
     state = reduce(state, { type: 'move', id: 'equipment-1', position: { x: 0.5, y: 0.48 } })
@@ -143,8 +143,9 @@ describe('Pass 2 mounting application policy and reducer', () => {
       containerEquipmentId: 'equipment-1', position: { x: 0.8, y: 0.7 } })
     expect(movedLit.mounts).toBe(litAssembly.mounts)
     expect(movedLit.equipment[0]).toBe(litAssembly.equipment[0])
-    expect(movedLit.containers[0]!.heatingState.status).toBe('not-heating')
-    expect(movedLit.containers[0]!.heatEvaluation.status).toBe('idle')
+    expect(movedLit.containers).toBe(litAssembly.containers)
+    expect(movedLit.containers[0]!.heatingState.status).toBe('heating')
+    expect(movedLit.containers[0]!.heatEvaluation.status).toBe('pending')
     expect(movedLit.containers[0]!.contents).toBe(litAssembly.containers[0]!.contents)
   })
 
@@ -190,14 +191,13 @@ describe('Pass 2 mounting application policy and reducer', () => {
     expect(remove(reset)).toBe(reset)
   })
 
-  it('does not heat or create requests just because a filled container mounts to a lit lamp elsewhere', () => {
+  it('heats and requests evaluation when a filled container mounts to its lit lamp regardless of free position', () => {
     let state = setup()
     state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-4' })
     state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'copper-carbonate', quantity: 1 })
     const changed = mount(state)
-    expect(changed.containers).toBe(state.containers)
-    expect(changed.containers[0]?.heatingState.status).toBe('not-heating')
-    expect(changed.containers[0]?.heatEvaluation.status).toBe('idle')
-    expect(changed.nextHeatRequestId).toBe(state.nextHeatRequestId)
+    expect(changed.containers[0]?.heatingState.status).toBe('heating')
+    expect(changed.containers[0]?.heatEvaluation.status).toBe('pending')
+    expect(changed.nextHeatRequestId).toBe(state.nextHeatRequestId + 1)
   })
 })

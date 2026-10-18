@@ -179,13 +179,13 @@ describe('Pass 2 native mounting foundations, isolated from production orchestra
     expect(screen.getByRole('combobox', { name: 'Alcohol lamp support' })).toBeInTheDocument()
   })
 
-  it('does not expose mounting controls or occupancy in the production lab before the integration gate', () => {
+  it('exposes native mounting and lamp occupancy in the integrated production lab', () => {
     render(<LabPage />)
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
-    expect(screen.queryByRole('combobox', { name: 'Alcohol lamp support' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Mount on support' })).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Alcohol lamp support' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mount on support' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
-    expect(screen.queryByRole('status', { name: 'Lamp support occupancy' })).not.toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Lamp support occupancy' })).toHaveTextContent('Support empty.')
     expect(screen.getByRole('button', { name: 'Ignite lamp' })).toBeEnabled()
   })
 

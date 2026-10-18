@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
@@ -220,7 +221,7 @@ describe('M5 alcohol lamp interaction', () => {
     expect(lamp).toHaveAccessibleDescription(expect.stringContaining('Lamp lit.'))
     expect(within(lamp).queryByText('Lit', { exact: true })).not.toBeInTheDocument()
     expect(within(lamp).queryByText('Off', { exact: true })).not.toBeInTheDocument()
-    expect(bench().querySelector('.heating-zone')).toBeInTheDocument()
+    expect(bench().querySelector('.heating-zone')).not.toBeInTheDocument()
     expect(within(bench()).queryByText('Heat zone', { exact: true })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Extinguish lamp' }))
     expect(lamp.querySelector('.lamp-flame')).not.toBeInTheDocument()
@@ -229,9 +230,10 @@ describe('M5 alcohol lamp interaction', () => {
     expect(within(lamp).getByText('Off', { exact: true })).toBeVisible()
   })
 
-  it.each(['Beaker', 'Test tube'])('heats an empty/filled %s only in the zone, without running heat reactions', (name) => {
+  it.each(['Beaker', 'Test tube'])('heats an empty/filled %s only while mounted, without immediate heat evaluation', (name) => {
     const lamp = litLamp()
     const sample = place(name, 0.5, 0.48)
+    mountSelectedSample('equipment-1')
     expect(screen.getByRole('status', { name: 'Container heating' })).toHaveTextContent('Heating over a lit alcohol lamp.')
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     expect(sample).toHaveAccessibleDescription(expect.stringContaining('Heating over a lit alcohol lamp.'))
@@ -251,6 +253,8 @@ describe('M5 alcohol lamp interaction', () => {
     expect(within(sample).queryByText('Heating', { exact: true })).not.toBeInTheDocument()
     expect(sample).not.toHaveAccessibleDescription(expect.stringContaining('Heating over a lit alcohol lamp.'))
     fireEvent.keyDown(sample, { key: 'ArrowLeft' })
+    expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
+    mountSelectedSample('equipment-1')
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     fireEvent.click(lamp)
     fireEvent.click(screen.getByRole('button', { name: 'Extinguish lamp' }))
@@ -261,6 +265,7 @@ describe('M5 alcohol lamp interaction', () => {
   it('keeps committed heating during previews/cancellation/invalid drops, and stops it on a valid move away', () => {
     litLamp()
     const sample = place('Beaker', 0.5, 0.48)
+    mountSelectedSample('equipment-1')
     pointer(sample, 'down', 0, 0)
     pointer(sample, 'move', 400, 300)
     expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
@@ -278,9 +283,10 @@ describe('M5 alcohol lamp interaction', () => {
     expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
   })
 
-  it('preserves the directly dragged lamp flame, disables its toggle and updates heating only on drop', () => {
+  it('preserves the directly dragged lamp flame, disables its toggle and preserves its mounted heating on drop', () => {
     const lamp = litLamp()
     const sample = place('Beaker', 0.5, 0.48)
+    mountSelectedSample('equipment-1')
     pointer(lamp, 'down', 0, 0)
     pointer(lamp, 'move', 400, 300)
     expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
@@ -291,7 +297,7 @@ describe('M5 alcohol lamp interaction', () => {
     expect(lamp.querySelector('.lamp-flame')).toBeInTheDocument()
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     pointer(lamp, 'up', 400, 300)
-    expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
+    expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Extinguish lamp' })).toBeEnabled()
   })
 
@@ -316,6 +322,7 @@ describe('M5 alcohol lamp interaction', () => {
   it.each(['sample', 'lamp'])('ignores arrow movement during a %s drag so cancellation preserves heating', (kind) => {
     const lamp = litLamp()
     const sample = place('Beaker', 0.5, 0.48)
+    mountSelectedSample('equipment-1')
     const source = kind === 'sample' ? sample : lamp
     const position = source.getAttribute('style')
     pointer(source, 'down', 0, 0)
@@ -330,12 +337,13 @@ describe('M5 alcohol lamp interaction', () => {
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     fireEvent.keyDown(source, { key: 'ArrowRight', shiftKey: true })
     expect(source.getAttribute('style')).not.toBe(position)
-    expect(sample.querySelector('.container-heat-glow')).not.toBeInTheDocument()
+    expect(sample.querySelector('.container-heat-glow') !== null).toBe(kind === 'lamp')
   })
 
   it('blocks keyboard equipment activation across controls while a pointer drag is active', () => {
     const lamp = litLamp()
     const sample = place('Beaker', 0.5, 0.48)
+    mountSelectedSample('equipment-1')
     const palette = screen.getByRole('button', { name: 'Add Alcohol lamp' })
     pointer(lamp, 'down', 0, 0)
     pointer(lamp, 'move', 400, 300)
@@ -431,6 +439,7 @@ describe('M4 reaction visualization', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Sodium bicarbonate' }))
     fireEvent.click(screen.getByRole('button', { name: 'Mix' }))
     const source = screen.getByRole('button', { name: 'Beaker 1' })
+    vi.spyOn(source, 'getBoundingClientRect').mockReturnValue(new DOMRect(356, 137, 88, 126))
     fireEvent.keyDown(source, { key: 'ArrowRight' })
     expect(source.querySelector('[data-reaction-effect="gas"]')).toBeInTheDocument()
     const position = source.getAttribute('style')

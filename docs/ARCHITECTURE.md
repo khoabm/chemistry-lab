@@ -329,6 +329,33 @@ The application does not model realistic heat transfer.
 Heating should produce an explicit simulation trigger after the interaction
 conditions required by the current milestone are satisfied.
 
+The render-polish Pass 4 contract uses the single `LabWorkspaceState.mounts`
+collection as its only persistent Heat source. A valid Beaker/Test tube mount to
+an existing lit alcohol lamp means physically heating, even for an empty sample.
+Only nonempty samples schedule evaluation. Extinguishing retains the mount;
+free containers never heat through geometric overlap. Mount/rebind/remove and
+assembly moves are atomic reducer transitions. Support projection and bounds
+remain presentation/interaction geometry; dormant container positions do not
+determine heating. No SVG coordinates or timer data enter application state.
+
+`synchronizeHeating` resolves the mounted source and maintains monotonic request
+IDs. An unchanged source preserves its request through assembly movement.
+Detach, rebind, extinction and contents edits invalidate pending generations.
+Explicit Mix supersedes pending Heat. Completed successful Heat results retain
+identity across mounting, movement and lamp toggles. The reducer independently
+validates the pending generation, nonempty contents and live mounted source
+before calling the reaction engine.
+
+`useHeatReactions` owns a private per-container/request timer Map with remaining
+milliseconds, monotonic deadline, paused/completed state, handle and invalidatable
+token. The illustrative delay remains 2000ms. Only a real mounted-container lift
+pauses its timer; cancellation or same-support return resumes the remainder.
+Lamp assembly, unrelated equipment and palette drags retain original deadlines.
+Commit-time reconciliation invalidates obsolete callbacks before scheduling a
+replacement. Callbacks check entry identity, request, token, handle and pause/
+completion state; unmount clears all work. Time values never drive chemistry or
+React rendering. Locale changes do not recreate requests or reset timers.
+
 Do not introduce:
 
 - specific heat capacity

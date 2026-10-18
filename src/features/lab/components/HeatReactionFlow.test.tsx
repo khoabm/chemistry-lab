@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -27,6 +28,7 @@ function heat(name = 'Beaker', chemical = 'Copper(II) carbonate') {
   const lamp = place('Alcohol lamp', 0.5, 0.7)
   fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
   const sample = place(name, 0.5, 0.48)
+  mountSelectedSample('equipment-1')
   fireEvent.click(screen.getByRole('button', { name: `Add ${chemical}` }))
   return { lamp, sample }
 }
@@ -54,7 +56,7 @@ describe('M6 laboratory heat flow', () => {
     it.each(reactions)(`${equipment} shows $name after the illustrative wait and preserves products on cooling`, ({ chemical, color, name, equation, gas }) => {
       const { sample, lamp } = heat(equipment, chemical)
       expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting for heat reaction')
-      expect(screen.getByText(/Keep this sample in the lit zone/)).toHaveTextContent('Mix cancels the pending heat check')
+      expect(screen.getByText(/Keep this sample mounted on the lit lamp/)).toHaveTextContent('Mix cancels the pending heat check')
       expect(screen.queryByText(/Sample ready/)).not.toBeInTheDocument()
       expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
       tick(heatReactionDelayMs - 1)
@@ -103,7 +105,7 @@ describe('M6 laboratory heat flow', () => {
     }
   })
 
-  it.each(['sample', 'lamp', 'dropper', 'palette'])('preserves M11 global Heat pause and full restart during a %s drag', (sourceType) => {
+  it.each(['sample', 'lamp', 'dropper', 'palette'])('isolates the mounted-sample remaining wait during a %s drag', (sourceType) => {
     const { sample, lamp } = heat()
     if (sourceType === 'dropper') fireEvent.click(screen.getByRole('button', { name: 'Add Dropper' }))
     const source = sourceType === 'sample' ? sample : sourceType === 'lamp' ? lamp
@@ -113,12 +115,14 @@ describe('M6 laboratory heat flow', () => {
     fireEvent.pointerMove(source, { clientX: 400, clientY: 300 })
     expect(document.querySelector('.equipment-drag-preview') !== null).toBe(sourceType === 'palette')
     tick(heatReactionDelayMs * 2)
-    expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+    expect(sample.querySelector('[data-reaction-effect="solid-color-change"]') !== null).toBe(sourceType !== 'sample')
     fireEvent.keyDown(source, { key: 'Escape' })
     fireEvent.pointerUp(source, { clientX: 400, clientY: 300 })
-    tick(heatReactionDelayMs - 1)
-    expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
-    tick(1)
+    if (sourceType === 'sample') {
+      tick(999)
+      expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
+      tick(1)
+    }
     expect(sample.querySelector('[data-reaction-effect="solid-color-change"]')).toBeInTheDocument()
     fireEvent.click(sample)
     expect(screen.getByRole('status', { name: 'Heat result' })).toHaveTextContent(reactions[0].name)
@@ -141,6 +145,7 @@ describe('M6 laboratory heat flow', () => {
     place('Alcohol lamp', 0.5, 0.7)
     fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
     const sample = place('Beaker', 0.5, 0.48)
+    mountSelectedSample('equipment-1')
     tick()
     expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('No heat evaluation pending.')
     expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()

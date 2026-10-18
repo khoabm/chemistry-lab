@@ -4,6 +4,7 @@ import { createLabWorkspaceState, labWorkspaceReducer, type LabWorkspaceState } 
 function setup() {
   let state = labWorkspaceReducer(createLabWorkspaceState(), { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.5, y: 0.7 } })
   state = labWorkspaceReducer(state, { type: 'add', equipmentType: 'beaker', position: { x: 0.5, y: 0.48 } })
+  state = labWorkspaceReducer(state, { type: 'mount-container', containerEquipmentId: 'equipment-2', lampEquipmentId: 'equipment-1' })
   return labWorkspaceReducer(state, { type: 'add', equipmentType: 'test-tube', position: { x: 0.85, y: 0.48 } })
 }
 function toggle(state: LabWorkspaceState, equipmentId = 'equipment-1') {
@@ -34,15 +35,13 @@ describe('M5 heating state transitions', () => {
     expect(toggle(heated).containers[0]?.heatingState.status).toBe('not-heating')
   })
 
-  it('updates on moving either a sample or its lamp and entering with a new container', () => {
+  it('keeps source identity on movement and never heats a newly added free sample', () => {
     const state = toggle(setup())
-    expect(move(state, 'equipment-2', 0.1, 0.48).containers[0]?.heatingState.status).toBe('not-heating')
-    expect(move(state, 'equipment-1', 0.85, 0.7).containers.map((item) => item.heatingState.status)).toEqual(['not-heating', 'heating'])
-    const moved = move(state, 'equipment-3', 0.5, 0.48)
-    expect(moved.containers.every((item) => item.heatingState.status === 'heating')).toBe(true)
+    expect(move(state, 'equipment-2', 0.1, 0.48).containers).toBe(state.containers)
+    expect(move(state, 'equipment-1', 0.85, 0.7).containers).toBe(state.containers)
+    expect(move(state, 'equipment-3', 0.5, 0.48).containers[1]?.heatingState.status).toBe('not-heating')
     const added = labWorkspaceReducer(state, { type: 'add', equipmentType: 'test-tube', position: { x: 0.5, y: 0.48 } })
-    expect(added.containers.at(-1)?.heatingState.status).toBe('heating')
-    expect(move(state, 'equipment-1', 0.5, 0.1).containers[0]?.heatingState.status).toBe('not-heating')
+    expect(added.containers.at(-1)?.heatingState.status).toBe('not-heating')
   })
 
   it('preserves contents and prior Mix results while heating, moving, selecting or extinguishing', () => {
@@ -75,11 +74,13 @@ describe('M5 heating state transitions', () => {
     expect(state.containers[0]?.reactionResult).toBeNull()
   })
 
-  it('isolates multiple lamps and falls back to a second overlapping lit source', () => {
+  it('isolates multiple lamps without fallback to an overlapping lit source', () => {
     let state = labWorkspaceReducer(setup(), { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.5, y: 0.7 } })
     state = toggle(toggle(state), 'equipment-4')
     expect(state.containers[0]?.heatingState).toEqual({ status: 'heating', lampId: 'equipment-1' })
     state = toggle(state)
+    expect(state.containers[0]?.heatingState.status).toBe('not-heating')
+    state = labWorkspaceReducer(state, { type: 'rebind-container', containerEquipmentId: 'equipment-2', fromLampEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-4' })
     expect(state.containers[0]?.heatingState).toEqual({ status: 'heating', lampId: 'equipment-4' })
     expect(state.lamps[1]?.status).toBe('lit')
     state = toggle(state, 'equipment-4')

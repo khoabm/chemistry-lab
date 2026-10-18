@@ -118,7 +118,5 @@ function keyboardMove(state: LabWorkspaceState, id: string, delta: Point, bounds
   return { type: 'move', id, position: requested }
 }
 
-// Concrete composition dependency for the closed Pass 2–4 integration gate.
-// LabPage deliberately does not supply this policy until Heat ownership migrates.
 // Native controls share prepareSupportMount/Removal; all commits use the reducer policy.
-export const supportPlacement = { resolveDrag, keyboardMove }
+export const supportPlacement = { resolveDrag, keyboardMove, prepareMount: prepareSupportMount, prepareRemoval: prepareSupportRemoval }

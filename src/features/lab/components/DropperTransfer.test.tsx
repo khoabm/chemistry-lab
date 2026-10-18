@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -25,6 +26,7 @@ describe('M11 dropper workflow', () => {
     choose('Source container', 'equipment-1'); click('Fill dropper')
     expect(screen.getByRole('combobox', { name: 'Destination container' })).toHaveFocus()
     const dropper = screen.getByRole('button', { name: 'Dropper 1' })
+    vi.spyOn(screen.getByRole('group', { name: 'Laboratory bench' }), 'getBoundingClientRect').mockReturnValue(new DOMRect(300, 100, 600, 400))
     expect(dropper).toHaveAccessibleDescription(expect.stringContaining('HCl'))
     expect(dropper.querySelector('.dropper-payload')).toHaveAttribute('data-chemical-id', 'hydrochloric-acid')
     const position = dropper.getAttribute('style')
@@ -104,11 +106,7 @@ describe('M11 dropper workflow', () => {
     tick(2000)
     click('Add Alcohol lamp'); click('Ignite lamp')
     click('Add Test tube'); click('Add Hydrochloric acid'); click('Add Hydrochloric acid')
-    // Lamp click-add position is .5,.4; moving it down places the tube in its zone.
-    const lamp = screen.getByRole('button', { name: 'Alcohol lamp 1' })
-    for (let i = 0; i < 7; i++) fireEvent.keyDown(lamp, { key: 'ArrowDown' })
-    const tube = screen.getByRole('button', { name: 'Test tube 1' })
-    for (let i = 0; i < 9; i++) fireEvent.keyDown(tube, { key: 'ArrowLeft' })
+    mountSelectedSample('equipment-2')
     click('Add Dropper'); choose('Source container', 'equipment-3')
     tick(heatReactionDelayMs / 2)
     const calls = evaluate.mock.calls.length

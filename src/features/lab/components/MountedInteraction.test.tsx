@@ -464,18 +464,13 @@ describe('internal Pass 3 reducer-backed apparatus integration', () => {
   })
 })
 
-describe('production Pass 2–4 integration gate', () => {
-  it('does not expose native mounting or pointer snap in normal LabPage', () => {
+describe('production mounting integration', () => {
+  it('exposes native mounting alongside support-aware equipment without a legacy Heat zone', () => {
     render(<LabPage />)
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))
-    const sample = screen.getByRole('button', { name: 'Beaker 1' })
-    expect(screen.queryByRole('button', { name: 'Mount on support' })).not.toBeInTheDocument()
-    expect(document.querySelector('.is-support-apparatus')).not.toBeInTheDocument()
-    pointer(sample, 'down', 500, 300)
-    pointer(sample, 'move', 421, 199)
-    pointer(sample, 'up', 421, 199)
-    expect(document.querySelector('.is-support-apparatus')).not.toBeInTheDocument()
-    expect(document.querySelector('.is-support-target')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mount on support' })).toBeInTheDocument()
+    expect(document.querySelector('.is-support-apparatus')).toBeInTheDocument()
+    expect(document.querySelector('.heating-zone')).not.toBeInTheDocument()
   })
 })

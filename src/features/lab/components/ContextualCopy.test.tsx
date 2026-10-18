@@ -72,7 +72,7 @@ describe('contextual teaching copy', () => {
     const reactionResult = evaluateReaction({ contents: filled.contents, trigger: 'mix' })
     render(details({ ...filled, reactionResult, heatingState: { status: 'heating', lampId: 'lamp' }, heatEvaluation: { status: 'pending', requestId: 1 } }))
     expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting for heat reaction')
-    expect(screen.getByText(/Keep this sample in the lit zone/)).toHaveTextContent('Mix cancels the pending heat check')
+    expect(screen.getByText(/Keep this sample mounted on the lit lamp/)).toHaveTextContent('Mix cancels the pending heat check')
     expect(screen.queryByText(/Sample ready|Place the center|Press Mix to check/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Mix' })).toBeEnabled()
   })

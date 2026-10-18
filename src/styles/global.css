@@ -437,7 +437,6 @@ h3 { font-size: 14px; font-weight: 600; }
 .lab-observations > .experiment-tabpanel .no-reaction-guidance { font-size: 14px; line-height: 1.6; }
 
 .equipment-state { position: absolute; top: 0; right: 0; padding: 2px 5px; border-radius: 4px; background: #f9ebcd; color: #80541c; font-size: 10px; pointer-events: none; }
-.heating-zone { position: absolute; z-index: 0; border: 1px dashed #ae7d38; border-radius: 8px; background: rgb(231 177 93 / 9%); pointer-events: none; }
 .lamp-flame { transform-box: fill-box; transform-origin: bottom; animation: flame-flicker 900ms ease-in-out infinite alternate; }
 .container-heat-glow { animation: heating-glow 1.8s ease-in-out infinite alternate; }
 @keyframes flame-flicker { to { transform: scaleX(0.88) scaleY(1.06); opacity: 0.88; } }

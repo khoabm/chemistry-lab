@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -142,8 +143,7 @@ describe('teaching replay in the existing enlarged view', () => {
     render(<LabPage />)
     click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click(`Add ${chemical}`)
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
-    for (let i = 0; i < 9; i++) fireEvent.keyDown(sample, { key: 'ArrowLeft' })
-    for (let i = 0; i < 5; i++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    mountSelectedSample('equipment-1')
     tick(heatReactionDelayMs); tick(8000)
     click('Alcohol lamp 1'); click('Extinguish lamp'); fireEvent.click(sample)
     const evaluations = evaluate.mock.calls.length

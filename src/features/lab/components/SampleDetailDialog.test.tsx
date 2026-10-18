@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
@@ -51,8 +52,7 @@ describe('selected sample detail', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     fireEvent.click(sample)
-    for (let step = 0; step < 3; step++) fireEvent.keyDown(sample, { key: 'ArrowRight', shiftKey: true })
-    for (let step = 0; step < 5; step++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    mountSelectedSample('equipment-2')
     const { dialog } = openDetail()
     expect(within(dialog).getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting')
     act(() => vi.advanceTimersByTime(heatReactionDelayMs))
@@ -72,8 +72,7 @@ describe('selected sample detail', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     fireEvent.click(sample)
-    for (let step = 0; step < 3; step++) fireEvent.keyDown(sample, { key: 'ArrowRight', shiftKey: true })
-    for (let step = 0; step < 5; step++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    mountSelectedSample('equipment-2')
     expect(sample.querySelector('.container-heat-glow')).toBeInTheDocument()
     expect(screen.getByRole('figure', { name: 'Selected sample close-up' }).querySelector('.container-heat-glow')).toBeInTheDocument()
     const { dialog } = openDetail()

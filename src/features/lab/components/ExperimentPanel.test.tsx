@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { StrictMode } from 'react'
@@ -200,8 +201,7 @@ describe('Experiment Sample/Result tabs', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     fireEvent.click(sample)
-    for (let step = 0; step < 3; step++) fireEvent.keyDown(sample, { key: 'ArrowRight', shiftKey: true })
-    for (let step = 0; step < 5; step++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    mountSelectedSample('equipment-2')
     fireEvent.click(resultTab())
     act(() => vi.advanceTimersByTime(heatReactionDelayMs - 1))
     expect(resultPanel()).toHaveTextContent('No experiment result yet')

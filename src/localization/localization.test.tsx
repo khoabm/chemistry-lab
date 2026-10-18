@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../tests/mounting'
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi as mock } from 'vitest'
@@ -165,6 +166,7 @@ describe('runtime localization without laboratory changes', () => {
     expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue('en')
     click('Add Beaker'); click('Add Copper(II) sulfate')
     const item = screen.getByRole('button', { name: 'Beaker 1' })
+    mock.spyOn(screen.getByRole('group', { name: 'Laboratory bench' }), 'getBoundingClientRect').mockReturnValue(new DOMRect(300, 100, 600, 400))
     const id = item.getAttribute('data-equipment-id')
     const position = item.getAttribute('style')
     const formula = screen.getByRole('list', { name: 'Container contents' }).textContent
@@ -279,8 +281,7 @@ describe('runtime localization without laboratory changes', () => {
     render(<LabPage />)
     click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click('Add Copper(II) carbonate')
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
-    for (let i = 0; i < 9; i++) fireEvent.keyDown(sample, { key: 'ArrowLeft' })
-    for (let i = 0; i < 5; i++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    mountSelectedSample('equipment-1')
     const source = live.mock.calls.at(-1)?.[0][0]
     tick(heatReactionDelayMs / 2)
     switchTo('vi')

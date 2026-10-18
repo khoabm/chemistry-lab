@@ -12,6 +12,8 @@ import { LabHelp } from './LabHelp'
 import { useReactionDynamics } from '../hooks/useReactionDynamics'
 import { LocalizationProvider } from '../../../localization/LocalizationProvider'
 import { DropperDetails } from './DropperDetails'
+import { supportPlacement } from '../interactions/supportPlacement'
+import { ContainerMountControls, LampSupportStatus } from './ContainerMountControls'
 
 export function LabPage() {
   return <LocalizationProvider><Laboratory /></LocalizationProvider>
@@ -20,9 +22,8 @@ export function LabPage() {
 function Laboratory() {
   const { t } = useTranslation()
   const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
-  const interaction = useEquipmentInteraction(state, dispatch)
-  // Pass 1 preserves M11's global drag pause, independently of preview rendering.
-  useHeatReactions(state.containers, dispatch, interaction.dragActive)
+  const interaction = useEquipmentInteraction(state, dispatch, supportPlacement)
+  useHeatReactions(state.containers, dispatch, interaction.liftedMountedContainerId)
   const presentations = useReactionDynamics(state.containers)
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
   const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
@@ -49,6 +50,11 @@ function Laboratory() {
         <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}
+          mountControls={selectedContainer && <ContainerMountControls state={state}
+            containerEquipmentId={selectedContainer.equipmentInstanceId} disabled={interaction.dragActive}
+            onMount={(lampId) => interaction.mountOnSupport(selectedContainer.equipmentInstanceId, lampId)}
+            onRemove={() => interaction.removeFromSupport(selectedContainer.equipmentInstanceId)} />}
+          lampSupportStatus={selectedLamp && <LampSupportStatus state={state} lampEquipmentId={selectedLamp.equipmentInstanceId} />}
           dropperDetails={selectedDropper && <DropperDetails dropper={selectedDropper} containers={state.containers}
             equipment={state.equipment} disabled={interaction.dragActive}
             onTransfer={(type, containerEquipmentId) => {

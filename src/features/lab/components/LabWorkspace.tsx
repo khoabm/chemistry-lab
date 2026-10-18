@@ -7,7 +7,7 @@ import type { EquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { equipmentPositionStyle } from '../interactions/workspaceGeometry'
 import { EquipmentVisual } from './EquipmentVisual'
 import { describeReactionEffects } from '../renderers/reactionPresentation'
-import { HeatingZone } from './HeatingZone'
+import { findContainerMount, findLampMount } from '../../../store/mounting'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { findChemical } from '../../../simulation/chemicals/catalog'
 
@@ -72,8 +72,6 @@ export function LabWorkspace({
           <p>{t('workspace.emptyBody')}</p>
           <p className="empty-detail">{t('workspace.emptyHint')}</p>
         </div>}
-        {labeledEquipment.filter(({ lamp }) => lamp?.status === 'lit').map(({ instance }) =>
-          <HeatingZone key={`zone-${instance.id}`} position={instance.position} />)}
         {labeledEquipment.map(({ instance, label, container, lamp, dropper, supportApparatus }) => (
           <button
             key={instance.id}
@@ -96,6 +94,12 @@ export function LabWorkspace({
               {lamp ? t('workspace.off') : t('workspace.heating')}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
+              {container && findContainerMount(state.mounts, instance.id) && t('mount.onLamp', {
+                lamp: labeledEquipment.find(({ instance: item }) => item.id === findContainerMount(state.mounts, instance.id)?.lampEquipmentId)?.label,
+              })}
+              {lamp && (findLampMount(state.mounts, instance.id) ? t('mount.supportOccupied', {
+                container: labeledEquipment.find(({ instance: item }) => item.id === findLampMount(state.mounts, instance.id)?.containerEquipmentId)?.label,
+              }) : t('mount.supportEmpty'))}
               {dropper ? dropper.payload ? t('dropper.loaded', { name: chemicalName(dropper.payload.chemicalId), formula: findChemical(dropper.payload.chemicalId)?.formula }) : t('dropper.empty') : ''}
               {lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : container?.heatingState.status === 'heating' ? `${t('heat.heating')} ` : ''}
               {container?.reactionResult?.status === 'reaction'

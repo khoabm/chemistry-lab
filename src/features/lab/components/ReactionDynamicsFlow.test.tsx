@@ -1,3 +1,4 @@
+import { mountSelectedSample } from '../../../../tests/mounting'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
@@ -92,8 +93,7 @@ describe('M9 reaction dynamics across existing views', () => {
     render(<LabPage />)
     click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click(`Add ${chemical}`)
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
-    for (let i = 0; i < 9; i++) fireEvent.keyDown(sample, { key: 'ArrowLeft' })
-    for (let i = 0; i < 5; i++) fireEvent.keyDown(sample, { key: 'ArrowUp' })
+    mountSelectedSample('equipment-1')
     tick(heatReactionDelayMs)
     expect(sample.querySelector('.is-transforming')).toBeInTheDocument()
     expect(!!sample.querySelector('[data-gas-context="heated-solid"]')).toBe(gas)

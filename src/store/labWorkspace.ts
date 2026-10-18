@@ -5,12 +5,11 @@ import { evaluateReaction } from '../simulation/engine/evaluateReaction'
 import { isContainerEquipment } from '../types/container'
 import type { ContainerState } from '../types/container'
 import type { AlcoholLampState } from '../types/heating'
-import { findHeatingLamp } from '../simulation/heating/heatingZone'
 import { isCompletedHeatReaction } from '../simulation/reactions/types'
 import type { HeatEvaluationState } from '../types/heating'
 import type { DropperState } from '../types/dropper'
 import { prepareDropperFill, prepareDropperDispense } from './dropperTransfer'
-import { findContainerMount, findLampMount, getMountIssue, getMountTargetIssue, type EquipmentMount } from './mounting'
+import { findContainerMount, findLampMount, findMountedHeatingLamp, getMountIssue, getMountTargetIssue, type EquipmentMount } from './mounting'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
@@ -45,19 +44,19 @@ export function createLabWorkspaceState(): LabWorkspaceState {
 }
 
 function synchronizeHeating(state: LabWorkspaceState): LabWorkspaceState {
-  const litLampIds = state.lamps.filter((lamp) => lamp.status === 'lit').map((lamp) => lamp.equipmentInstanceId)
   let nextHeatRequestId = state.nextHeatRequestId
   const containers: readonly ContainerState[] = state.containers.map((container) => {
-    const instance = state.equipment.find((item) => item.id === container.equipmentInstanceId)
-    const lampId = instance ? findHeatingLamp(instance, state.equipment, litLampIds) : null
+    const lampId = findMountedHeatingLamp(state, container.equipmentInstanceId)
     const sameSource = container.heatingState.status === 'heating' && container.heatingState.lampId === lampId
       || container.heatingState.status === 'not-heating' && lampId === null
     let heatEvaluation: HeatEvaluationState = container.heatEvaluation
     if (!lampId || container.contents.length === 0) {
-      if (heatEvaluation.status !== 'idle') heatEvaluation = { status: 'idle' }
+      const retainMixCancellation = heatEvaluation.status === 'cancelled' && container.contents.length > 0
+        && findContainerMount(state.mounts, container.equipmentInstanceId) !== undefined
+      if (heatEvaluation.status !== 'idle' && !retainMixCancellation) heatEvaluation = { status: 'idle' }
     } else if (isCompletedHeatReaction(container.reactionResult)) {
       if (heatEvaluation.status !== 'evaluated') heatEvaluation = { status: 'evaluated' }
-    } else if (!sameSource || heatEvaluation.status === 'idle') {
+    } else if (heatEvaluation.status !== 'cancelled' && (!sameSource || heatEvaluation.status === 'idle')) {
       heatEvaluation = { status: 'pending', requestId: nextHeatRequestId++ }
     }
     if (sameSource && heatEvaluation === container.heatEvaluation) return container
@@ -105,8 +104,7 @@ export function labWorkspaceReducer(
       : state
   }
 
-  // Internal relation transitions do not replace geometry-based heating.
-  // Production mount controls remain unwired until the Pass 4 integration gate.
+  // All relationship changes synchronize the sole mounted Heat source atomically.
   if (action.type === 'mount-container') {
     if (getMountIssue(state, action.containerEquipmentId, action.lampEquipmentId)
       || findContainerMount(state.mounts, action.containerEquipmentId)
@@ -115,7 +113,7 @@ export function labWorkspaceReducer(
     const next = { ...positioned, mounts: [...state.mounts, {
       containerEquipmentId: action.containerEquipmentId, lampEquipmentId: action.lampEquipmentId,
     }] }
-    return positioned === state ? next : synchronizeHeating(next)
+    return synchronizeHeating(next)
   }
 
   if (action.type === 'rebind-container') {
@@ -125,9 +123,14 @@ export function labWorkspaceReducer(
       || getMountTargetIssue(state, action.containerEquipmentId, action.lampEquipmentId)
       || action.lampPosition && !validWorkspacePosition(action.lampPosition)) return state
     const positioned = positionEquipment(state, action.lampEquipmentId, action.lampPosition)
+    const cancelledContainer = state.containers.find((container) => container.equipmentInstanceId === action.containerEquipmentId
+      && container.heatEvaluation.status === 'cancelled')
     const next = { ...positioned, mounts: state.mounts.map((mount) => mount === current
-      ? { containerEquipmentId: action.containerEquipmentId, lampEquipmentId: action.lampEquipmentId } : mount) }
-    return positioned === state ? next : synchronizeHeating(next)
+      ? { containerEquipmentId: action.containerEquipmentId, lampEquipmentId: action.lampEquipmentId } : mount),
+      // A new support is an explicit source change, unlike toggling the same lamp.
+      containers: cancelledContainer ? state.containers.map((container) => container === cancelledContainer
+        ? { ...container, heatEvaluation: { status: 'idle' as const } } : container) : state.containers }
+    return synchronizeHeating(next)
   }
 
   if (action.type === 'move-lamp-assembly') {
@@ -136,8 +139,6 @@ export function labWorkspaceReducer(
       || getMountTargetIssue(state, action.containerEquipmentId, action.lampEquipmentId)
       || !validWorkspacePosition(action.position)) return state
     const next = positionEquipment(state, action.lampEquipmentId, action.position)
-    // One legacy geometry synchronization, never a detach/reacquire sequence.
-    // Mounted Heat ownership is deliberately deferred to Pass 4.
     return next === state && state.selectedEquipmentId === action.lampEquipmentId ? state
       : synchronizeHeating({ ...next, selectedEquipmentId: action.lampEquipmentId })
   }
@@ -167,6 +168,7 @@ export function labWorkspaceReducer(
   if (action.type === 'evaluate-heat') {
     const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
     if (!container || container.heatingState.status !== 'heating' || container.contents.length === 0
+      || findMountedHeatingLamp(state, action.equipmentId) !== container.heatingState.lampId
       || container.heatEvaluation.status !== 'pending' || container.heatEvaluation.requestId !== action.requestId) return state
     const reactionResult = evaluateReaction({ contents: container.contents, trigger: 'heat' })
     return { ...state, containers: state.containers.map((item) => item.id === container.id

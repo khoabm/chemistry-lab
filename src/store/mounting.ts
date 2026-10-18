@@ -35,3 +35,11 @@ export function getMountIssue(state: MountingWorkspace, containerEquipmentId: st
   const current = findContainerMount(state.mounts, containerEquipmentId)
   return current && current.lampEquipmentId !== lampEquipmentId ? 'alreadyMounted' : null
 }
+
+// Workspace relationship, not geometry or chemistry, owns the persistent source.
+export function findMountedHeatingLamp(state: MountingWorkspace, containerEquipmentId: string): string | null {
+  const mount = findContainerMount(state.mounts, containerEquipmentId)
+  if (!mount || getMountTargetIssue(state, containerEquipmentId, mount.lampEquipmentId)) return null
+  return state.lamps.some((lamp) => lamp.equipmentInstanceId === mount.lampEquipmentId && lamp.status === 'lit')
+    ? mount.lampEquipmentId : null
+}

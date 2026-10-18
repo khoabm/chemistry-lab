@@ -13,7 +13,7 @@ function equipmentLabel(state: MountingWorkspace, equipmentId: string, t: TFunct
   return `${t(`equipment.${instance.equipmentType}`)} ${number}`
 }
 
-// Pass 2 foundation: composed into details in tests; LabPage does not wire it yet.
+// Native alternative to pointer placement, sharing application mounting policy.
 export function ContainerMountControls({ state, containerEquipmentId, disabled, onMount, onRemove }: {
   state: MountingWorkspace
   containerEquipmentId: string

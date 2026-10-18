@@ -81,7 +81,8 @@ regions so keyboard users can reach and scroll them without moving equipment.
 
 M8 workspace emphasis: statically scale only the SVG directly inside placed
 workspace equipment by 20%, around its center. Keep the existing button footprint,
-labels/selection, normalized positioning, drag offsets and heating zone unchanged.
+labels/selection, normalized positioning and drag offsets unchanged; the later
+render-polish Pass 4 support model replaces the former heating zone.
 Palette/drag preview/close-up/dialog drawings retain their sizes. Reduce grid-line
 opacity from 12% to 6%, preserving its spacing and bench background. This visual
 scale is not an animation or a larger logical interaction area; existing desktop,
@@ -222,7 +223,7 @@ in the shared workspace/details/drag-preview SVG; accessible text identifies it.
 Only one unreacted liquid entry with at least one simplified unit can be sampled.
 Source quantity decreases and zero portions disappear; Dispense empties the payload
 without Mix. Select the destination and explicitly Mix afterward. Normal Heat
-checks still apply after material edits in a lit zone. Reset clears payloads.
+checks still apply after material edits on a lit mounted support. Reset clears payloads.
 
 Equipment should have clear visual icons or illustrations.
 
@@ -379,41 +380,35 @@ Heating feedback may include:
 
 Do not use a complex temperature dashboard.
 
-M5 interaction: select a placed lamp and use the explicit Ignite lamp / Extinguish
-lamp button in its observation details. Clicking the lamp itself selects it;
-moving it never toggles ignition. New lamps start extinguished. Lit lamps show an
-animated flame and a dashed, pointer-transparent aiming zone above them. Place
-the center of a beaker/test tube inside the zone using existing drag or arrow-key
-movement. Show a warm container glow, a Heating badge and a textual status. Empty
-containers also heat; droppers and lamps cannot be heated containers.
+Current render-polish Pass 4 interaction: select a placed lamp and use Ignite
+lamp / Extinguish lamp. Clicking or moving it never toggles ignition. New lamps
+start extinguished; flame identifies lit lamps, Off identifies extinguished lamps.
 
-M8 heating-cue refinement: flame is the visible lit-lamp cue; omit its redundant
-Lit badge. Keep Off for extinguished lamps. The dashed/tinted zone remains as a
-spatial guide without Heat zone text. Keep one Heating label on each actively
-heated container. Existing hidden aria-describedby lamp/heating descriptions,
-equipment names, SVG glow/reaction effects and panel statuses remain unchanged.
-No zone geometry, timing, interaction or simulation behavior changes.
+Mount one Beaker or Test tube on a lamp support by dragging onto it, or choose
+Alcohol lamp support and Mount on support in the selected container's Sample
+panel. Mounting works with empty samples and extinguished lamps. Occupied supports
+reject placement without ejecting their sample. Lamp details announce empty or
+occupied support. Mounting and physical Heating are separate: only a valid mount
+to a lit lamp heats. Free containers do not heat through overlap. The previous
+marked geometric Heat zone is removed.
 
-M10 refinement Pass 4 draws the alcohol lamp with a simplified three-legged
-support and sparse gauze above the flame. EquipmentVisual shares this decorative
-setup across Materials, workspace, drag preview and lamp details. The support has
-no equipment identity, state or interaction. The 88×126 logical footprint, drawing
-scale, flame state/animation and marked heating zone remain unchanged.
-Apparatus alignment is qualitative, with no snapping or required contact with
-gauze. Beakers and test tubes retain the same simplified heating interaction;
-the drawing does not model the holder normally used for a real test tube.
+The simplified tripod/gauze remains part of the lamp drawing, without separate
+equipment identity. Beaker/Test tube rendering derives from the support anchor;
+buttons remain independent, keyed and focusable. Lamp drag and Arrow/Shift move
+the complete assembly within union bounds. Dragging its container lifts a draft;
+a valid free drop removes the mount, another available support rebinds atomically,
+and return to its own support preserves the relationship. Remove from support
+places it clearly free, or reports insufficient room. Container Arrow/Shift
+removes and moves it clearly away in the requested direction, or rejects without
+state changes. The test-tube apparatus is qualitative, not a realistic holder.
 
-The simplified zone uses normalized bench coordinates: horizontally +/-0.07 from
-the lamp, vertically 0.16–0.30 above it, clipped to usable bench bounds. It denotes
-interaction alignment, not realistic distance or heat transfer. Resize preserves
-logical relationships. Moving the source/sample away or extinguishing the source
-ends heating; another overlapping lit source may continue it. A lamp too close to
-the top has no usable zone until moved lower. Reset removes all lamp/heating state.
-During dragging, controls are disabled and previews retain committed state until
-a valid drop; cancelled/invalid drops leave heating unchanged. The close-up and
-modal share the same heating feedback. Reduced-motion disables flame/glow motion
-while preserving static shapes/text. M5 does not evaluate heat reactions, change
-chemical contents or invalidate existing Mix results.
+Escape, pointercancel, capture loss, blur, hidden document, resize and invalid
+or occupied drops discard drafts and preserve committed relationships/positions.
+No mounting occurs before a valid release. Pointer movement has no per-coordinate
+live announcements. Native Mount/Remove are alternatives to dragging. Selection
+is subtle; keyboard focus remains a separate visible outline above adjacent
+selected apparatus. Close-up/modal share physical Heat and result feedback.
+Reduced-motion retains static flame/glow shapes and text while disabling motion.
 
 M6 extends this interaction with a short illustrative wait for filled containers.
 Show pending/completed heat evaluation separately from physical Heating. R7 changes
@@ -423,8 +418,13 @@ label the particles as an illustration of colorless gas release, not boiling or
 steam. The returned equation and explanation appear in the existing observation
 panel and update an already-open close-up modal.
 
-Cancel pending evaluation on source exit/extinction, source change, clear/add/reset.
-Pause waits during drag previews; unrelated selection/updates retain each deadline.
+The 2000ms wait is illustrative, not reaction kinetics. Each container/request has
+its own deadline. Only lifting a mounted sample beyond the existing drag threshold
+pauses its pending wait. Cancellation and same-support return resume its remaining
+duration; pointerdown, assembly movement, palette and unrelated equipment drags
+never pause it. Detach/extinction invalidates pending work. Rebind to a lit lamp
+starts a fresh eligible wait; contents edits, including Dropper Fill/Dispense,
+invalidate only the edited sample's generation. Reset invalidates all work.
 Keep successful solid color after cooling, with gas motion only while heated
 and within the finite M9 reaction-presentation window. Reheating an already
 completed result does not replay its activity.
@@ -434,7 +434,8 @@ show No observable reaction. Do not calculate temperature, kinetics or yields.
 
 Explicit Mix supersedes a pending heat check and shows its cancellation status.
 Do not let the older delayed Heat result overwrite the user's newer Mix result.
-Changing contents/source or leaving/re-entering a lit zone can start a fresh check.
+Changing contents or remounting/rebinding a sample without a completed Heat result
+can start a fresh eligible check; harmless movement never restarts a cancelled Mix wait.
 
 ---
 

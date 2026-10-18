@@ -123,6 +123,10 @@ describe('atomic qualitative dropper transfer', () => {
     state = reduce(state, { type: 'move', id: 'equipment-1', position: { x: 0.5, y: 0.48 } })
     state = reduce(state, { type: 'move', id: 'equipment-2', position: { x: 0.5, y: 0.48 } })
     state = reduce(state, { type: 'add-chemical', equipmentId: 'equipment-2', chemicalId: 'copper-carbonate', quantity: 1 })
+    state = reduce(state, { type: 'mount-container', containerEquipmentId: 'equipment-1', lampEquipmentId: 'equipment-4' })
+    state = reduce(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.8, y: 0.8 } })
+    state = reduce(state, { type: 'mount-container', containerEquipmentId: 'equipment-2', lampEquipmentId: 'equipment-5' })
+    state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-5' })
     const pending = state.containers[0]!.heatEvaluation
     if (pending.status !== 'pending') throw new Error('Expected source pending')
     const unrelated = state.containers[1]
@@ -142,6 +146,7 @@ describe('atomic qualitative dropper transfer', () => {
     state = reduce(state, { type: 'add', equipmentType: 'alcohol-lamp', position: { x: 0.5, y: 0.7 } })
     state = reduce(state, { type: 'toggle-lamp', equipmentId: 'equipment-4' })
     state = reduce(state, { type: 'move', id: 'equipment-2', position: { x: 0.5, y: 0.48 } })
+    state = reduce(state, { type: 'mount-container', containerEquipmentId: 'equipment-2', lampEquipmentId: 'equipment-4' })
     const old = state.containers[1]!.heatEvaluation
     if (old.status !== 'pending') throw new Error('Expected destination pending')
     const evaluate = vi.spyOn(engine, 'evaluateReaction')

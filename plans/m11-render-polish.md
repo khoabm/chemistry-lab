@@ -14,8 +14,10 @@ it away or using a keyboard-accessible action, and understand why that sample is
 This is an explicitly authorized auxiliary branch within the official active milestone
 `M11 — Dropper Transfer & 2D Material Presentation`. It neither renames M11 nor creates
 another milestone. The completed M11 transfer/material work is the baseline, not work to
-reimplement. Passes 1–3 internal foundations are delivered below; Passes 4–5 remain
-planned. The production mounting integration gate remains closed until Pass 4.
+reimplement. Passes 1–3 foundations and Pass 4 production integration are delivered
+below; Pass 5 remains planned. The production mounting integration gate is now open
+with mounts as the sole Heat source. Earlier gate/geometry records below describe
+their historical pass baselines, not the current production contract.
 
 ## Scope
 
@@ -586,7 +588,7 @@ QA claimed by this planning task.
 - [x] Pass 3: projection, assembly bounds/movement and cancellation/rebind.
   Internal implementation and validation complete on 2026-10-17 from clean
   `M11-render-polish` HEAD `067e601` (approved Pass 2); browser limits recorded below.
-  Production composition remains closed: `LabPage` does not supply the concrete
+  At the Pass 3 handoff, production composition remained closed: `LabPage` did not supply the concrete
   support-placement policy or native mount controls. Internal reducer-backed tests
   supply that policy to the existing Pointer Events hook.
 - [x] Pass 3 correction (2026-10-18): clearly free keyboard detach and explicit native
@@ -595,12 +597,31 @@ QA claimed by this planning task.
   existing movement step, and reject bounded positions that still touch a support target
   or cannot provide that clearance. Reuse removal preparation for native controls;
   return a typed issue and display it in the unwired controls rather than ignoring null.
-- [ ] Pass 4: coherent mounted-only integration and per-container timer policy.
+- [x] Pass 4: coherent mounted-only integration and per-container timer policy.
+  Started 2026-10-18 from clean `M11-render-polish` HEAD `3aa8463` (approved
+  focused Pass 3 correction). Execute A: mounted source/reducer tests; B: private
+  per-request remaining-delay/token timers; C: production native/pointer wiring and
+  removal of geometric Heat ownership; D: migrations, browser QA and documentation.
+  All four stages completed; full local validation passed 513 tests / 37 files,
+  typecheck, lint, production build and diff whitespace checks. Browser evidence
+  and explicit QA limitations are recorded in the Pass 4 outcome below.
 - [ ] Pass 5: visual affordance/browser QA and scoped documentation closeout.
 - [ ] Run final cross-pass validation, inspect final diff and hand off the complete polish implementation.
 
 ## Surprises and discoveries
 
+- Pass 4: enabling real support geometry requires old jsdom interaction tests to
+  supply bench/button measurements. A zero-size bench correctly rejects preparation;
+  a zero-size source button produces an unrealistic grab offset and invalid center.
+  Update browser-measurement fixtures, not production bounds or cancellation checks.
+- Pass 4: StrictMode invokes the pure reducer twice per dispatched action. Engine
+  spies in production tests therefore observe two evaluations per committed result;
+  hook tests independently require exactly one timer dispatch per request.
+- Pass 4 browser QA: fixed support SVG slots align both container types at all three
+  viewports. No decorative/front-gauze or other visual CSS correction was justified.
+  Short-landscape sticky tools still obscure upper bench content after deep scroll;
+  scrolling back restores access. Native controls and keyboard remain available.
+  Preserve this scoped limitation for Pass 5 instead of unrelated layout changes.
 - Pass 3: default flex SVG placement depends on label wrapping. A fixed scoped SVG
   slot is necessary for reliable contact anchors; free production equipment keeps
   its existing layout while the support composition is closed.
@@ -643,6 +664,22 @@ QA claimed by this planning task.
 
 ## Decision log
 
+- 2026-10-18, Pass 4: resolve Heat from validated mount pairs and lit lamp state in
+  the application layer. Synchronize mount/rebind even without an anchor adjustment,
+  and validate the current source again at delayed evaluation. Remove the obsolete
+  geometric Heat helper/component/CSS; retain support geometry for placement only.
+- 2026-10-18, Pass 4: reconcile a private equipment/request timer Map in a layout
+  effect at commit time, with performance.now deadlines, remaining duration, paused/
+  completed state, timeout handle and replacement object token. Invalidate token on
+  pause/removal/completion/cleanup; verify entry/request/token/handle before dispatch.
+  Keep a completed entry while the same pending input remains to prevent duplicates.
+- 2026-10-18, Pass 4: expose only the actually lifted mounted container ID from the
+  existing draft. Lamp/palette/unrelated movement does not pause Heat. Cancellation
+  and same-support return resume remainder; new source/generation starts a full wait.
+- 2026-10-18, Pass 4: open the Pass 2–4 gate by composing supportPlacement and the
+  prepared native Mount/Remove/occupancy components in normal LabPage. Shared geometry
+  preparation remains in the interaction layer; reducer eligibility remains final.
+  Keep typed native Remove failures visible; preserve stable independent buttons/SVGs.
 - 2026-10-18, focused Pass 3 correction: a mounted-container Arrow first leaves one
   footprint plus a 12px gap along that Arrow, then applies the normal/Shift step.
   Check bounded clearance and final free-workspace target classification, returning
@@ -1138,3 +1175,115 @@ Pass 3 handoff. The general mounted-browser QA limitation remains. Production mo
 stays integration-gated, current geometry heating/global timer policy are unchanged,
 and Passes 4–5 remain incomplete. Changes remain uncommitted; no push, merge, dependency
 installation, hosted CI claim or milestone advancement.
+
+
+### Pass 4 production integration, 2026-10-18
+
+Baseline: clean `M11-render-polish`, HEAD `3aa8463` (ancestor verification passed).
+AGENTS.md, .agent/PLANS.md, this plan, current source/tests and current-contract
+architecture/UI documentation were inspected before edits. No pre-existing changes.
+
+Stage A replaces `findHeatingLamp` with `findMountedHeatingLamp` in the store.
+Eligibility is a valid stable-ID mount pair plus its live lit lamp, independently
+rechecked by evaluate-heat. Mount/rebind synchronize even when no position changes.
+Off/empty mount, occupancy, parallel independent sources, no geometric fallback,
+stale evaluation, assembly request identity and completed results have reducer tests.
+Mix cancellation persists through same-support extinguish/reignite and movement;
+explicit remove/remount, rebind or material mutation permits a fresh eligible check.
+Rebind clears only that sample's cancellation inside the same atomic transition.
+
+Stage B replaces the global boolean pause/full restart with the private per-request
+Map described in the decision log. Actual mounted-container drag supplies its stable
+ID after the six-pixel threshold. Pause samples performance.now once, invalidates the
+old token and clears the handle. Resume schedules the remainder, including zero;
+callbacks cannot survive pause/resume with the same request ID. Completed entries
+prevent repeated dispatch while their unchanged pending input remains. Cleanup and
+new generations invalidate tokens. Nothing is serialized into workspace/chemistry.
+Initial A tests passed 10/10; A+B focused validation passed 21/21. Hook tests explicitly
+invoke pre-pause callbacks both during pause and after resume; they also cover
+StrictMode, repeated pauses, independent requests, zero remainder and cleanup.
+
+Stage C opens the public integration gate. LabPage supplies the existing concrete
+supportPlacement policy, ContainerMountControls and LampSupportStatus; the existing
+Pointer Events hook prepares native geometry and returns typed Remove failure.
+Normal pointer/native mount, lift, same-support return, detach, rebind, assembly move
+and Arrow/Shift semantics now use the same application actions. Accessible bench
+descriptions include mounted lamp and empty/occupied support. Existing button/SVG,
+selection, focus and result identities remain separate. Legacy HeatingZone component,
+geometry Heat source helper/tests and zone CSS are removed; supportGeometry is the
+sole placement geometry, not a chemistry source. EN/VI generic instructions now teach
+mounting, illustrative Heat and remaining-duration cancellation. No new copy system.
+
+Stage D migrates former geometry-heating tests to the real native mount workflow,
+using a shared test-only bench measurement helper. Existing M9 finite effects,
+Replay/Auto Replay/reduced-motion, M10 localization, M11 transfer/conservation and
+Pass 1/3 pointer cancellation tests remain. MountedHeatFlow exercises actual
+StrictMode LabPage: native empty/off/occupied controls, failure feedback, keyboard
+focus/selection, source-specific deadlines, all cancellation paths including resize,
+same-support return, occupied rejection, stale pointerup, pointer mount/rebind/detach,
+EN/VI during pause, Dropper Fill isolation and immutable completed R7/R8 occurrences.
+
+Browser QA used the production Vite page through the in-app real browser, with
+1440x960, 390x844 and 844x390 viewport overrides. No internal/debug UI was added.
+Observed and exercised:
+
+- Both Beaker and Test tube rest on gauze with visible flame/support at all sizes;
+  simple sibling layering suffices. Independent lamp/container click targets work.
+- Native off/empty mount, Remove, occupied selector feedback and occupied pointer
+  drop rejection; free pointer mount, free detach and A-to-B rebind all worked.
+- Lamp pointer movement carries its sample; Arrow/Shift keeps focus/selection and
+  assembly alignment. Container Arrow detach is clearly free. Resize and right/top
+  bounds retain projected alignment. No horizontal page overflow was observed.
+- R7 finished black solid and finite gas; R8 finished pale solid. Detach/remount,
+  assembly movement and rebind retained completed appearance. R8 Replay/Auto Replay
+  worked in the dialog; switching EN/VI retained Auto Replay and mounted Heat.
+- Two lit mounted samples coexist. Fill from a mounted HCl source loads one unit;
+  Dispense into a mounted NaOH destination does not Mix automatically. Explicit Mix
+  showed neutralization, then retained it with Heat evaluation cancelled by Mix.
+- No browser warning/error logs were captured in that session.
+
+Browser limitations: desktop viewport emulation is not physical touch-device testing.
+Available capabilities did not expose reduced-motion emulation. Whole-gesture drag
+API cannot hold a lifted sample for an exact timed cancel/resume check, so precise
+remaining-duration/concurrent-timer/stale-callback behavior is proven in automated
+hook and production tests, not claimed as manually timed browser QA. Reduced-motion
+is covered by retained existing tests. Short-landscape sticky tools still obscure the
+upper bench after deep page scrolling; scrolling back restores pointer access and
+native/keyboard actions remain available. No unrelated sticky/layout CSS was changed.
+Pass 5 may assess that limitation and restrained target/label polish; no front-gauze
+layer, new animation or broad apparatus redesign was necessary here.
+
+QA captures (outside the repository):
+`C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/pass4-desktop.png`,
+`pass4-portrait.png`, `pass4-landscape.png` in that same directory.
+
+Validation notes: an initial focused launch hit Windows TEMP cache EPERM before
+collecting tests. Subsequent runs use existing node_modules/.cache/pass4-temp as
+TEMP/TMP, without installing dependencies. Initial integration failures exposed
+missing layout fixtures, an accidentally used locale JSON identifier instead of the
+aliased Vitest mock, and StrictMode engine-spy counts; those were corrected without
+weakening behavior. A production occupied-target test took 5312ms under concurrent
+browser/test load and exceeded the existing timeout; the controlled two-file rerun
+passed 32/32 without changing timeout/assertions. A rebind initially rebuilt an
+unchanged container array; the existing reference assertion caught it and the action
+now retains the array unless it clears a real Mix cancellation. Final validation is
+recorded below after running the required commands sequentially.
+
+Final Pass 4 validation (2026-10-18): `npm run typecheck` PASS;
+`npm run lint` PASS; `npm test -- --maxWorkers=2` PASS, 513 tests in 37 files
+(173.52s, controlled run with dev server/browser QA stopped); `npm run build`
+PASS (91 modules, Vite production output); `git diff --check` PASS. Final affected
+source/production focused run: 54/54 in three files. Hosted CI was not run because
+the work remains local and uncommitted as instructed.
+Final review also restored the original strict container-array identity assertion
+for empty/off removal (no Heat lifecycle change); its 21-test reducer file passed
+again. Only the actual lit pending-to-idle round trip uses final-state equality.
+
+Final scope review: one mounting collection; no timer data or SVG coordinates in
+application/simulation state; no geometry fallback or dual Heat rule; no reaction
+definition, M9 owner or Dropper transfer algorithm change; no new dependency,
+feature flag, scene graph, production debug UI or Pass 5 decoration. Current
+contracts are updated in docs/ARCHITECTURE.md and docs/UI_UX.md; M11_CLOSEOUT is
+untouched. Pass 4 is complete, the mounting integration gate is open, and Pass 5
+and whole-branch closeout remain incomplete. No commit, push, merge or official
+milestone advancement was performed.
