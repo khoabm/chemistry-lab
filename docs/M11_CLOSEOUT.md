@@ -147,3 +147,29 @@ The following are not M11 completion requirements:
 Complete Vietnamese chemistry content remains a dedicated future polish task with
 teacher/SGK review. English continues to provide complete fallback until those terms and
 scientific explanations are approved.
+
+
+## Subsequent reviewed render-polish integration — 2026-10-18
+
+This closeout initially described M11 at its pre-polish implementation baseline.
+The subsequently approved `M11-render-polish` auxiliary branch replaces the former
+**geometric heating-zone interaction** with **explicit mounted-only heating**.
+A Beaker/Test tube is attached to at most one alcohol-lamp support, and each lamp
+accepts at most one container. Mount/remove/rebind and assembly movement use atomic
+application-state actions; the mount relation determines persistent Heat, rather
+than visual overlap. Lifting a mounted sample temporarily pauses its pending Heat
+wait without creating a new chemistry trigger. Normal explicit Mix, qualitative
+Dropper transfer, M9 dynamics/Replay, and M10 localization remain supported.
+
+Direct-on-bench dragging, mounted apparatus drawing/order, native accessible
+Mount/Remove controls, source-aware Heat timers and responsive short-landscape
+handling are detailed in `plans/m11-render-polish.md`, `docs/UI_UX.md`,
+`docs/ARCHITECTURE.md` and `README.md`. Earlier statements in this file about
+heating zones represent the original M11 delivery and are **not the final runtime
+contract** after render polish.
+
+The auxiliary final HEAD `29497502ef6d79c280b1cce9fd3d2c4dfa79ab92`
+passed hosted GitHub CI run `39090561234`: Typecheck, Lint, 518 tests / 37 files,
+and production Build. The user confirmed visual QA on the new interface. The
+loaded-Dropper cue stays as delivered pending actual feedback. No new chemistry,
+quantitative model, physical collision system or 3D features were introduced.
