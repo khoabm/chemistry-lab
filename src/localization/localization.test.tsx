@@ -14,7 +14,7 @@ import { LabPage } from '../features/lab/components/LabPage'
 import * as engine from '../simulation/engine/evaluateReaction'
 import * as dynamics from '../features/lab/hooks/useReactionDynamics'
 import * as replay from '../features/lab/hooks/useReactionReplay'
-import { heatReactionDelayMs } from '../features/lab/hooks/useHeatReactions'
+import { r7TeachingWaitMs } from '../../tests/thermal'
 
 const tick = (ms: number) => act(() => mock.advanceTimersByTime(ms))
 function click(name: string) { fireEvent.click(screen.getByRole('button', { name })) }
@@ -279,23 +279,26 @@ describe('runtime localization without laboratory changes', () => {
     const evaluate = mock.spyOn(engine, 'evaluateReaction')
     const live = mock.spyOn(dynamics, 'useReactionDynamics')
     render(<LabPage />)
-    click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click('Add Copper(II) carbonate')
+    click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click('Add Basic copper(II) carbonate')
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     mountSelectedSample('equipment-1')
     const source = live.mock.calls.at(-1)?.[0][0]
-    tick(heatReactionDelayMs / 2)
+    tick(r7TeachingWaitMs / 2)
+    const warmed = live.mock.calls.at(-1)?.[0][0]
     switchTo('vi')
-    expect(live.mock.calls.at(-1)?.[0][0]).toBe(source)
+    expect(live.mock.calls.at(-1)?.[0][0]).toBe(warmed)
+    expect(warmed?.contents).toBe(source?.contents)
+    expect(warmed?.thermal.temperature).toBeGreaterThan(source!.thermal.temperature!)
     expect(screen.getByRole('button', { name: 'Đèn cồn 1' })).toHaveAccessibleDescription(/Đèn đang cháy/)
     expect(screen.getByRole('status', { name: 'Trạng thái đun mẫu' })).toHaveTextContent('Đang đun')
-    tick(heatReactionDelayMs / 2)
+    tick(r7TeachingWaitMs / 2)
     expect(screen.getByRole('status', { name: 'Kết quả khi đun' })).toHaveTextContent('Thermal decomposition of copper carbonate')
     const result = live.mock.calls.at(-1)?.[0][0]?.reactionResult
     const evaluations = evaluate.mock.calls.length
     switchTo('en')
     expect(live.mock.calls.at(-1)?.[0][0]?.reactionResult).toBe(result)
     expect(evaluate).toHaveBeenCalledTimes(evaluations)
-    expect(screen.getByRole('region', { name: 'Reaction equation' })).toHaveTextContent('CuCO3 → CuO + CO2↑')
+    expect(screen.getByRole('region', { name: 'Reaction equation' })).toHaveTextContent('Cu2CO3(OH)2 → 2CuO + CO2↑ + H2O')
     expect(sample).toHaveAttribute('aria-pressed', 'true')
   })
 })

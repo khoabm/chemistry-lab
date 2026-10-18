@@ -1,3 +1,4 @@
+import { emptyThermal } from '../../../simulation/thermal/profiles'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { describe, expect, it, vi } from 'vitest'
@@ -12,7 +13,7 @@ import { LabPage } from './LabPage'
 const sample: ContainerState = {
   id: 'sample', equipmentInstanceId: 'beaker',
   contents: chemicals.map((chemical, index) => ({ chemicalId: chemical.id, quantity: index + 1 })),
-  reactionResult: null, heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' },
+  reactionResult: null, heatingState: { status: 'not-heating' }, thermal: emptyThermal(), heatEvaluation: { status: 'idle' },
 }
 const details = (container: ContainerState) => <ContainerDetails container={container} equipmentType="beaker"
   disabled={false} onClear={vi.fn()} onMix={vi.fn()} onEnlarge={vi.fn()} />
@@ -76,7 +77,7 @@ describe('shared starting-substance visual identity', () => {
     const contents = [{ chemicalId, quantity: 1 }]
     const result = evaluateReaction({ contents, trigger: 'heat' })
     expect(result.status).toBe('reaction')
-    render(details({ ...sample, contents, reactionResult: result, heatEvaluation: { status: 'evaluated' } }))
+    render(details({ ...sample, contents, reactionResult: result, thermal: emptyThermal(), heatEvaluation: { status: 'evaluated' } }))
     const list = screen.getByRole('list', { name: 'Container contents' })
     expect(cues(list)).toHaveLength(1)
     expect(cues(list)[0]).toHaveAttribute('data-chemical-id', chemicalId)

@@ -1,3 +1,4 @@
+import { emptyThermal } from '../../../simulation/thermal/profiles'
 import { act, cleanup, renderHook } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -7,7 +8,7 @@ import { useReactionDynamics } from './useReactionDynamics'
 import { effectDurationMs } from '../renderers/reactionDynamics'
 
 function sample(id: string): ContainerState {
-  return { id, equipmentInstanceId: id, contents: [], heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' },
+  return { id, equipmentInstanceId: id, contents: [], heatingState: { status: 'not-heating' }, thermal: emptyThermal(), heatEvaluation: { status: 'idle' },
     reactionResult: evaluateReaction({ contents: [{ chemicalId: 'hydrochloric-acid', quantity: 1 }, { chemicalId: 'sodium-bicarbonate', quantity: 1 }], trigger: 'mix' }) }
 }
 const tick = (ms: number) => act(() => vi.advanceTimersByTime(ms))

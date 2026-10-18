@@ -232,11 +232,11 @@ White solid or a simplified white powder representation.
 
 Name:
 
-Copper(II) carbonate
+Basic copper(II) carbonate
 
 Formula:
 
-CuCO3
+Cu2CO3(OH)2
 
 Initial appearance:
 
@@ -517,7 +517,7 @@ Reactants:
 
 Equation:
 
-    CuCO3 → CuO + CO2↑
+    Cu2CO3(OH)2 → 2CuO + CO2↑ + H2O
 
 Primary visible observation:
 
@@ -530,10 +530,11 @@ Effects:
 
 Educational observation:
 
-Heating copper(II) carbonate decomposes it into copper(II) oxide and carbon
-dioxide.
+Heating basic copper(II) carbonate produces black copper(II) oxide, carbon
+dioxide and water.
 
-The MVP does not model exact decomposition temperature.
+The B+ experimental teaching milestone is 350°C, not a universal decomposition
+threshold or calibrated completion condition. One final CuO result is modeled.
 
 ---
 
@@ -565,7 +566,9 @@ Educational observation:
 Heating hydrated copper(II) sulfate removes its water of crystallization,
 leaving anhydrous copper(II) sulfate.
 
-The MVP does not model exact temperature or intermediate hydration states.
+The B+ experimental teaching milestone is 240°C, not a universal dehydration
+threshold or measured completion fraction. Only the final anhydrous result is
+modeled; no intermediate hydration stages or general kinetics are implemented.
 
 ---
 
@@ -619,22 +622,11 @@ The alcohol lamp can be:
 - extinguished
 - lit
 
-A compatible container placed in the supported heating zone can enter a
-heating state.
-
-The application may wait for a short UI-friendly duration before issuing the
-`heat` trigger.
-
-This delay is an interaction effect, not reaction kinetics.
-
-Do not calculate:
-
-- flame temperature
-- actual sample temperature
-- heat transfer
-- heating curves
-
-during MVP.
+Only a compatible container mounted on a lit lamp receives power; geometric
+overlap alone does not heat it. The authorized B+ extension uses a bounded nominal
+sample-temperature model and experimental teaching qualification, replacing the
+older illustrative delay. It does not calculate actual flame temperature or claim
+measured sample temperatures. See the numerical limits below.
 
 ---
 
@@ -647,3 +639,49 @@ real laboratory experiments.
 
 Educational UI should avoid implying that virtual interaction rules replace
 real laboratory safety procedures.
+
+## Thermometer B+ numerical limits
+
+The bounded nominal thermal model is an explicit exception to the older logical-only
+Heat contract. Sample temperature is independent of sensor presence; qualification
+uses the sample, never its delayed thermometer reading. Lamp power requires mounting
+and ignition. R7/R8 have separate effective solid parameters (Beaker C=48J/K, P=96W, K=0.24W/K; Test tube C=16J/K,
+P=32W, K=0.08W/K), not the aqueous 20–60°C profile. These values/milestones are uncalibrated
+teaching conventions and do not specify a real laboratory procedure.
+
+AQ-B/AQ-T assume fixed nominal 50g/4g dilute samples; first eligible single-solution
+Add needs no Prepare. Quantitative R6 requires explicit 25+25mL or 2+2mL 1mol/L
+reference preparation, density assumption 1g/mL and approximate 57kJ/mol neutralization
+energy, spent once on Mix. No value comes from qualitative portion counts. Material
+edits and unknown transfer history invalidate unsupported numerical profiles. Both
+Beaker and Test tube use the documented 25mm-immersion sensor proposal; real lag,
+sensor perturbation and fixture fit are not experimental calibration claims.
+
+Fresh solids enter at nominal 25°C. Their initial reference temperature is
+(Cv Tv + 8 × 25)/(Cv + 8), with Cv=40J/K (Beaker) or 8J/K (Test tube), not the
+previous sample's temperature. This assumed initial equilibration is not a transient
+conduction model. A load whose initial estimate reaches/exceeds its own milestone
+is unsupported rather than immediately reacted. Cool the emptied known vessel or
+use a fresh one before loading again. Current simulated solid temperature and the
+fixed experimental milestone are displayed separately, neither as a liquid sensor
+measurement.
+
+When material edits invalidate a sample, its numerical temperature is unavailable.
+Only the last known nominal vessel estimate is retained and passively cooled with
+the empty-vessel loss/capacity; unmodeled material exchange and lamp input are not
+inferred for that estimate. Empty recovers this disclosed estimate for a new batch;
+truly unknown vessel history remains unknown and cannot prepare quantitative R6.
+An attached sensor in unknown contact uses nominal ambient/air-lag relaxation
+internally while showing no measurement. Detach/rebind preserves that evolved
+reading; no reaction is caused by this fallback. These are v1 assumptions requiring
+the same external scientific review as the other nominal thermal parameters.
+
+The approved THCS single-result convention caps committed R7/R8 temperature at
+350°C/240°C after qualification while powered. A large time step cannot overshoot;
+the sample cools without power and reheats only toward the same cap, preserving
+its one result. The original 450°C supported-domain maximum remains distinct.
+This plateau is pedagogical, not a claim that real solids stop absorbing energy or
+cannot exceed a reaction temperature. No change to R6 energy budgets is implied.
+Physical thermometer attachment is allowed in any compatible vessel, including
+empty/unsupported/solid samples. Hanging in such a vessel is not a valid liquid
+measurement or a claim of real instrument compatibility with heated solids.

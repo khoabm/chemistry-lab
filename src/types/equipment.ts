@@ -1,4 +1,4 @@
-export type EquipmentType = 'beaker' | 'test-tube' | 'dropper' | 'alcohol-lamp'
+export type EquipmentType = 'beaker' | 'test-tube' | 'dropper' | 'alcohol-lamp' | 'thermometer'
 
 export interface Point {
   x: number

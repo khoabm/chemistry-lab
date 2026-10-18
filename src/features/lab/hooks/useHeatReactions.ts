@@ -1,84 +1,61 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import type { Dispatch } from 'react'
-import type { ContainerState } from '../../../types/container'
-import type { LabWorkspaceAction } from '../../../store/labWorkspace'
+import type { LabWorkspaceState, LabWorkspaceAction } from '../../../store/labWorkspace'
+import { simulationSpeed } from '../../../simulation/thermal/profiles'
+import { findMountedHeatingLamp } from '../../../store/mounting'
 
-// An illustrative interaction delay, not reaction kinetics or measured heating.
-export const heatReactionDelayMs = 2000
-
-interface HeatTimer {
-  requestId: number
-  remainingMs: number
-  deadline: number | null
-  paused: boolean
-  completed: boolean
-  handle: ReturnType<typeof setTimeout> | null
-  token: object
+interface Clock {
+  epoch: number
+  time: number
+  wall: number
+  running: boolean
+  liftedContainerId: string | null
+  liftedThermometerId: string | null
 }
 
-function invalidate(timer: HeatTimer) {
-  if (timer.handle !== null) clearTimeout(timer.handle)
-  timer.handle = null
-  timer.token = {}
-}
-
-export function useHeatReactions(containers: readonly ContainerState[], dispatch: Dispatch<LabWorkspaceAction>, liftedContainerId: string | null) {
-  const timers = useRef(new Map<string, HeatTimer>())
-
-  // Reconcile at commit, before queued callbacks can see an obsolete pause/source.
+// One clock; no fixed Heat timeout or per-reaction scheduling path.
+export function useHeatReactions(state: LabWorkspaceState, dispatch: Dispatch<LabWorkspaceAction>) {
+  const clock = useRef<Clock | null>(null)
+  const needsTick = state.thermometers.length > 0 || state.containers.some((item) => item.thermal.temperature !== null
+    && item.thermal.kind !== 'unsupported' && (item.thermal.temperature !== 25
+      || item.thermal.kind !== 'empty' && findMountedHeatingLamp(state, item.equipmentInstanceId) !== null)
+    || item.thermal.vesselTemperature != null && item.thermal.vesselTemperature !== 25)
   useLayoutEffect(() => {
-    const pending = containers.filter((container) => container.heatEvaluation.status === 'pending'
-      && container.heatingState.status === 'heating' && container.contents.length > 0)
-    for (const [equipmentId, timer] of timers.current) {
-      if (!pending.some((container) => container.equipmentInstanceId === equipmentId
-        && container.heatEvaluation.status === 'pending' && container.heatEvaluation.requestId === timer.requestId)) {
-        invalidate(timer)
-        timers.current.delete(equipmentId)
-      }
+    if (!clock.current || clock.current.epoch !== state.thermalEpoch) {
+      clock.current = { epoch: state.thermalEpoch, time: state.simulationTime, wall: performance.now(),
+        running: document.visibilityState !== 'hidden', liftedContainerId: null, liftedThermometerId: null }
     }
-    for (const container of pending) {
-      if (container.heatEvaluation.status !== 'pending') continue
-      const equipmentId = container.equipmentInstanceId
-      const requestId = container.heatEvaluation.requestId
-      let timer = timers.current.get(equipmentId)
-      if (!timer) {
-        timer = { requestId, remainingMs: heatReactionDelayMs, deadline: null,
-          paused: false, completed: false, handle: null, token: {} }
-        timers.current.set(equipmentId, timer)
-      }
-      if (equipmentId === liftedContainerId) {
-        if (!timer.paused) {
-          if (timer.deadline !== null) timer.remainingMs = Math.max(0, timer.deadline - performance.now())
-          invalidate(timer)
-          timer.deadline = null
-          timer.paused = true
-        }
-        continue
-      }
-      timer.paused = false
-      if (timer.handle !== null || timer.completed) continue
-      timer.deadline = performance.now() + timer.remainingMs
-      const entry = timer
-      const token = entry.token = {}
-      const handle = setTimeout(() => {
-        const currentTimer = timers.current.get(equipmentId)
-        if (currentTimer !== entry || currentTimer.requestId !== requestId || currentTimer.token !== token
-          || currentTimer.paused || currentTimer.completed || currentTimer.handle !== handle) return
-        currentTimer.completed = true
-        currentTimer.remainingMs = 0
-        currentTimer.deadline = null
-        invalidate(currentTimer)
-        dispatch({ type: 'evaluate-heat', equipmentId, requestId })
-      }, entry.remainingMs)
-      entry.handle = handle
+  }, [state.thermalEpoch, state.simulationTime])
+  const advance = useCallback(() => {
+    const current = clock.current
+    if (!current) return
+    const now = performance.now()
+    const elapsed = current.running ? Math.max(0, now - current.wall) * simulationSpeed / 1000 : 0
+    current.wall = now
+    if (!elapsed) return
+    current.time += elapsed
+    dispatch({ type: 'advance-thermal', epoch: current.epoch, time: current.time,
+      liftedContainerId: current.liftedContainerId, liftedThermometerId: current.liftedThermometerId })
+  }, [dispatch])
+  const dispatchAction = useCallback((action: LabWorkspaceAction) => {
+    advance()
+    dispatch(action)
+  }, [advance, dispatch])
+  const setContact = useCallback((liftedContainerId: string | null, liftedThermometerId: string | null) => {
+    const current = clock.current
+    if (!current || current.liftedContainerId === liftedContainerId && current.liftedThermometerId === liftedThermometerId) return
+    advance()
+    current.liftedContainerId = liftedContainerId
+    current.liftedThermometerId = liftedThermometerId
+  }, [advance])
+  useEffect(() => {
+    const visibility = () => {
+      advance()
+      if (clock.current) { clock.current.running = document.visibilityState !== 'hidden'; clock.current.wall = performance.now() }
     }
-  }, [containers, dispatch, liftedContainerId])
-
-  useLayoutEffect(() => {
-    const activeTimers = timers.current
-    return () => {
-      for (const timer of activeTimers.values()) invalidate(timer)
-      activeTimers.clear()
-    }
-  }, [])
+    const interval = needsTick ? setInterval(advance, 50) : null
+    document.addEventListener('visibilitychange', visibility)
+    return () => { if (interval !== null) clearInterval(interval); document.removeEventListener('visibilitychange', visibility) }
+  }, [advance, needsTick])
+  return { dispatch: dispatchAction, setContact }
 }

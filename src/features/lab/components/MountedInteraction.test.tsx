@@ -435,7 +435,7 @@ describe('internal Pass 3 reducer-backed apparatus integration', () => {
   })
 
   it('preserves loaded Dropper, contents, completed Heat occurrence and presentation start through movement/rebind/detach and locale changes', async () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance'] })
     let initial = fixture()
     initial = reduce(initial, { type: 'add-chemical', equipmentId: 'equipment-2', chemicalId: 'hydrochloric-acid', quantity: 2 })
     initial = reduce(initial, { type: 'fill-dropper', equipmentId: 'equipment-3', containerEquipmentId: 'equipment-2' })

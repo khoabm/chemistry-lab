@@ -1,11 +1,11 @@
 import { mountSelectedSample } from '../../../../tests/mounting'
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
 import * as engine from '../../../simulation/engine/evaluateReaction'
 import * as dynamics from '../hooks/useReactionDynamics'
-import { heatReactionDelayMs } from '../hooks/useHeatReactions'
+import { r7TeachingWaitMs } from '../../../../tests/thermal'
 
 class TestPointerEvent extends MouseEvent { readonly pointerId = 1 }
 beforeEach(() => { vi.useFakeTimers(); vi.stubGlobal('PointerEvent', TestPointerEvent) })
@@ -58,7 +58,7 @@ describe('M11 dropper workflow', () => {
 
   it('shows disabled source reasons and preserves independent payloads through direct drag, cancel and drop', () => {
     render(<LabPage />)
-    click('Add Beaker'); click('Add Test tube'); click('Add Copper(II) carbonate')
+    click('Add Beaker'); click('Add Test tube'); click('Add Basic copper(II) carbonate')
     click('Add Dropper')
     expect(screen.getByRole('option', { name: /Beaker 1 — This source is empty/ })).toBeDisabled()
     expect(screen.getByRole('option', { name: /Test tube 1 — Solid samples/ })).toBeDisabled()
@@ -108,18 +108,18 @@ describe('M11 dropper workflow', () => {
     click('Add Test tube'); click('Add Hydrochloric acid'); click('Add Hydrochloric acid')
     mountSelectedSample('equipment-2')
     click('Add Dropper'); choose('Source container', 'equipment-3')
-    tick(heatReactionDelayMs / 2)
+    tick(r7TeachingWaitMs / 2)
     const calls = evaluate.mock.calls.length
     click('Fill dropper')
     expect(evaluate).toHaveBeenCalledTimes(calls)
     expect(live.mock.calls.at(-1)![0][0]).toBe(untouched)
     expect(live.mock.results.at(-1)!.value.get(untouched.id).startedAt).toBe(start)
-    tick(heatReactionDelayMs / 2)
+    tick(r7TeachingWaitMs / 2)
     expect(evaluate).toHaveBeenCalledTimes(calls)
-    tick(heatReactionDelayMs / 2)
-    expect(evaluate).toHaveBeenLastCalledWith({ contents: [{ chemicalId: 'hydrochloric-acid', quantity: 1 }], trigger: 'heat' })
+    tick(r7TeachingWaitMs / 2)
+    expect(evaluate).toHaveBeenCalledTimes(calls)
     click('Test tube 1')
-    expect(within(screen.getByRole('tabpanel', { name: 'Result' })).getByText('No observable reaction.')).toBeInTheDocument()
+    expect(screen.getByText(/Numerical measurement unavailable/)).toBeInTheDocument()
     tick(4000)
     expect(screen.getByRole('button', { name: 'Beaker 1' }).querySelector('[data-reaction-effect="gas"]')).not.toBeInTheDocument()
   })

@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
 import { effectDurationMs } from '../renderers/reactionDynamics'
-import { heatReactionDelayMs } from '../hooks/useHeatReactions'
+import { r7TeachingWaitMs } from '../../../../tests/thermal'
 
 const tick = (ms: number) => act(() => vi.advanceTimersByTime(ms))
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal')
@@ -87,14 +87,14 @@ describe('M9 reaction dynamics across existing views', () => {
   })
 
   it.each([
-    ['Copper(II) carbonate', '#303330', true],
+    ['Basic copper(II) carbonate', '#303330', true],
     ['Copper(II) sulfate pentahydrate', '#f2eee4', false],
   ] as const)('retains final %s solid and never replays completed heat activity', (chemical, color, gas) => {
     render(<LabPage />)
     click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click(`Add ${chemical}`)
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     mountSelectedSample('equipment-1')
-    tick(heatReactionDelayMs)
+    tick(r7TeachingWaitMs)
     expect(sample.querySelector('.is-transforming')).toBeInTheDocument()
     expect(!!sample.querySelector('[data-gas-context="heated-solid"]')).toBe(gas)
     expect(sample.querySelector('.reacted-liquid, .bubble-surface-ring')).not.toBeInTheDocument()

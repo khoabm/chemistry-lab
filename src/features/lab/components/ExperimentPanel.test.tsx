@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { StrictMode } from 'react'
 import { LabPage } from './LabPage'
-import { heatReactionDelayMs } from '../hooks/useHeatReactions'
+import { r7TeachingWaitMs } from '../../../../tests/thermal'
 
 afterEach(() => { cleanup(); vi.useRealTimers() })
 const sampleTab = () => screen.getByRole('tab', { name: 'Sample' })
@@ -194,7 +194,7 @@ describe('Experiment Sample/Result tabs', () => {
     expect(resultPanel()).toHaveTextContent('Silver chloride precipitation')
   })
 
-  it.each(['Copper(II) carbonate', 'Sodium chloride'])('opens Result after delayed Heat for %s without tab navigation triggering evaluation', (chemical) => {
+  it.each(['Basic copper(II) carbonate', 'Sodium chloride'])('opens Result after delayed Heat for %s without tab navigation triggering evaluation', (chemical) => {
     vi.useFakeTimers()
     prepare(chemical)
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
@@ -203,13 +203,17 @@ describe('Experiment Sample/Result tabs', () => {
     fireEvent.click(sample)
     mountSelectedSample('equipment-2')
     fireEvent.click(resultTab())
-    act(() => vi.advanceTimersByTime(heatReactionDelayMs - 1))
+    act(() => vi.advanceTimersByTime(r7TeachingWaitMs - 1))
     expect(resultPanel()).toHaveTextContent('No experiment result yet')
     fireEvent.click(sampleTab())
     act(() => vi.advanceTimersByTime(1))
-    expect(resultTab()).toHaveAttribute('aria-selected', 'true')
-    expect(within(resultPanel()).getByRole('status', { name: 'Heat result' })).toHaveTextContent(
-      chemical === 'Sodium chloride' ? 'No observable reaction.' : 'Thermal decomposition',
-    )
+    if (chemical === 'Sodium chloride') {
+      expect(sampleTab()).toHaveAttribute('aria-selected', 'true')
+      expect(within(samplePanel()).getByText(/Sample: /)).toBeInTheDocument()
+      expect(screen.queryByRole('status', { name: 'Heat result' })).not.toBeInTheDocument()
+    } else {
+      expect(resultTab()).toHaveAttribute('aria-selected', 'true')
+      expect(within(resultPanel()).getByRole('status', { name: 'Heat result' })).toHaveTextContent('Thermal decomposition')
+    }
   })
 })

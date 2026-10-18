@@ -10,10 +10,10 @@ export function EquipmentDragPreview({ preview }: { preview: EquipmentDragDraft 
       className={`equipment-drag-preview ${preview.valid ? 'is-valid' : 'is-invalid'}`}
       style={{ left: preview.point.x, top: preview.point.y, ...equipmentFootprint }}
       aria-hidden="true"
+      data-equipment-type={preview.source.equipmentType}
     >
       <EquipmentVisual equipmentType={preview.source.equipmentType} />
       <span>{t(`equipment.${preview.source.equipmentType}`)}</span>
-      <span className="equipment-drag-feedback">{preview.valid ? t('preview.release') : t('preview.moveOnto')}</span>
     </div>
   )
 }

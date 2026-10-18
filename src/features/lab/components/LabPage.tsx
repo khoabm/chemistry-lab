@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useReducer } from 'react'
+import { useLayoutEffect, useReducer } from 'react'
 import { createLabWorkspaceState, labWorkspaceReducer } from '../../../store/labWorkspace'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { EquipmentDragPreview } from './EquipmentDragPreview'
@@ -14,6 +14,7 @@ import { LocalizationProvider } from '../../../localization/LocalizationProvider
 import { DropperDetails } from './DropperDetails'
 import { supportPlacement } from '../interactions/supportPlacement'
 import { ContainerMountControls, LampSupportStatus } from './ContainerMountControls'
+import { ThermalDetails, ThermometerDetails } from './ThermometerDetails'
 
 export function LabPage() {
   return <LocalizationProvider><Laboratory /></LocalizationProvider>
@@ -21,14 +22,17 @@ export function LabPage() {
 
 function Laboratory() {
   const { t } = useTranslation()
-  const [state, dispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
+  const [state, reducerDispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
+  const { dispatch, setContact } = useHeatReactions(state, reducerDispatch)
   const interaction = useEquipmentInteraction(state, dispatch, supportPlacement)
-  useHeatReactions(state.containers, dispatch, interaction.liftedMountedContainerId)
+  useLayoutEffect(() => { setContact(interaction.liftedMountedContainerId, interaction.liftedThermometerId) },
+    [setContact, interaction.liftedMountedContainerId, interaction.liftedThermometerId])
   const presentations = useReactionDynamics(state.containers)
   const selectedContainer = state.containers.find((container) => container.equipmentInstanceId === state.selectedEquipmentId)
   const selectedEquipment = state.equipment.find((equipment) => equipment.id === state.selectedEquipmentId)
   const selectedLamp = state.lamps.find((lamp) => lamp.equipmentInstanceId === state.selectedEquipmentId)
   const selectedDropper = state.droppers.find((dropper) => dropper.equipmentInstanceId === state.selectedEquipmentId)
+  const selectedThermometer = state.thermometers.find((item) => item.equipmentInstanceId === state.selectedEquipmentId)
   return (
     <div
       className="lab-page"
@@ -51,6 +55,12 @@ function Laboratory() {
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}
           lifted={!!selectedContainer && interaction.liftedMountedContainerId === selectedContainer.equipmentInstanceId}
+          thermalDetails={selectedContainer && selectedEquipment && <ThermalDetails container={selectedContainer}
+            equipmentType={selectedEquipment.equipmentType} disabled={interaction.dragActive}
+            onPrepare={() => dispatch({ type: 'prepare-r6', equipmentId: selectedContainer.equipmentInstanceId })} />}
+          thermometerDetails={selectedThermometer && <ThermometerDetails state={state} thermometer={selectedThermometer}
+            onPickup={() => interaction.pickupThermometer(selectedThermometer.equipmentInstanceId)}
+            onRemove={() => interaction.removeThermometer(selectedThermometer.equipmentInstanceId)} />}
           mountControls={selectedContainer && <ContainerMountControls state={state}
             containerEquipmentId={selectedContainer.equipmentInstanceId} disabled={interaction.dragActive}
             onMount={(lampId) => interaction.mountOnSupport(selectedContainer.equipmentInstanceId, lampId)}

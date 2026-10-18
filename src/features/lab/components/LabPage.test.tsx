@@ -38,6 +38,44 @@ afterEach(() => {
 })
 
 describe('M2 chemical and container interactions', () => {
+  it.each(['Escape', 'pointercancel', 'lostcapture', 'blur', 'resize', 'scroll', 'hidden', 'outside'] as const)('restores the initially empty bench after %s and rejects stale pointer release', (reason) => {
+    const source = screen.getByRole('button', { name: 'Add Thermometer' })
+    pointer(source, 'down', 100, 200)
+    pointer(source, 'move', 600, 300)
+    expect(document.querySelector('.workspace-empty')).not.toBeInTheDocument()
+    if (reason === 'Escape') fireEvent.keyDown(source, { key: 'Escape' })
+    if (reason === 'pointercancel') fireEvent.pointerCancel(source, { pointerId: 1 })
+    if (reason === 'lostcapture') fireEvent.lostPointerCapture(source, { pointerId: 1 })
+    if (reason === 'blur') fireEvent.blur(window)
+    if (reason === 'resize') fireEvent(window, new Event('resize'))
+    if (reason === 'scroll') fireEvent(window, new Event('scroll'))
+    if (reason === 'hidden') {
+      vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden')
+      fireEvent(document, new Event('visibilitychange'))
+    }
+    if (reason === 'outside') pointer(source, 'up', 50, 50)
+    pointer(source, 'up', 600, 300)
+    expect(items()).toHaveLength(0)
+    expect(document.querySelector('.workspace-empty')).toBeInTheDocument()
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(document.querySelector('.bench-drop-feedback')).not.toBeInTheDocument()
+  })
+  it('hides empty instructions during palette drag and uses one stable drop instruction', () => {
+    const source = screen.getByRole('button', { name: 'Add Thermometer' })
+    expect(screen.getByRole('heading', { name: 'Room for discovery.' })).toBeInTheDocument()
+    pointer(source, 'down', 100, 200)
+    pointer(source, 'move', 102, 202)
+    expect(screen.getByRole('heading', { name: 'Room for discovery.' })).toBeInTheDocument()
+    pointer(source, 'move', 600, 300)
+    expect(screen.queryByRole('heading', { name: 'Room for discovery.' })).not.toBeInTheDocument()
+    expect(document.querySelectorAll('.bench-drop-feedback')).toHaveLength(1)
+    expect(document.querySelector('.equipment-drag-feedback')).not.toBeInTheDocument()
+    expect(document.querySelector('.equipment-drag-preview')).toBeInTheDocument()
+    pointer(source, 'up', 600, 300)
+    expect(items()).toHaveLength(1)
+    expect(document.querySelector('.equipment-drag-preview')).not.toBeInTheDocument()
+    expect(document.querySelector('.bench-drop-feedback')).not.toBeInTheDocument()
+  })
   it('shows the full catalog and accepts only a selected supported container', () => {
     const palette = screen.getByRole('region', { name: 'Chemicals' })
     expect(within(palette).getAllByRole('button')).toHaveLength(11)
@@ -63,7 +101,7 @@ describe('M2 chemical and container interactions', () => {
     // A keyboard-generated native button click has detail 0.
     fireEvent.click(liquid, { detail: 0 })
     fireEvent.click(liquid)
-    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Basic copper(II) carbonate' }))
     const contents = screen.getByRole('list', { name: 'Container contents' })
     expect(within(contents).getByText('2 units · Solution')).toBeInTheDocument()
     expect(within(contents).getByText('1 unit · Solid')).toBeInTheDocument()
@@ -81,7 +119,7 @@ describe('M2 chemical and container interactions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Silver nitrate' }))
     fireEvent.click(screen.getByRole('button', { name: 'Add Test tube' }))
     expect(screen.getByText(/This container is empty/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Basic copper(II) carbonate' }))
     const tube = screen.getByRole('button', { name: 'Test tube 1' })
     expect(tube.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
     const tubeClip = tube.querySelector('clipPath')?.id
@@ -93,7 +131,7 @@ describe('M2 chemical and container interactions', () => {
     expect(beaker.querySelector('[data-content-state]')).not.toBeInTheDocument()
     expect(tube.querySelector('[data-content-state="solid"]')).toBeInTheDocument()
     fireEvent.click(tube)
-    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText(/Copper\(II\) carbonate/)).toBeInTheDocument()
+    expect(within(screen.getByRole('list', { name: 'Container contents' })).getByText(/[Cc]opper\(II\) carbonate/)).toBeInTheDocument()
   })
 
   it('retains separate starting substances without gas or reaction output, and resets all contents', () => {
@@ -239,7 +277,7 @@ describe('M5 alcohol lamp interaction', () => {
     expect(sample).toHaveAccessibleDescription(expect.stringContaining('Heating over a lit alcohol lamp.'))
     expect(within(sample).getByText('Heating', { exact: true })).toBeVisible()
     expect(within(bench()).getAllByText('Heating', { exact: true })).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Add Copper(II) carbonate' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add Basic copper(II) carbonate' }))
     expect(sample.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', '#609d73')
     expect(sample.querySelector('[data-reaction-effect]')).not.toBeInTheDocument()
     expect(screen.queryByRole('status', { name: 'Mix result' })).not.toBeInTheDocument()

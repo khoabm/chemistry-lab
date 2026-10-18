@@ -33,17 +33,19 @@ export interface SupportProjection {
   containerPosition: Point
 }
 
-export function projectSupport(requested: Point, type: EquipmentType, bounds: BenchBounds): SupportProjection | null {
+export type ContainerClearances = ReadonlyMap<string, { top: number; side: number }>
+
+export function projectSupport(requested: Point, type: EquipmentType, bounds: BenchBounds, extraTop = 0, extraSide = 0): SupportProjection | null {
   if (!isContainerEquipment(type)
     || ![requested.x, requested.y, bounds.left, bounds.top, bounds.width, bounds.height].every(Number.isFinite)) return null
   const offset = supportOffset(type)
-  const halfWidth = equipmentFootprint.width / 2 + clearance
+  const halfWidth = equipmentFootprint.width / 2 + clearance + extraSide
   const halfHeight = equipmentFootprint.height / 2 + clearance
-  if (bounds.width < halfWidth * 2 || bounds.height < halfHeight * 2 + offset) return null
+  if (bounds.width < halfWidth * 2 || bounds.height < halfHeight * 2 + offset + extraTop) return null
   const center = equipmentCenter(requested, bounds)
   const lampCenter = {
     x: Math.max(bounds.left + halfWidth, Math.min(bounds.left + bounds.width - halfWidth, center.x)),
-    y: Math.max(bounds.top + halfHeight + offset, Math.min(bounds.top + bounds.height - halfHeight, center.y)),
+    y: Math.max(bounds.top + halfHeight + offset + extraTop, Math.min(bounds.top + bounds.height - halfHeight, center.y)),
   }
   return {
     lampPosition: projectedPosition(lampCenter, bounds),
@@ -58,6 +60,7 @@ export type SupportDropTarget =
 
 export function resolveSupportTarget(
   state: MountingWorkspace, containerEquipmentId: string, center: Point, bounds: BenchBounds,
+  extensions?: ContainerClearances,
 ): SupportDropTarget {
   if (!isInsideBench(center, bounds)) return { kind: 'invalid', reason: 'outside-bench' }
   const container = state.equipment.find((item) => item.id === containerEquipmentId)
@@ -66,10 +69,12 @@ export function resolveSupportTarget(
   const candidates = state.equipment.filter((item) => item.equipmentType === 'alcohol-lamp').flatMap((lamp) => {
     const occupant = state.mounts.find((mount) => mount.lampEquipmentId === lamp.id)
     const occupantType = state.equipment.find((item) => item.id === occupant?.containerEquipmentId)?.equipmentType
-    const existing = occupantType ? projectSupport(lamp.position, occupantType, bounds) : null
+    const occupantExtra = extensions?.get(occupant?.containerEquipmentId ?? '')
+    const extra = extensions?.get(containerEquipmentId)
+    const existing = occupantType ? projectSupport(lamp.position, occupantType, bounds, occupantExtra?.top, occupantExtra?.side) : null
     const lampCenter = equipmentCenter(existing?.lampPosition ?? lamp.position, bounds)
     const target = { x: lampCenter.x, y: lampCenter.y - supportOffset(container.equipmentType) }
-    const fitted = projectSupport(lamp.position, container.equipmentType, bounds)
+    const fitted = projectSupport(lamp.position, container.equipmentType, bounds, extra?.top, extra?.side)
     const targets = [target, ...(fitted ? [equipmentCenter(fitted.containerPosition, bounds)] : [])]
     const distances = targets.flatMap((point) => {
       const dx = center.x - point.x
@@ -84,7 +89,8 @@ export function resolveSupportTarget(
   if (!candidate) return { kind: 'free-bench', position: benchPosition(center, bounds) }
   const issue = getMountTargetIssue(state, containerEquipmentId, candidate.lamp.id)
   if (issue) return { kind: 'invalid', reason: issue === 'occupied' ? 'occupied' : 'invalid-equipment' }
-  const projection = projectSupport(candidate.lamp.position, container.equipmentType, bounds)
+  const extra = extensions?.get(containerEquipmentId)
+  const projection = projectSupport(candidate.lamp.position, container.equipmentType, bounds, extra?.top, extra?.side)
   if (!projection) return { kind: 'invalid', reason: 'assembly-too-large' }
   return { kind: current?.lampEquipmentId === candidate.lamp.id ? 'same-support' : 'available-support',
     lampEquipmentId: candidate.lamp.id, projection }
@@ -92,14 +98,15 @@ export function resolveSupportTarget(
 
 export function mountedPositions(state: MountingWorkspace, bounds: BenchBounds, override?: {
   id: string; position: Point; lifted?: boolean
-}): ReadonlyMap<string, Point> {
+}, extensions?: ContainerClearances): ReadonlyMap<string, Point> {
   const positions = new Map(state.equipment.map((item) => [item.id, item.position]))
   if (override) positions.set(override.id, override.position)
   for (const mount of state.mounts) {
     const lampPosition = positions.get(mount.lampEquipmentId)
     const container = state.equipment.find((item) => item.id === mount.containerEquipmentId)
     if (!lampPosition || !container) continue
-    const projection = projectSupport(lampPosition, container.equipmentType, bounds)
+    const extra = extensions?.get(container.id)
+    const projection = projectSupport(lampPosition, container.equipmentType, bounds, extra?.top, extra?.side)
     // An unfittable resize cannot invent a free position or detach. Keep the
     // projected alignment (possibly clipped) and reject all assembly movement.
     const center = equipmentCenter(lampPosition, bounds)

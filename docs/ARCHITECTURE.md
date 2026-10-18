@@ -310,69 +310,83 @@ reaction rule.
 
 ---
 
-## 11. Heating architecture
+## 11. Heating and thermometer architecture
 
-MVP heating is intentionally simple.
+Lamp power has one persistent source: a valid container-to-lamp mount with a lit
+lamp. Free overlap never supplies power. Mount/rebind/remove and assembly movement
+remain atomic reducer transitions; their normalized free positions are dormant while
+bound. Thermometer attachments form a separate one-to-one collection, using stable
+instance IDs. No reverse writable relation or scene graph is introduced.
 
-The alcohol lamp has an interaction state:
+The authorized Thermometer B+ contract extends the earlier logical-only model with
+a bounded **nominal educational** thermal model. Pure TypeScript in
+src/simulation/thermal evolves sample temperature and a separate lagging sensor.
+ChemicalPortion.quantity remains qualitative. Explicit profile data supplies assumed
+load, heat capacity, absorbed power and loss; those values are not experimental
+calibration. Ordinary eligible aqueous samples select a disclosed fixed default
+without a Prepare action. Later material edits/transfer invalidate the numerical
+profile honestly. Explicit Mix remains the only Mix trigger.
 
-    extinguished
-    lit
+Container thermal state belongs to the existing reducer. An explicit Prepare R6
+operation fills only an empty known-temperature vessel with the declared reference
+recipe, retains vessel residual heat through a nominal energy balance, and creates
+one finite batch budget. Only the first eligible Mix spends it. Repeated Mix,
+preparation, movement, Replay and locale changes cannot replenish energy. Empty ends
+a batch without erasing known vessel temperature; Reset changes the simulation epoch.
+Unknown history is unavailable, never a fabricated ambient sample measurement.
 
-A compatible container may become:
+Invalidation retains a separate optional nominal vesselTemperature estimate from
+the last supported thermal history. While the sample is unsupported, only that
+estimate passively cools with the empty-vessel profile (no inferred lamp input or
+unknown-material exchange). Explicit Empty can recover it for a fresh reference;
+it cannot recover a truly unknown estimate or reset a hot vessel to ambient. This
+fallback is not a numerical temperature of the unsupported sample. R6 batch/budget
+guards survive invalidation and only explicit Empty/Reset ends the batch.
 
-    not-heating
-    heating
+Fresh solid loads use the existing nominal 8J/K load at 25°C and the retained vessel
+capacity in a lumped initial energy balance. This is an initial reference convention,
+not instantaneous adoption of the old sample temperature or a conduction solver.
+Initialization at/above the new milestone is unsupported, with no Heat event; Empty
+and cooling a known vessel (or using a fresh vessel) permits a later eligible load.
 
-The application does not model realistic heat transfer.
+useHeatReactions coordinates one monotonic 6x clock. It advances the previous segment
+before application actions/contact changes, pauses when hidden without catch-up,
+and dispatches absolute simulated times guarded by epoch. There is no 2000ms timer,
+per-container remaining-wait map, or alternate production trigger. Lifting a mounted
+container stops input power while residual heat cools; cancellation restores contact
+without rewinding time. Assembly movement retains support/contact. Detached sensors
+approach ambient independently. Presentation/Replay time is not accelerated.
+Sensors still attached to unknown samples also use ambient relaxation internally,
+with the existing air lag. Their measurement stays unavailable; this explicit v1
+fallback neither invents a sample temperature nor resets readings on detach/rebind.
 
-Heating should produce an explicit simulation trigger after the interaction
-conditions required by the current milestone are satisfied.
+R7/R8 use separate nominal solid curves and first-crossing single-final-result
+teaching rules at proposed experimental 350°C/240°C milestones. They are not universal
+reaction thresholds, measured kinetics or intermediate hydration stages. Pure thermal
+qualification calls the existing heat engine once; legacy evaluate-heat callbacks
+cannot bypass it. Completed result and contents references survive temperature ticks,
+cooling, source changes, movement, sensor attachment and localization. Liquid
+thermometers cannot measure the high-temperature solids. See plans/thermometer-bplus.md
+for profile constants, assumptions, evidence limits and release gates.
+Powered solid evolution uses a pure teaching cap at the marker, including a large
+crossing tick. The cap is separate from profile.maximum=450°C; cooling remains the
+existing exponential and reheating preserves completed/result identity. AQ/R6 have
+no marker and keep their prior energy/evolution behavior.
 
-The render-polish Pass 4 contract uses the single `LabWorkspaceState.mounts`
-collection as its only persistent Heat source. A valid Beaker/Test tube mount to
-an existing lit alcohol lamp means physically heating, even for an empty sample.
-Only nonempty samples schedule evaluation. Extinguishing retains the mount;
-free containers never heat through geometric overlap. Mount/rebind/remove and
-assembly moves are atomic reducer transitions. Support projection and bounds
-remain presentation/interaction geometry; dormant container positions do not
-determine heating. No SVG coordinates or timer data enter application state.
-
-`synchronizeHeating` resolves the mounted source and maintains monotonic request
-IDs. An unchanged source preserves its request through assembly movement.
-Detach, rebind, extinction and contents edits invalidate pending generations.
-Explicit Mix supersedes pending Heat. Completed successful Heat results retain
-identity across mounting, movement and lamp toggles. The reducer independently
-validates the pending generation, nonempty contents and live mounted source
-before calling the reaction engine.
-
-`useHeatReactions` owns a private per-container/request timer Map with remaining
-milliseconds, monotonic deadline, paused/completed state, handle and invalidatable
-token. The illustrative delay remains 2000ms. Only a real mounted-container lift
-pauses its timer; cancellation or same-support return resumes the remainder.
-Lamp assembly, unrelated equipment and palette drags retain original deadlines.
-Commit-time reconciliation invalidates obsolete callbacks before scheduling a
-replacement. Callbacks check entry identity, request, token, handle and pause/
-completion state; unmount clears all work. Time values never drive chemistry or
-React rendering. Locale changes do not recreate requests or reset timers.
-
-Pass 5 consumes the existing lifted-container ID for presentation feedback only.
-Workspace badges/descriptions and the selected Sample status distinguish a lifted
-draft from supported heating, without changing HeatingState or the `heating` prop
-used by reaction rendering/animation synchronization. No per-coordinate live-region
-updates or timer policy changes are introduced. Fixed SVG anchors remain unchanged;
-CSS positions wrapping mounted labels beside silhouettes and disables sticky tools
-only for short narrow layouts. The decorative container Heat ellipse is removed;
-flame and genuine reaction effects keep their existing lifecycle.
-
-Do not introduce:
-
-- specific heat capacity
-- flame temperature calculation
-- heat conduction equations
-- thermal-fluid simulation
-
-unless a future specification explicitly requires them.
+Bulb/interior targeting, insertion projection, drafts and full assembly bounds belong
+to interaction/presentation. Rendering remains keyed sibling buttons/SVGs. Pointer
+capture/cancellation, native pickup/click placement and keyboard Enter/Arrow/Escape
+share reducer semantics. No per-coordinate announcements or dependency additions.
+Physical eligibility is only compatible equipment/occupancy; thermometerMeasurement
+separately classifies available/empty/solid/unsupported output. Existing attach/rebind
+actions do not alter thermal state. Empty/solid hanging and liquid immersion are
+presentation geometry. workspacePositions uses shared parent clearances for render,
+targeting, draft attachment, native/keyboard movement and resize, without storing
+projected coordinates. A fixed worst-case headroom keeps parent position stable
+through contents changes; a necessary initial parent projection is previewed before
+commit. Native buttons/SVGs stay independent. Scoped thermometer grip/stem hit regions
+leave the vessel body accessible; palette feedback lives outside the usable bench.
+No actual flame temperature, general heat-transfer/kinetics solver or fluid physics.
 
 ---
 

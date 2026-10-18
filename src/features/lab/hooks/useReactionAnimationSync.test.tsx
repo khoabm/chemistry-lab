@@ -1,3 +1,4 @@
+import { emptyThermal } from '../../../simulation/thermal/profiles'
 import { act, render } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import { EquipmentVisual } from '../components/EquipmentVisual'
@@ -17,7 +18,7 @@ it('resynchronizes heated-solid gas revealed by reheating without an unrelated r
   const reactionResult = evaluateReaction({ contents, trigger: 'heat' })
   function Sample({ heating }: { heating: boolean }) {
     const container: ContainerState = { id: 'sample', equipmentInstanceId: 'equipment', contents, reactionResult,
-      heatEvaluation: { status: 'evaluated' }, heatingState: heating ? { status: 'heating', lampId: 'lamp' } : { status: 'not-heating' } }
+      thermal: emptyThermal(), heatEvaluation: { status: 'evaluated' }, heatingState: heating ? { status: 'heating', lampId: 'lamp' } : { status: 'not-heating' } }
     const presentations = useReactionDynamics([container])
     return <EquipmentVisual equipmentType="beaker" contents={contents} reactionResult={reactionResult}
       presentation={presentations.get(container.id)} heating={heating} />

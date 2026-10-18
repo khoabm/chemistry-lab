@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
 import { StrictMode } from 'react'
-import { heatReactionDelayMs } from '../hooks/useHeatReactions'
+import { r7TeachingWaitMs } from '../../../../tests/thermal'
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal')
 const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close')
@@ -47,15 +47,15 @@ function openDetail() {
 describe('selected sample detail', () => {
   it('updates an already-open dialog when delayed heating finishes', () => {
     vi.useFakeTimers()
-    addSample('Copper(II) carbonate')
+    addSample('Basic copper(II) carbonate')
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
     fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     fireEvent.click(sample)
     mountSelectedSample('equipment-2')
     const { dialog } = openDetail()
-    expect(within(dialog).getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting')
-    act(() => vi.advanceTimersByTime(heatReactionDelayMs))
+    expect(within(dialog).getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Warming toward')
+    act(() => vi.advanceTimersByTime(r7TeachingWaitMs))
     expect(within(dialog).getByRole('status', { name: 'Heat result' })).toHaveTextContent('Thermal decomposition')
     expect(within(dialog).getByText('Products').nextElementSibling).toHaveTextContent('Copper(II) oxide (CuO)')
     expect(dialog.querySelector('[data-content-state="solid"]')).toHaveAttribute('fill', '#303330')
@@ -67,7 +67,7 @@ describe('selected sample detail', () => {
   })
 
   it('shares physical heating in the close-up/dialog without inventing a reaction', () => {
-    addSample('Copper(II) carbonate')
+    addSample('Basic copper(II) carbonate')
     fireEvent.click(screen.getByRole('button', { name: 'Add Alcohol lamp' }))
     fireEvent.click(screen.getByRole('button', { name: 'Ignite lamp' }))
     const sample = screen.getByRole('button', { name: 'Beaker 1' })

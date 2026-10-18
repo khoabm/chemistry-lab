@@ -4,7 +4,7 @@ import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LabPage } from './LabPage'
 import * as engine from '../../../simulation/engine/evaluateReaction'
-import { heatReactionDelayMs } from '../hooks/useHeatReactions'
+import { r7TeachingWaitMs } from '../../../../tests/thermal'
 import { replayHoldMs, replayInitialMs } from '../hooks/useReactionReplay'
 
 const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal')
@@ -134,7 +134,7 @@ describe('teaching replay in the existing enlarged view', () => {
   })
 
   it.each([
-    ['Copper(II) carbonate', '#609d73', '#303330', true],
+    ['Basic copper(II) carbonate', '#609d73', '#303330', true],
     ['Copper(II) sulfate pentahydrate', '#478ecb', '#f2eee4', false],
   ] as const)('replays cooled %s with static reduced-motion progression and leaves the real solid final', (chemical, initial, final, gas) => {
     const motion = new EventTarget()
@@ -144,7 +144,7 @@ describe('teaching replay in the existing enlarged view', () => {
     click('Add Alcohol lamp'); click('Ignite lamp'); click('Add Beaker'); click(`Add ${chemical}`)
     const sample = screen.getByRole('button', { name: 'Beaker 1' })
     mountSelectedSample('equipment-1')
-    tick(heatReactionDelayMs); tick(8000)
+    tick(r7TeachingWaitMs); tick(8000)
     click('Alcohol lamp 1'); click('Extinguish lamp'); fireEvent.click(sample)
     const evaluations = evaluate.mock.calls.length
     const { dialog } = openResult()

@@ -1,3 +1,4 @@
+import { r7TeachingWaitMs } from '../../../../tests/thermal'
 import { StrictMode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,7 +14,6 @@ class TestPointerEvent extends MouseEvent {
 }
 let bounds = new DOMRect(300, 100, 600, 400)
 const tick = (ms: number) => act(() => vi.advanceTimersByTime(ms))
-function button(id: string) { return document.querySelector<HTMLButtonElement>(`[data-equipment-id="${id}"]`)! }
 function center(element: HTMLElement) {
   return equipmentCenter({ x: parseFloat(element.style.left.slice(5)) / 100,
     y: parseFloat(element.style.top.slice(5)) / 100 }, bounds)
@@ -29,7 +29,7 @@ function add(name: string) {
   click(`Add ${name}`)
   return document.querySelector<HTMLButtonElement>('.workspace-equipment:last-of-type')!
 }
-function firstAssembly(chemical = 'Copper(II) carbonate') {
+function firstAssembly(chemical = 'Basic copper(II) carbonate') {
   const lamp = add('Alcohol lamp'); click('Ignite lamp')
   const sample = add('Beaker'); click(`Add ${chemical}`)
   mountSelectedSample(lamp.dataset.equipmentId!)
@@ -50,7 +50,7 @@ function setup() {
 }
 beforeEach(() => {
   bounds = new DOMRect(300, 100, 600, 400)
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance'] })
   vi.stubGlobal('PointerEvent', TestPointerEvent)
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
     if (this.classList.contains('workbench')) return bounds
@@ -65,7 +65,7 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(
 
 // StrictMode calls the pure reducer twice per action; two engine calls represent
 // one committed Heat result. Hook tests separately assert one timer dispatch.
-describe('production mounted heating and pointer timer integration', () => {
+describe('mounted thermal heating and pointer contact integration', () => {
   it.each(['Beaker', 'Test tube'])('keeps mounted %s label, button and SVG identity through EN/VI and lift cancellation', (name) => {
     const { containers } = setup()
     const lamp = add('Alcohol lamp')
@@ -100,7 +100,7 @@ describe('production mounted heating and pointer timer integration', () => {
   it('keeps actual R7 reaction heating and finite presentation age while only draft feedback is lifted', () => {
     const { containers } = setup()
     const { sample } = firstAssembly()
-    tick(2000)
+    tick(r7TeachingWaitMs)
     const result = containers()[0]!.reactionResult
     const gas = sample.querySelector('[data-reaction-effect="gas"]')
     expect(gas).toBeInTheDocument()
@@ -119,14 +119,14 @@ describe('production mounted heating and pointer timer integration', () => {
   })
 
   it.each([
-    ['Beaker', 'Copper(II) carbonate', 'R7'],
+    ['Beaker', 'Basic copper(II) carbonate', 'R7'],
     ['Test tube', 'Copper(II) sulfate pentahydrate', 'R8'],
   ])('retains completed %s result and presentation age across assembly move, detach, rebind and toggles', (name, chemical, reactionId) => {
     const { containers, live, evaluate } = setup()
     const lamp = add('Alcohol lamp'); click('Ignite lamp')
     const sample = add(name); click(`Add ${chemical}`)
     mountSelectedSample(lamp.dataset.equipmentId!)
-    tick(2000); tick(8000)
+    tick(r7TeachingWaitMs); tick(8000)
     const container = containers()[0]!
     expect(container.reactionResult).toMatchObject({ reactionId })
     const presentation = () => (live.mock.results.at(-1)!.value as ReturnType<typeof dynamics.useReactionDynamics>).get(container.id)
@@ -215,136 +215,53 @@ describe('production mounted heating and pointer timer integration', () => {
     expect(document.querySelector('.heating-zone')).not.toBeInTheDocument()
   })
 
-  it.each(['lamp', 'dropper', 'palette', 'free-container', 'pointerdown'] as const)('preserves the original deadline during %s interaction', (kind) => {
-    const { evaluate, containers } = setup()
-    const { lamp, sample } = firstAssembly()
-    const source = kind === 'dropper' ? add('Dropper') : kind === 'free-container' ? add('Test tube')
-      : kind === 'palette' ? screen.getByRole('button', { name: 'Add Dropper' }) : kind === 'pointerdown' ? sample : lamp
-    const request = containers()[0]!.heatEvaluation
-    tick(1000)
+  it.each(['lamp', 'dropper', 'palette', 'free-container', 'pointerdown'] as const)('preserves thermal progress through unrelated %s interaction', (kind) => {
+    const { containers } = setup()
+    const { sample, lamp } = firstAssembly()
+    const source = kind === 'lamp' ? lamp : kind === 'dropper' ? add('Dropper') : kind === 'palette'
+      ? screen.getByRole('button', { name: 'Add Test tube' }) : kind === 'free-container' ? add('Beaker') : sample
+    tick(10000)
     pointer(source, 'down', kind === 'palette' ? { x: 0, y: 0 } : center(source))
-    if (kind !== 'pointerdown') pointer(source, 'move', { x: 650, y: 400 })
-    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
-    if (kind === 'lamp') pointer(source, 'up', { x: 650, y: 400 })
-    tick(999)
-    expect(evaluate).not.toHaveBeenCalled()
-    tick(1)
-    expect(evaluate).toHaveBeenCalledTimes(2)
-    fireEvent.keyDown(source, { key: 'Escape' })
+    if (kind !== 'pointerdown') pointer(source, 'move', { x: 700, y: 420 })
+    tick(r7TeachingWaitMs)
     expect(containers()[0]!.reactionResult).toMatchObject({ reactionId: 'R7' })
-    expect(request.status).toBe('pending')
+    fireEvent.keyDown(source, { key: 'Escape' })
   })
 
-  it.each(['Escape', 'pointercancel', 'lostcapture', 'blur', 'hidden', 'resize', 'outside', 'occupied', 'same-support'] as const)('isolates two concurrent waits and resumes the remaining duration after %s', (reason) => {
-    const { containers, evaluate } = setup()
+  it.each(['Escape', 'pointercancel', 'lostcapture', 'blur', 'hidden', 'resize', 'outside', 'occupied', 'same-support'] as const)('preserves committed mounting and residual heat after %s', (reason) => {
+    const { containers } = setup()
     const { sample } = firstAssembly()
-    const { sample: other } = secondAssembly()
-    const original = center(sample)
-    const request = containers()[0]!.heatEvaluation
-    tick(1000)
-    pointer(sample, 'down')
-    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
-    pointer(sample, 'move', reason === 'occupied' ? center(other) : { x: 700, y: 420 })
-    expect(sample).toHaveClass('is-mounted', 'is-lifted')
-    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument()
-    expect(sample).toHaveAccessibleDescription(expect.stringContaining('Lifted from the support.'))
-    expect(sample).not.toHaveAccessibleDescription(expect.stringContaining('Heating over a lit'))
-    expect(screen.getByRole('status', { name: 'Container heating' })).toHaveTextContent('Lifted from the support.')
-    expect(containers()[0]!.heatingState.status).toBe('heating')
-    tick(1000)
-    expect(evaluate).toHaveBeenCalledTimes(2) // Only the second setup completes.
-    expect(containers()[0]!.heatEvaluation).toBe(request)
+    const other = secondAssembly().sample
+    tick(10000)
+    const originalCenter = center(sample)
+    const contents = containers()[0]!.contents
+    const warm = containers()[0]!.thermal.temperature!
+    pointer(sample, 'down'); pointer(sample, 'move', { x: 720, y: 420 })
+    tick(10000)
+    expect(containers()[0]!.thermal.temperature).toBeLessThan(warm)
+    expect(containers()[0]!.reactionResult).toBeNull()
     if (reason === 'Escape') fireEvent.keyDown(sample, { key: 'Escape' })
     if (reason === 'pointercancel') fireEvent.pointerCancel(sample, { pointerId: 1 })
     if (reason === 'lostcapture') fireEvent.lostPointerCapture(sample, { pointerId: 1 })
-    if (reason === 'blur') fireEvent.blur(window)
+    if (reason === 'blur') fireEvent(window, new Event('blur'))
     if (reason === 'hidden') {
       vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden')
       fireEvent(document, new Event('visibilitychange'))
+      const paused = containers()[0]!.thermal.temperature
+      tick(10000)
+      expect(containers()[0]!.thermal.temperature).toBe(paused)
+      vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+      fireEvent(document, new Event('visibilitychange'))
     }
     if (reason === 'resize') fireEvent(window, new Event('resize'))
-    if (reason === 'outside') pointer(sample, 'up', { x: 299, y: 300 })
+    if (reason === 'outside') pointer(sample, 'up', { x: -10, y: -10 })
     if (reason === 'occupied') pointer(sample, 'up', center(other))
-    if (reason === 'same-support') pointer(sample, 'up', original)
-    pointer(sample, 'up', { x: 700, y: 420 }) // Stale pointerup after cancellation.
-    expect(sample).not.toHaveClass('is-lifted')
-    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
-    expect(containers()[0]!.heatEvaluation).toBe(request)
-    tick(999)
-    expect(evaluate).toHaveBeenCalledTimes(2)
-    tick(1)
-    expect(evaluate).toHaveBeenCalledTimes(4)
+    if (reason === 'same-support') pointer(sample, 'up', originalCenter)
+    pointer(sample, 'up', { x: -10, y: -10 }) // Stale release after cancellation.
+    expect(sample).toHaveClass('is-mounted')
+    expect(containers()[0]!.contents).toBe(contents)
+    tick(60000)
     expect(containers()[0]!.reactionResult).toMatchObject({ reactionId: 'R7' })
-  })
-
-  it('supports pointer mount, same-support return, atomic lit rebind and free detach without a duplicate visual', () => {
-    const { containers, evaluate } = setup()
-    const { sample, lamp } = firstAssembly()
-    const target = center(sample)
-    const dormantNode = sample.querySelector('svg')
-    click('Remove from support')
-    pointer(sample, 'down'); pointer(sample, 'move', target)
-    expect(containers()[0]!.heatingState.status).toBe('not-heating')
-    pointer(sample, 'up', target)
-    expect(sample.querySelector('svg')).toBe(dormantNode)
-    expect(containers()[0]!.heatingState).toEqual({ status: 'heating', lampId: lamp.dataset.equipmentId })
-    const request = containers()[0]!.heatEvaluation
-    const second = add('Alcohol lamp'); click('Ignite lamp')
-    // Use the native path once to observe the same type-specific support anchor.
-    const temp = add('Test tube'); mountSelectedSample(second.dataset.equipmentId!)
-    const target2 = center(temp)
-    click('Remove from support')
-    tick(1000)
-    pointer(sample, 'down'); pointer(sample, 'move', target2)
-    expect(containers()[0]!.heatEvaluation).toBe(request)
-    pointer(sample, 'up', target2)
-    expect(sample.querySelector('.equipment-state')).toHaveTextContent('Heating')
-    expect(containers()[0]!.heatingState).toEqual({ status: 'heating', lampId: second.dataset.equipmentId })
-    expect(containers()[0]!.heatEvaluation).not.toEqual(request)
-    tick(1999)
-    expect(evaluate).not.toHaveBeenCalled()
-    pointer(sample, 'down'); pointer(sample, 'move', { x: 650, y: 430 }); pointer(sample, 'up', { x: 650, y: 430 })
-    expect(containers()[0]!.heatingState.status).toBe('not-heating')
-    expect(sample.querySelector('.equipment-state')).not.toBeInTheDocument()
-    tick(5000)
-    expect(evaluate).not.toHaveBeenCalled()
-    expect(document.querySelectorAll(`[data-equipment-id="${sample.dataset.equipmentId}"]`)).toHaveLength(1)
-  })
-
-  it('keeps a paused remainder and stable request through EN/VI changes, then resumes it', () => {
-    const { containers, evaluate } = setup()
-    const { sample } = firstAssembly()
-    const initial = containers()[0]
-    tick(1000)
-    pointer(sample, 'down'); pointer(sample, 'move', { x: 700, y: 420 })
-    fireEvent.change(screen.getByRole('combobox', { name: 'Language' }), { target: { value: 'vi' } })
-    expect(containers()[0]).toBe(initial)
-    expect(sample).toHaveAccessibleDescription(expect.stringContaining('Đang nhấc khỏi giá đỡ.'))
-    expect(screen.getByRole('status', { name: 'Trạng thái đun mẫu' })).toHaveTextContent('Đang nhấc khỏi giá đỡ.')
-    expect(screen.getByRole('status', { name: 'Trạng thái đun mẫu' })).toHaveAttribute('aria-live', 'off')
-    tick(4000)
-    expect(evaluate).not.toHaveBeenCalled()
-    fireEvent.keyDown(sample, { key: 'Escape' })
-    tick(999); expect(evaluate).not.toHaveBeenCalled()
-    tick(1); expect(evaluate).toHaveBeenCalledTimes(2)
-    expect(sample).toBe(button(sample.dataset.equipmentId!))
-  })
-
-  it('preserves unrelated requests while Dropper Fill edits a mounted liquid source without automatic Mix', () => {
-    const { containers, evaluate } = setup()
-    const { sample } = firstAssembly('Hydrochloric acid')
-    click('Add Hydrochloric acid')
-    secondAssembly()
-    const old = containers()[0]!.heatEvaluation
-    const other = containers()[1]
-    add('Dropper')
-    fireEvent.change(screen.getByRole('combobox', { name: 'Source container' }), { target: { value: sample.dataset.equipmentId } })
-    tick(1000); click('Fill dropper')
-    expect(evaluate).not.toHaveBeenCalled()
-    expect(containers()[0]!.heatEvaluation).not.toEqual(old)
-    expect(containers()[1]).toBe(other)
-    tick(1000); expect(evaluate).toHaveBeenCalledTimes(2)
-    tick(1000); expect(evaluate).toHaveBeenCalledTimes(4)
-    expect(evaluate.mock.calls.every(([input]) => input.trigger === 'heat')).toBe(true)
+    expect(containers()[1]!.reactionResult).toMatchObject({ reactionId: 'R8' })
   })
 })

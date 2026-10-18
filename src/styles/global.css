@@ -305,22 +305,30 @@ h3 { font-size: 14px; font-weight: 600; }
 .workspace-equipment:active, .equipment-palette-item:active { cursor: grabbing; }
 .workbench.is-drop-valid { outline: 3px solid var(--color-accent); outline-offset: -3px; }
 .workbench.is-drop-invalid { outline: 2px dashed #9f7755; outline-offset: -3px; }
+.workspace-drop-slot {
+  position: relative;
+  z-index: 21;
+  height: 64px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
 .bench-drop-feedback {
-  position: absolute;
-  top: var(--space-3);
-  z-index: 4;
-  padding: var(--space-2) var(--space-3);
+  padding: 4px var(--space-3);
   border-radius: var(--radius-small);
   background: var(--color-panel);
   color: var(--color-accent);
   font-size: 12px;
+  line-height: 1.35;
   pointer-events: none;
 }
 .bench-caption, .workspace-empty { pointer-events: none; }
 .equipment-drag-preview { position: fixed; z-index: 20; pointer-events: none; background: #fffefaee; border-color: var(--color-accent); box-shadow: var(--shadow-panel); }
 .equipment-drag-preview.is-invalid { border-style: dashed; border-color: #9f7755; }
-.equipment-drag-feedback { position: absolute; top: calc(100% + 6px); white-space: nowrap; padding: 4px 7px; border-radius: 4px; background: var(--color-panel); color: var(--color-muted); }
 .workspace-message { min-height: 32px; padding-top: var(--space-2); font-size: 12px; line-height: 1.6; color: var(--color-accent); text-align: center; }
+.workspace-message.is-suppressed { visibility: hidden; }
 
 .chemical-palette { display: grid; gap: var(--space-2); margin-top: var(--space-3); }
 .chemical-search { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-3); }
@@ -584,3 +592,25 @@ h3 { font-size: 14px; font-weight: 600; }
   .lab-palette { position: static; }
   .workbench { min-height: 300px; height: 300px; }
 }
+/* Thermometers share the fixed SVG slot used by support/interior projection. */
+.workspace-equipment[data-equipment-type='thermometer'] { z-index: 3; width: 48px !important; pointer-events: none; }
+.workspace-equipment[data-equipment-type='thermometer'] > .equipment-visual,
+.equipment-drag-preview[data-equipment-type='thermometer'] > .equipment-visual { position: absolute; top: 11px; left: 50%; width: 84px; height: 84px; transform: translateX(-50%) scale(1.2); }
+.equipment-drag-preview[data-equipment-type='thermometer'] > span:first-of-type { position: absolute; top: 99px; }
+.thermometer-info { position: absolute; top: -44px; width: 100px; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: auto; }
+.thermometer-info .equipment-label { font-size: 10px; line-height: 14px; overflow-wrap: anywhere; text-shadow: 0 1px 2px #fffefa; }
+.thermometer-reading { padding: 1px 4px; line-height: 16px; background: #fffefa; border-radius: 3px; color: #234d40; font-variant-numeric: tabular-nums; }
+.thermometer-grip { position: absolute; top: -10px; width: 44px; height: 44px; border: 1px dashed rgb(35 102 83 / 35%); border-radius: 6px; pointer-events: auto; }
+.thermometer-grip:hover { border-color: var(--color-accent); }
+.thermometer-stem-target { position: absolute; top: 34px; width: 14px; height: 72px; pointer-events: auto; }
+.workspace-equipment[data-equipment-type='thermometer']:focus-visible .thermometer-grip { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.workspace-equipment.is-support-container > .equipment-label { pointer-events: auto; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+.workspace-equipment.is-support-container:not(.is-mounted) > .equipment-label { top: 82px; }
+.workspace-equipment.is-mounted.has-thermometer > .equipment-state { top: 26px; left: calc(100% + 4px); right: auto; max-width: 80px; }
+.workspace-equipment.is-mounted.has-thermometer.label-on-left > .equipment-state { left: auto; right: calc(100% + 4px); }
+.workspace-equipment.is-mounted.has-thermometer[data-equipment-type='test-tube'] > .equipment-state { top: 78px; }
+.workspace-equipment[data-equipment-type='thermometer']:focus-visible { z-index: 4; }
+.thermometer-details > .equipment-visual { height: 220px; }
+.thermal-details { border-top: 1px solid var(--color-border); margin-top: 16px; padding-top: 12px; }
+.thermal-details button[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+.workspace-equipment.is-thermometer-target { border: 1px dashed var(--color-accent); background: rgb(255 255 255 / 12%); }

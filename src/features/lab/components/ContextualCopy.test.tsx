@@ -1,3 +1,4 @@
+import { emptyThermal } from '../../../simulation/thermal/profiles'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { describe, expect, it, vi } from 'vitest'
@@ -12,7 +13,7 @@ import { LampDetails } from './LampDetails'
 
 const empty: ContainerState = {
   id: 'sample', equipmentInstanceId: 'beaker', contents: [], reactionResult: null,
-  heatingState: { status: 'not-heating' }, heatEvaluation: { status: 'idle' },
+  heatingState: { status: 'not-heating' }, thermal: emptyThermal(), heatEvaluation: { status: 'idle' },
 }
 const filled: ContainerState = { ...empty, contents: [{ chemicalId: 'silver-nitrate', quantity: 1 }, { chemicalId: 'sodium-chloride', quantity: 1 }] }
 const details = (container: ContainerState) => <ContainerDetails container={container} equipmentType="beaker" disabled={false}
@@ -70,9 +71,9 @@ describe('contextual teaching copy', () => {
 
   it('prioritizes pending Heat guidance even when an earlier Mix result exists', () => {
     const reactionResult = evaluateReaction({ contents: filled.contents, trigger: 'mix' })
-    render(details({ ...filled, reactionResult, heatingState: { status: 'heating', lampId: 'lamp' }, heatEvaluation: { status: 'pending', requestId: 1 } }))
-    expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Waiting for heat reaction')
-    expect(screen.getByText(/Keep this sample mounted on the lit lamp/)).toHaveTextContent('Mix cancels the pending heat check')
+    render(details({ ...filled, reactionResult, heatingState: { status: 'heating', lampId: 'lamp' }, thermal: emptyThermal(), heatEvaluation: { status: 'pending', requestId: 1 } }))
+    expect(screen.getByRole('status', { name: 'Heat evaluation' })).toHaveTextContent('Warming toward')
+    expect(screen.getByText(/The sample is warming/)).toHaveTextContent('Heat qualification')
     expect(screen.queryByText(/Sample ready|Place the center|Press Mix to check/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Mix' })).toBeEnabled()
   })
@@ -81,7 +82,7 @@ describe('contextual teaching copy', () => {
     const contents = [{ chemicalId: 'copper-carbonate', quantity: 1 }] as const
     const reactionResult = evaluateReaction({ contents, trigger: 'heat' })
     // Cooling resets evaluation to idle while the committed transformation remains.
-    render(details({ ...empty, contents, reactionResult, heatEvaluation: { status: 'idle' } }))
+    render(details({ ...empty, contents, reactionResult, thermal: emptyThermal(), heatEvaluation: { status: 'idle' } }))
     const heating = screen.getByRole('status', { name: 'Container heating' })
     expect(heating).toHaveTextContent('Not heating.')
     expect(heating).not.toHaveClass('visually-hidden')
@@ -90,7 +91,7 @@ describe('contextual teaching copy', () => {
     expect(screen.getByText(/This heated sample has transformed/)).toHaveTextContent('Empty the container or add chemicals to start a fresh experiment; product reactions are not modeled.')
     expect(screen.getByText(/Amounts use simplified units/)).toHaveTextContent('the list records starting substances and the drawing illustrates the result')
     expect(screen.queryByText(/Sample ready|Keep this sample/)).not.toBeInTheDocument()
-    expect(screen.getByRole('list', { name: 'Container contents' })).toHaveTextContent('CuCO₃ · Copper(II) carbonate')
+    expect(screen.getByRole('list', { name: 'Container contents' })).toHaveTextContent('Cu₂CO₃(OH)₂ · Basic copper(II) carbonate')
   })
 
   it('preserves mounted accessible heating statuses through contextual visibility, locale changes and meaningful transitions', () => {
@@ -116,7 +117,7 @@ describe('contextual teaching copy', () => {
     expect(evaluation).toHaveAttribute('aria-live', 'polite')
     act(() => { void instance.changeLanguage('vi') })
     expect(screen.getByRole('status', { name: 'Kiểm tra khi đun' })).toBe(evaluation)
-    expect(evaluation).toHaveTextContent('Đang chờ phản ứng khi đun')
+    expect(evaluation).toHaveTextContent('Đang gia nhiệt đến mốc minh họa thử nghiệm')
     expect(evaluation).toHaveAttribute('aria-live', 'off')
     rerender(view({ status: 'not-heating' }, { status: 'evaluated' }))
     expect(heating).not.toHaveClass('visually-hidden')
@@ -149,7 +150,7 @@ describe('contextual teaching copy', () => {
     expect(status).toHaveTextContent(t('lamp.lit'))
     expect(status).toHaveAttribute('aria-live', 'polite')
     expect(screen.getByText(t('lamp.moveHint'))).toBeInTheDocument()
-    expect(screen.getByText(t('lamp.waitHint'))).toHaveTextContent('No exact temperature is calculated.')
+    expect(screen.getByText(t('lamp.waitHint'))).toHaveTextContent('6×')
     fireEvent.click(screen.getByRole('button', { name: t('action.extinguish') }))
     expect(onToggle).toHaveBeenCalledTimes(2)
     rerender(view('extinguished'))
