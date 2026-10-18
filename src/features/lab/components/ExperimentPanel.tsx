@@ -10,6 +10,7 @@ import { LampDetails } from './LampDetails'
 import { ReactionObservation } from './ReactionObservation'
 import { SampleDetailDialog } from './SampleDetailDialog'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
+import { EquipmentRemovalControls } from './EquipmentRemovalControls'
 
 type ExperimentTab = 'sample' | 'result'
 
@@ -23,6 +24,8 @@ interface ExperimentPanelProps {
   onClear: () => void
   onRemoveChemical?: (id: ChemicalId) => void
   onRemoveEquipment?: () => void
+  equipmentLabel?: string | undefined
+  hasEquipmentConnections?: boolean
   onToggleLamp: () => void
   presentation?: ReactionPresentation | undefined
   dropperDetails?: ReactNode
@@ -32,7 +35,7 @@ interface ExperimentPanelProps {
   thermalDetails?: ReactNode
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, equipmentLabel, hasEquipmentConnections = false, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -43,7 +46,6 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
     () => ({ result, contents, tab: result ? 'result' : 'sample' }),
   )
   const [detailTab, setDetailTab] = useState<ExperimentTab | null>(null)
-  const [confirmRemove, setConfirmRemove] = useState(false)
   // Observe immutable props only; rendered outcome data always comes from the container.
   if (view.result !== result || view.contents !== contents) {
     setView({ result, contents, tab: result ? 'result' : 'sample' })
@@ -58,18 +60,6 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         <p className="eyebrow">{t('experiment.eyebrow')}</p>
         <h2 id={`${id}-title`}>{t('experiment.title')}</h2>
       </div>
-      {equipment && <div className="equipment-removal">
-        {!confirmRemove ? <button type="button" className="equipment-removal-open" disabled={disabled}
-          onClick={() => setConfirmRemove(true)}>{t('action.removeEquipment')}</button>
-          : <div className="equipment-removal-confirm" role="group" aria-label={t('equipmentRemoval.title')}>
-            <p>{t('equipmentRemoval.confirm', { equipment: t(`equipment.${equipment.equipmentType}`) })}</p>
-            <p className="empty-caption">{t('equipmentRemoval.connected')}</p>
-            <div className="equipment-removal-buttons">
-              <button type="button" className="action-button action-button--secondary" onClick={() => setConfirmRemove(false)}>{t('action.cancelRemove')}</button>
-              <button type="button" className="action-button equipment-removal-accept" disabled={disabled} onClick={() => onRemoveEquipment?.()}>{t('action.confirmRemoveEquipment')}</button>
-            </div>
-          </div>}
-      </div>}
       {container && equipment && isContainerEquipment(equipment.equipmentType) ? <>
       <div className="experiment-tabs" role="tablist" aria-label={t('experiment.views')}
         onKeyDown={(event) => {
@@ -125,6 +115,9 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         <p>{t('experiment.emptyBody')}</p>
         <p>{t('experiment.emptyHelp')}</p>
       </div>}
+      {equipment && onRemoveEquipment && <EquipmentRemovalControls key={equipment.id}
+        name={equipmentLabel ?? t(`equipment.${equipment.equipmentType}`)} hasConnections={hasEquipmentConnections}
+        removesContents={!!container && container.contents.length > 0} disabled={disabled} onRemove={onRemoveEquipment} />}
       {detailTab && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
         presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {

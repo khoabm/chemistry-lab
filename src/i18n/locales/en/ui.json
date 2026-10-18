@@ -247,8 +247,11 @@
   "action.confirmRemoveEquipment": "Remove equipment",
   "action.cancelRemove": "Cancel",
   "equipmentRemoval.title": "Confirm equipment removal",
-  "equipmentRemoval.confirm": "Remove this {{equipment}} from the bench?",
-  "equipmentRemoval.connected": "Attached equipment stays on the bench and is detached safely.",
+  "equipmentRemoval.manage": "Equipment",
+  "equipmentRemoval.confirm": "Remove {{equipment}} from the bench?",
+  "equipmentRemoval.contents": "Its contents and result will also be removed.",
+  "equipmentRemoval.connected": "Other linked equipment stays on the bench. Connections to this tool are released.",
+  "workspace.feedback.removed": "{{equipment}} removed from the bench. Other equipment is kept.",
   "sample.removeChemical": "Remove {{name}} from this sample",
   "sample.removeOne": "Remove"
 }

@@ -223,8 +223,11 @@
   "action.confirmRemoveEquipment": "Xóa dụng cụ",
   "action.cancelRemove": "Hủy",
   "equipmentRemoval.title": "Xác nhận xóa dụng cụ",
+  "equipmentRemoval.manage": "Quản lý dụng cụ",
   "equipmentRemoval.confirm": "Xóa {{equipment}} khỏi bàn?",
-  "equipmentRemoval.connected": "Dụng cụ đang gắn vẫn ở trên bàn và được tháo liên kết.",
+  "equipmentRemoval.contents": "Chất chứa bên trong và kết quả cũng sẽ bị xóa.",
+  "equipmentRemoval.connected": "Dụng cụ liên kết khác vẫn ở trên bàn. Liên kết với dụng cụ này sẽ được tháo.",
+  "workspace.feedback.removed": "Đã xóa {{equipment}} khỏi bàn. Dụng cụ khác được giữ lại.",
   "sample.removeChemical": "Bỏ {{name}} khỏi mẫu",
   "sample.removeOne": "Bỏ"
 }
