@@ -21,8 +21,8 @@ interface ExperimentPanelProps {
   lifted?: boolean
   onMix: () => void
   onClear: () => void
-  onRemoveChemical: (id: ChemicalId) => void
-  onRemoveEquipment: () => void
+  onRemoveChemical?: (id: ChemicalId) => void
+  onRemoveEquipment?: () => void
   onToggleLamp: () => void
   presentation?: ReactionPresentation | undefined
   dropperDetails?: ReactNode
@@ -62,11 +62,11 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         {!confirmRemove ? <button type="button" className="equipment-removal-open" disabled={disabled}
           onClick={() => setConfirmRemove(true)}>{t('action.removeEquipment')}</button>
           : <div className="equipment-removal-confirm" role="group" aria-label={t('equipmentRemoval.title')}>
-            <p>{t('equipmentRemoval.confirm', { equipment: t('equipment.' + equipment.equipmentType) })}</p>
+            <p>{t('equipmentRemoval.confirm', { equipment: t(`equipment.${equipment.equipmentType}`) })}</p>
             <p className="empty-caption">{t('equipmentRemoval.connected')}</p>
             <div className="equipment-removal-buttons">
               <button type="button" className="action-button action-button--secondary" onClick={() => setConfirmRemove(false)}>{t('action.cancelRemove')}</button>
-              <button type="button" className="action-button equipment-removal-accept" disabled={disabled} onClick={onRemoveEquipment}>{t('action.confirmRemoveEquipment')}</button>
+              <button type="button" className="action-button equipment-removal-accept" disabled={disabled} onClick={() => onRemoveEquipment?.()}>{t('action.confirmRemoveEquipment')}</button>
             </div>
           </div>}
       </div>}
@@ -101,7 +101,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
           presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}
           onClear={() => { setDetailTab(null); selectTab('sample'); onClear() }}
-          onRemoveChemical={(id) => { setDetailTab(null); selectTab('sample'); onRemoveChemical(id) }}
+          onRemoveChemical={(id) => { setDetailTab(null); selectTab('sample'); onRemoveChemical?.(id) }}
           onEnlarge={() => setDetailTab('sample')} />
       </div>
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-result-panel`} aria-labelledby={`${id}-result-tab`}
