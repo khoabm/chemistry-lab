@@ -38,6 +38,8 @@ export type LabWorkspaceAction =
   | { type: 'reset' }
   | { type: 'add-chemical'; equipmentId: string; chemicalId: ChemicalId; quantity: number }
   | { type: 'clear-container'; equipmentId: string }
+  | { type: 'remove-chemical'; equipmentId: string; chemicalId: ChemicalId }
+  | { type: 'remove-equipment'; id: string; released?: { equipmentId: string; position: Point } }
   | { type: 'mix'; equipmentId: string }
   | { type: 'toggle-lamp'; equipmentId: string }
   | { type: 'evaluate-heat'; equipmentId: string; requestId: number }
@@ -145,6 +147,34 @@ export function labWorkspaceReducer(
       thermometerAttachments: state.thermometerAttachments.filter((item) => item.thermometerEquipmentId !== action.thermometerId) }
   }
 
+  if (action.type === 'remove-equipment') {
+    if (!state.equipment.some((item) => item.id === action.id)) return state
+    const survivor = state.mounts.find((item) => item.lampEquipmentId === action.id)?.containerEquipmentId
+      ?? state.thermometerAttachments.find((item) => item.containerEquipmentId === action.id)?.thermometerEquipmentId
+    if (survivor && (!action.released || action.released.equipmentId !== survivor || !validWorkspacePosition(action.released.position))) return state
+    return synchronizeHeating({
+      ...state,
+      equipment: state.equipment.filter((item) => item.id !== action.id).map((item) =>
+        item.id === survivor ? { ...item, position: { ...action.released!.position } } : item),
+      containers: state.containers.filter((item) => item.equipmentInstanceId !== action.id),
+      lamps: state.lamps.filter((item) => item.equipmentInstanceId !== action.id),
+      droppers: state.droppers.filter((item) => item.equipmentInstanceId !== action.id),
+      thermometers: state.thermometers.filter((item) => item.equipmentInstanceId !== action.id),
+      mounts: state.mounts.filter((item) => item.lampEquipmentId !== action.id && item.containerEquipmentId !== action.id),
+      thermometerAttachments: state.thermometerAttachments.filter((item) => item.containerEquipmentId !== action.id && item.thermometerEquipmentId !== action.id),
+      selectedEquipmentId: state.selectedEquipmentId === action.id ? null : state.selectedEquipmentId,
+    })
+  }
+  if (action.type === 'remove-chemical') {
+    const container = state.containers.find((item) => item.equipmentInstanceId === action.equipmentId)
+    if (!container || container.reactionResult?.status === 'reaction'
+      || !container.contents.some((item) => item.chemicalId === action.chemicalId)) return state
+    const contents = container.contents.filter((item) => item.chemicalId !== action.chemicalId)
+    const thermal = contents.length ? invalidateThermal(container.thermal)
+      : emptyThermal(container.thermal.temperature ?? container.thermal.vesselTemperature ?? null)
+    return synchronizeHeating({ ...state, containers: state.containers.map((item) => item === container
+      ? { ...item, contents, reactionResult: null, thermal, heatEvaluation: { status: 'idle' } } : item) })
+  }
   if (action.type === 'select') {
     return state.equipment.some((item) => item.id === action.id)
       ? { ...state, selectedEquipmentId: action.id }

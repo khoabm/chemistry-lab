@@ -3,6 +3,7 @@ import { useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { isContainerEquipment, type ContainerState } from '../../../types/container'
 import type { EquipmentInstance } from '../../../types/equipment'
+import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 import type { AlcoholLampState } from '../../../types/heating'
 import { ContainerDetails } from './ContainerDetails'
 import { LampDetails } from './LampDetails'
@@ -20,6 +21,8 @@ interface ExperimentPanelProps {
   lifted?: boolean
   onMix: () => void
   onClear: () => void
+  onRemoveChemical: (id: ChemicalId) => void
+  onRemoveEquipment: () => void
   onToggleLamp: () => void
   presentation?: ReactionPresentation | undefined
   dropperDetails?: ReactNode
@@ -29,7 +32,7 @@ interface ExperimentPanelProps {
   thermalDetails?: ReactNode
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -40,6 +43,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
     () => ({ result, contents, tab: result ? 'result' : 'sample' }),
   )
   const [detailTab, setDetailTab] = useState<ExperimentTab | null>(null)
+  const [confirmRemove, setConfirmRemove] = useState(false)
   // Observe immutable props only; rendered outcome data always comes from the container.
   if (view.result !== result || view.contents !== contents) {
     setView({ result, contents, tab: result ? 'result' : 'sample' })
@@ -54,6 +58,18 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         <p className="eyebrow">{t('experiment.eyebrow')}</p>
         <h2 id={`${id}-title`}>{t('experiment.title')}</h2>
       </div>
+      {equipment && <div className="equipment-removal">
+        {!confirmRemove ? <button type="button" className="equipment-removal-open" disabled={disabled}
+          onClick={() => setConfirmRemove(true)}>{t('action.removeEquipment')}</button>
+          : <div className="equipment-removal-confirm" role="group" aria-label={t('equipmentRemoval.title')}>
+            <p>{t('equipmentRemoval.confirm', { equipment: t('equipment.' + equipment.equipmentType) })}</p>
+            <p className="empty-caption">{t('equipmentRemoval.connected')}</p>
+            <div className="equipment-removal-buttons">
+              <button type="button" className="action-button action-button--secondary" onClick={() => setConfirmRemove(false)}>{t('action.cancelRemove')}</button>
+              <button type="button" className="action-button equipment-removal-accept" disabled={disabled} onClick={onRemoveEquipment}>{t('action.confirmRemoveEquipment')}</button>
+            </div>
+          </div>}
+      </div>}
       {container && equipment && isContainerEquipment(equipment.equipmentType) ? <>
       <div className="experiment-tabs" role="tablist" aria-label={t('experiment.views')}
         onKeyDown={(event) => {
@@ -85,6 +101,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
           presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}
           onClear={() => { setDetailTab(null); selectTab('sample'); onClear() }}
+          onRemoveChemical={(id) => { setDetailTab(null); selectTab('sample'); onRemoveChemical(id) }}
           onEnlarge={() => setDetailTab('sample')} />
       </div>
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-result-panel`} aria-labelledby={`${id}-result-tab`}

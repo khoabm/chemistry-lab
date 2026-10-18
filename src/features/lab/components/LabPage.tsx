@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useLayoutEffect, useReducer } from 'react'
+import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 import { createLabWorkspaceState, labWorkspaceReducer } from '../../../store/labWorkspace'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { EquipmentDragPreview } from './EquipmentDragPreview'
@@ -74,6 +75,8 @@ function Laboratory() {
           presentation={selectedContainer ? presentations.get(selectedContainer.id) : undefined}
           onMix={() => { if (selectedContainer) dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onClear={() => { if (selectedContainer) dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId }) }}
+          onRemoveChemical={(chemicalId: ChemicalId) => { if (selectedContainer && !interaction.dragActive) dispatch({ type: 'remove-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId }) }}
+          onRemoveEquipment={() => { if (selectedEquipment && !interaction.dragActive) interaction.removeEquipment(selectedEquipment.id) }}
           onToggleLamp={() => { if (selectedLamp) dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId }) }} />
       </main>
       {interaction.drag?.source.kind === 'palette' && <EquipmentDragPreview preview={interaction.drag} />}
