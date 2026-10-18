@@ -15,6 +15,19 @@ function useClock(lifted: string | null = null, sensor = true) {
 const tick = (ms: number) => act(() => vi.advanceTimersByTime(ms))
 
 describe('single sixfold thermal clock', () => {
+  it('keeps passive vessel cooling active for an unsupported sample without a thermometer', () => {
+    const { result } = renderHook(() => useClock(null, false))
+    act(() => result.current.dispatch({ type: 'add', equipmentType: 'beaker', position: { x: 0.5, y: 0.5 } }))
+    act(() => result.current.dispatch({ type: 'prepare-r6', equipmentId: 'equipment-1' }))
+    act(() => result.current.dispatch({ type: 'mix', equipmentId: 'equipment-1' }))
+    const warm = result.current.state.containers[0]!.thermal.temperature!
+    act(() => result.current.dispatch({ type: 'add-chemical', equipmentId: 'equipment-1', chemicalId: 'sodium-chloride', quantity: 1 }))
+    tick(20000)
+    expect(result.current.state.simulationTime).toBeCloseTo(120)
+    expect(result.current.state.containers[0]!.thermal.temperature).toBeNull()
+    act(() => result.current.dispatch({ type: 'clear-container', equipmentId: 'equipment-1' }))
+    expect(result.current.state.containers[0]!.thermal.temperature).toBeCloseTo(25 + (warm - 25) * Math.exp(-120 * 0.3 / 40), 10)
+  })
   it('advances once under StrictMode, rejects duplicate time and cleans up', () => {
     const { result, unmount } = renderHook(() => useClock(), { wrapper: StrictMode })
     tick(1000)

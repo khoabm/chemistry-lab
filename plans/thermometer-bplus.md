@@ -365,7 +365,8 @@ Retain the empty vessel's modeled temperature after Empty and cool it toward amb
 Reference reagents enter at declared ambient 25°C. At Prepare, calculate initial
 temperature from (m cp Ta + Cv Tv)/(m cp + Cv), where Tv is the retained vessel
 temperature, rather than resetting a warm vessel to 25°C. Fresh equipment begins at
-ambient. Unknown/inactivated sample temperature means unknown vessel temperature;
+ambient. Invalidated samples retain only their last nominal vessel estimate with
+passive empty-vessel cooling; Empty may recover that estimate. If no estimate exists,
 reject quantitative preparation honestly until a fresh vessel/reset is used. These
 are explicitly nominal assumptions, not measured cooling or new quantity semantics.
 
@@ -523,7 +524,8 @@ Keep one authoritative collection per physical relation and the existing reducer
   containerEquipmentId. Enforce one-to-one eligibility, existence, no self-binding,
   and no duplication. Do not add writable reverse maps to containers or lamp mounts.
 - ContainerState.thermal stores kind (empty/aqueous/r6/r7/r8/unsupported), nullable
-  temperature, referenceUsed, energyRemaining, batchId and completed. The container
+  temperature, optional nullable vesselTemperature for unsupported-history passive
+  cooling, referenceUsed, energyRemaining, batchId and completed. The container
   instance is the stable sample anchor; explicit R6 batches have epoch/counter IDs.
   Kind selects the fixed v1 profile data in code; there is no mutable profile version
   or persistence migration. Preserve invalidated batch anti-retrigger markers until
@@ -770,6 +772,11 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 ## Progress
 
+- [x] Review correction at clean feature-thermometer HEAD 1367e33: reproduce P1-01/02/03 before fixes (5 new failing tests, 7 existing passing); reproduce P2-01 in EN/VI (4 failing UI cases).
+- [x] Correct Clear recovery using a separate passive nominal vessel estimate, fresh-solid initialization/admission, unavailable-sensor evolution, and separate current/milestone UI; preserve one clock, R6 budget and M11 interactions.
+- [x] Validate review corrections in 547 tests / 43 files, typecheck, lint, build and whitespace checks; actual browser QA at 1440×960, 390×844 and 844×390 recorded below.
+- [ ] Obtain an actual GitHub CI run for the review corrections through the existing workflow_dispatch path; no trigger changes or PR authorized.
+
 - [x] Receive explicit implementation authorization and merge three main documentation commits safely (merge HEAD 963e60b468060262047ab663d809321fe0409cb4); plan preserved.
 - [x] Specify empty-vessel R6 preparation, energy-conserving nominal initial temperature and one-shot budget; propose and calculate reachable nominal solid parameters.
 - [x] Implement pure analytical sample/sensor model and R6 lifecycle; initial focused validation: 10 tests passed.
@@ -843,6 +850,10 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 | Date | Decision | Reason |
 | --- | --- | --- |
+| 2026-10-18, technical review correction | Preserve optional vesselTemperature only as a passive nominal estimate when sample temperature is invalidated; Empty recovers that estimate, never an invented ambient value | Unsupported sample temperature and retained vessel history are different facts. The estimate cools with the existing empty-vessel profile, with no unknown-material exchange or lamp input inferred. Truly unknown history still rejects quantitative preparation |
+| 2026-10-18, technical review correction | Initialize each fresh solid with (Cv Tv + 8 × 25)/(Cv + 8); reject the profile if its initial estimate reaches/exceeds its own milestone | Reuse declared capacities without copying the old sample temperature, modeling conduction, changing milestones or immediately emitting an unjustified new Heat result. Empty/cool/reload or a fresh vessel is the recovery path |
+| 2026-10-18, technical review correction | Evolve unknown-contact sensors toward ambient using existing air lag while keeping numerical measurement unavailable | An explicit v1 fallback avoids a frozen internal reading or a discontinuity on detach/rebind; it is not an estimate of the unknown sample and cannot trigger chemistry |
+| 2026-10-18, technical review correction | Display current simulated solid temperature separately from the fixed experimental milestone in EN/VI | Neither the marker nor the high-temperature model is a liquid-in-glass measurement; existing scientific disclosure remains visible |
 | 2026-10-18 | Produce a conditional plan only; retain all production source unchanged | The supplied review's GO authorizes planning; full R7/R8 implementation/release remains blocked |
 | 2026-10-18 | Keep reducer, reaction matcher, stable IDs, independent lamp mounts, and Replay structure | Extend the accepted project rather than redesign it for one equipment type |
 | 2026-10-18 | Declare AQ/R6 parameters nominal and measurement applicability separate | Analytical calculations are not experimental calibration or proof of immersion |
@@ -861,6 +872,44 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 | 2026-10-18, final validation | Record 531 passing tests in 42 files and three actual browser viewport checks; retain external scientific and release gates | Engineering evidence supports review, not experimental calibration, physical-device certification or milestone approval |
 
 ## Outcomes and retrospective
+
+Technical review corrections from baseline 1367e33: all three P1 findings and the
+P2-01 UI finding were independently confirmed. Before source fixes, five new
+reducer regression cases failed (two Clear/recovery, two hot-solid replacement,
+one unknown-contact sensor), while seven old cases passed. Before the UI fix,
+four new R7/R8 EN/VI cases failed because no current solid temperature was shown.
+Additional tests cover warm/unknown R6 preparation, batch identity and repeat-Mix
+budget, passive cooling without sensors, cooling/interrupted heating/first crossing,
+sensor detach/rebind continuity, and unavailable output despite internal evolution.
+Final review validation passed 547 tests in 43 files (190.79s); the focused set
+passed 30 tests in four files. Typecheck, lint, build and
+diff whitespace checks passed. No test was skipped or timeout increased. Vitest's
+initial sandbox run failed at cache rename (EPERM) before executing any test;
+the established local runtime outside the sandbox produced the actual red/green results.
+
+Browser review QA used viewport emulation, not physical devices: R7 current display
+changed from 27.1°C to 249.8°C while the 350°C milestone stayed fixed; R8 changed
+from 25°C through 45°C/102.4°C and eventually completed while 240°C stayed fixed.
+EN desktop and VI portrait/landscape text remained readable, with no horizontal
+overflow at 390×844 or 844×390. The real UI also reproduced hot R7 → Empty → R8
+as an unavailable new profile, without an immediate result, and aqueous → edited
+unsupported → Empty → fresh aqueous recovered a 25°C nominal profile in a fresh vessel.
+Screenshots outside the repository use the earlier QA directory and names
+thermometer-review-r8-en-desktop.png, thermometer-review-r8-vi-portrait.png,
+thermometer-review-r8-vi-landscape.png and thermometer-review-hot-r7-clear-r8.png.
+No physical sensor validation, screen-reader certification or new calibration is claimed.
+
+CI review: ci.yml already has workflow_dispatch and pull_request; pushes only match
+M*. The existing branch is not covered by push and triggers were left unchanged.
+GitHub CLI reports no logged-in host and the browser is signed out. The exact
+workflow_dispatch command below was attempted and stopped with gh auth login
+required; no workflow run was created. An attempted
+credential-helper retrieval was unavailable in sandbox; escalation was rejected by
+automatic review as credential probing and was stopped, with no alternative secret
+retrieval. Use the standard authenticated workflow path: gh auth login, then
+gh workflow run ci.yml --repo khoabm/chemistry-lab --ref feature-thermometer;
+verify the resulting run's head SHA and successful conclusion before claiming CI.
+No PR, main merge, dependency change or milestone transition is part of this correction.
 
 Engineering implementation is delivered on feature-thermometer for user review.
 React/TypeScript, useReducer, the reaction matcher, M11 lamp mounts/Dropper, M9 finite

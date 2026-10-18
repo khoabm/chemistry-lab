@@ -1,13 +1,13 @@
 import type { SampleThermalState, ThermalProfile } from '../../types/thermal'
 import type { EquipmentType } from '../../types/equipment'
-import { ambientTemperature, airSensorLag, liquidSensorLag, thermalProfile } from './profiles'
+import { ambientTemperature, airSensorLag, invalidateThermal, liquidSensorLag, thermalProfile } from './profiles'
 
 export function releaseReferenceHeat(sample: SampleThermalState, type: EquipmentType): SampleThermalState {
   if (sample.kind !== 'r6' || sample.temperature === null || sample.energyRemaining <= 0) return sample
   const profile = thermalProfile('r6', type)!
   const temperature = sample.temperature + sample.energyRemaining / profile.capacity
   return temperature <= profile.maximum ? { ...sample, temperature, energyRemaining: 0 }
-    : { ...sample, kind: 'unsupported', temperature: null, energyRemaining: 0 }
+    : invalidateThermal({ ...sample, temperature })
 }
 
 export function validProfile(profile: ThermalProfile): boolean {

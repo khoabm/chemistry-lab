@@ -242,7 +242,7 @@ export function labWorkspaceReducer(
     if (contents === container.contents && action.type !== 'clear-container') return state
     if (action.type === 'clear-container' && !contents.length && container.thermal.kind === 'empty'
       && !container.thermal.referenceUsed && container.reactionResult === null) return state
-    const thermal = action.type === 'clear-container' ? emptyThermal(container.thermal.temperature)
+    const thermal = action.type === 'clear-container' ? emptyThermal(container.thermal.temperature ?? container.thermal.vesselTemperature ?? null)
       : container.thermal.kind === 'empty' && !container.thermal.referenceUsed
         ? initialSample(contents, container.thermal, state.equipment.find((item) => item.id === action.equipmentId)!.equipmentType) : invalidateThermal(container.thermal)
     return synchronizeHeating({

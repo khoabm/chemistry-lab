@@ -1,8 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import { crossingTime, evolveSensor, evolveTemperature, validProfile } from './model'
-import { thermalProfile } from './profiles'
+import { emptyThermal, initialSample, thermalProfile } from './profiles'
 
 describe('nominal thermal model (not experimental calibration)', () => {
+  it.each(['beaker', 'test-tube'] as const)('initializes solid loads in %s by a disclosed lumped energy balance', (type) => {
+    const vesselCapacity = type === 'beaker' ? 40 : 8
+    for (const [chemicalId, kind] of [['copper-carbonate', 'r7'], ['copper-sulfate-pentahydrate', 'r8']] as const) {
+      const sample = initialSample([{ chemicalId, quantity: 99 }], emptyThermal(100), type)
+      const profile = thermalProfile(kind, type)!
+      expect(sample.temperature).toBeCloseTo((vesselCapacity * 100 + 8 * 25) / profile.capacity, 10)
+      expect(sample.kind).toBe(kind)
+      const wait = crossingTime(sample.temperature!, profile)!
+      expect(evolveTemperature(sample.temperature!, wait - 0.001, profile, true)).toBeLessThan(profile.marker!)
+      expect(evolveTemperature(sample.temperature!, wait, profile, true)).toBeCloseTo(profile.marker!, 10)
+      expect(initialSample([{ chemicalId, quantity: 1 }], emptyThermal(null), type).temperature).toBeNull()
+      const unknown = initialSample([{ chemicalId, quantity: 1 }], emptyThermal(Number.NaN), type)
+      expect(unknown.temperature).toBeNull()
+      expect(unknown.vesselTemperature).toBeNull()
+    }
+  })
   it('matches analytical warming, cooling and the delayed sensor', () => {
     const profile = thermalProfile('aqueous', 'beaker')!
     expect(evolveTemperature(25, 600, profile, true)).toBeCloseTo(42.16, 2)

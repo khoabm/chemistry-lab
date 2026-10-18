@@ -458,6 +458,12 @@ scroll re-anchors keyboard drafts; pointer scroll/resize/blur/hidden/capture los
 cancels without changing committed attachment. Invalid/occupied targets retain it.
 Reading changes are not an aria-live stream. EN/VI disclose nominal assumptions and
 experimental milestones. Sensor lag is preserved at reaction trigger time.
+The solid details panel shows current simulated temperature separately from the
+fixed teaching milestone, explicitly excluding liquid-thermometer measurement.
+Unsupported samples explain how Empty plus a retained cooling vessel estimate can
+start a fresh batch; a truly unknown vessel needs a fresh reference vessel. No UI
+action silently resets a hot vessel. An unavailable sensor continues nominal air
+relaxation internally and resumes from that value on detach/rebind.
 
 
 ---

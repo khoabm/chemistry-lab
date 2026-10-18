@@ -656,3 +656,22 @@ energy, spent once on Mix. No value comes from qualitative portion counts. Mater
 edits and unknown transfer history invalidate unsupported numerical profiles. Both
 Beaker and Test tube use the documented 25mm-immersion sensor proposal; real lag,
 sensor perturbation and fixture fit are not experimental calibration claims.
+
+Fresh solids enter at nominal 25°C. Their initial reference temperature is
+(Cv Tv + 8 × 25)/(Cv + 8), with Cv=40J/K (Beaker) or 8J/K (Test tube), not the
+previous sample's temperature. This assumed initial equilibration is not a transient
+conduction model. A load whose initial estimate reaches/exceeds its own milestone
+is unsupported rather than immediately reacted. Cool the emptied known vessel or
+use a fresh one before loading again. Current simulated solid temperature and the
+fixed experimental milestone are displayed separately, neither as a liquid sensor
+measurement.
+
+When material edits invalidate a sample, its numerical temperature is unavailable.
+Only the last known nominal vessel estimate is retained and passively cooled with
+the empty-vessel loss/capacity; unmodeled material exchange and lamp input are not
+inferred for that estimate. Empty recovers this disclosed estimate for a new batch;
+truly unknown vessel history remains unknown and cannot prepare quantitative R6.
+An attached sensor in unknown contact uses nominal ambient/air-lag relaxation
+internally while showing no measurement. Detach/rebind preserves that evolved
+reading; no reaction is caused by this fallback. These are v1 assumptions requiring
+the same external scientific review as the other nominal thermal parameters.

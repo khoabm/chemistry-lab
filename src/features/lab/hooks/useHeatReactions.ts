@@ -18,7 +18,8 @@ export function useHeatReactions(state: LabWorkspaceState, dispatch: Dispatch<La
   const clock = useRef<Clock | null>(null)
   const needsTick = state.thermometers.length > 0 || state.containers.some((item) => item.thermal.temperature !== null
     && item.thermal.kind !== 'unsupported' && (item.thermal.temperature !== 25
-      || item.thermal.kind !== 'empty' && findMountedHeatingLamp(state, item.equipmentInstanceId) !== null))
+      || item.thermal.kind !== 'empty' && findMountedHeatingLamp(state, item.equipmentInstanceId) !== null)
+    || item.thermal.vesselTemperature != null && item.thermal.vesselTemperature !== 25)
   useLayoutEffect(() => {
     if (!clock.current || clock.current.epoch !== state.thermalEpoch) {
       clock.current = { epoch: state.thermalEpoch, time: state.simulationTime, wall: performance.now(),

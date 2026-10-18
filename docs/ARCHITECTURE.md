@@ -335,6 +335,20 @@ preparation, movement, Replay and locale changes cannot replenish energy. Empty 
 a batch without erasing known vessel temperature; Reset changes the simulation epoch.
 Unknown history is unavailable, never a fabricated ambient sample measurement.
 
+Invalidation retains a separate optional nominal vesselTemperature estimate from
+the last supported thermal history. While the sample is unsupported, only that
+estimate passively cools with the empty-vessel profile (no inferred lamp input or
+unknown-material exchange). Explicit Empty can recover it for a fresh reference;
+it cannot recover a truly unknown estimate or reset a hot vessel to ambient. This
+fallback is not a numerical temperature of the unsupported sample. R6 batch/budget
+guards survive invalidation and only explicit Empty/Reset ends the batch.
+
+Fresh solid loads use the existing nominal 8J/K load at 25°C and the retained vessel
+capacity in a lumped initial energy balance. This is an initial reference convention,
+not instantaneous adoption of the old sample temperature or a conduction solver.
+Initialization at/above the new milestone is unsupported, with no Heat event; Empty
+and cooling a known vessel (or using a fresh vessel) permits a later eligible load.
+
 useHeatReactions coordinates one monotonic 6x clock. It advances the previous segment
 before application actions/contact changes, pauses when hidden without catch-up,
 and dispatches absolute simulated times guarded by epoch. There is no 2000ms timer,
@@ -342,6 +356,9 @@ per-container remaining-wait map, or alternate production trigger. Lifting a mou
 container stops input power while residual heat cools; cancellation restores contact
 without rewinding time. Assembly movement retains support/contact. Detached sensors
 approach ambient independently. Presentation/Replay time is not accelerated.
+Sensors still attached to unknown samples also use ambient relaxation internally,
+with the existing air lag. Their measurement stays unavailable; this explicit v1
+fallback neither invents a sample temperature nor resets readings on detach/rebind.
 
 R7/R8 use separate nominal solid curves and first-crossing single-final-result
 teaching rules at proposed experimental 350°C/240°C milestones. They are not universal

@@ -19,12 +19,19 @@ export function initialSample(contents: readonly ChemicalPortion[], previous: Sa
   const id = contents.length === 1 ? contents[0]?.chemicalId : null
   const kind = id === 'copper-carbonate' ? 'r7' : id === 'copper-sulfate-pentahydrate' ? 'r8'
     : id && aqueousIds.has(id) ? 'aqueous' : 'unsupported'
-  let temperature = previous.temperature
+  let temperature = previous.temperature !== null && Number.isFinite(previous.temperature) ? previous.temperature : null
   if (kind === 'aqueous' && temperature !== null) {
     temperature = referenceStartingTemperature(temperature, type)
+  } else if ((kind === 'r7' || kind === 'r8') && temperature !== null) {
+    const profile = thermalProfile(kind, type)!
+    const vesselCapacity = type === 'test-tube' ? 8 : 40
+    // A fresh nominal solid load enters at ambient, not at the old sample's temperature.
+    // This lumped initial energy balance does not model transient heat conduction.
+    temperature = (vesselCapacity * temperature + 8 * ambientTemperature) / profile.capacity
+    if (temperature < 20 || temperature >= profile.marker!) temperature = null
   }
-  return { ...previous, kind: kind === 'unsupported' || temperature === null ? 'unsupported' : kind,
-    temperature: kind === 'unsupported' ? null : temperature }
+  return kind === 'unsupported' || temperature === null ? invalidateThermal(previous)
+    : { ...previous, kind, temperature }
 }
 
 export function referenceStartingTemperature(vesselTemperature: number | null, type: EquipmentType): number | null {
@@ -51,5 +58,7 @@ export function thermalProfile(kind: SampleThermalState['kind'], type: Equipment
 }
 
 export function invalidateThermal(previous: SampleThermalState): SampleThermalState {
-  return { ...previous, kind: 'unsupported', temperature: null, energyRemaining: 0 }
+  const vesselTemperature = previous.temperature ?? previous.vesselTemperature
+  return { ...previous, kind: 'unsupported', temperature: null, energyRemaining: 0,
+    vesselTemperature: vesselTemperature != null && Number.isFinite(vesselTemperature) ? vesselTemperature : null }
 }
