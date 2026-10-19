@@ -610,7 +610,10 @@ h3 { font-size: 14px; font-weight: 600; }
 .workspace-equipment.is-mounted.has-thermometer.label-on-left > .equipment-state { left: auto; right: calc(100% + 4px); }
 .workspace-equipment.is-mounted.has-thermometer[data-equipment-type='test-tube'] > .equipment-state { top: 78px; }
 .workspace-equipment[data-equipment-type='thermometer']:focus-visible { z-index: 4; }
+/* A focused host keeps its perimeter ring without covering its own sensor grip. */
+.workspace-equipment.has-thermometer:focus-visible { z-index: 2; }
 .thermometer-details > .equipment-visual { height: 220px; }
+.sample-thermometer-reading { padding: var(--space-2); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; color: var(--color-text); font-variant-numeric: tabular-nums; }
 .thermal-details { border-top: 1px solid var(--color-border); margin-top: 16px; padding-top: 12px; }
 .thermal-details button[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
 .workspace-equipment.is-thermometer-target { border: 1px dashed var(--color-accent); background: rgb(255 255 255 / 12%); }

@@ -10,17 +10,21 @@ import { HeatingStatus } from './HeatingStatus'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { useReactionReplay } from '../hooks/useReactionReplay'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
+import type { ThermometerObservation } from '../../../types/thermometerObservation'
+import { SampleThermometerReading } from './SampleThermometerReading'
 
-export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation }: {
+export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation, thermometer = null }: {
   container: ContainerState
   equipmentType: EquipmentType
   onDismiss: () => void
   presentation?: ReactionPresentation | undefined
+  thermometer?: ThermometerObservation | null
 }) {
   const { t } = useTranslation()
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   const replay = useReactionReplay(container, presentation)
+  const visibleThermometer = replay.stage ? replay.thermometer : thermometer
   const replayLive = useStatusLive(replay.autoReplay ? 'auto' : replay.running ? 'playing' : replay.stage === 'final' ? 'complete' : 'idle')
   const hasReplay = container.reactionResult?.status === 'reaction' && container.reactionResult.effects.length > 0
 
@@ -50,9 +54,14 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
         <div className="sample-detail-demonstration">
           <div className="sample-detail-visual">
             <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
-              presentation={replay.presentation} replayStage={replay.stage}
+              presentation={replay.presentation} replayStage={replay.stage} thermometer={visibleThermometer}
               heating={container.heatingState.status === 'heating'} />
           </div>
+          <SampleThermometerReading observation={visibleThermometer} recorded={replay.stage !== undefined} />
+          {replay.stage && <p className="empty-caption">{replay.recording
+            ? replay.recording.frames.length > 1 ? t('thermometer.recordingRange', { seconds: replay.recording.frames.at(-1)!.at.toFixed(1) })
+              : t('thermometer.recordingSingle')
+            : t('thermometer.notRecorded')}</p>}
           {hasReplay && <div className="sample-replay">
             <div className="sample-replay-controls">
               <button type="button" className="action-button action-button--secondary" disabled={!replay.canReplay}

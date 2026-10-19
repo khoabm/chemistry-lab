@@ -9,6 +9,7 @@ import { LampDetails } from './LampDetails'
 import { ReactionObservation } from './ReactionObservation'
 import { SampleDetailDialog } from './SampleDetailDialog'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
+import type { ThermometerObservation } from '../../../types/thermometerObservation'
 
 type ExperimentTab = 'sample' | 'result'
 
@@ -27,9 +28,10 @@ interface ExperimentPanelProps {
   lampSupportStatus?: ReactNode
   thermometerDetails?: ReactNode
   thermalDetails?: ReactNode
+  thermometer?: ThermometerObservation | null
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails, thermometer = null }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -79,7 +81,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-sample-panel`} aria-labelledby={`${id}-sample-tab`}
         tabIndex={0} hidden={activeTab !== 'sample'}>
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
-          lifted={lifted}
+          lifted={lifted} thermometer={thermometer}
           mountControls={mountControls}
           thermalDetails={thermalDetails}
           presentation={presentation} visible={activeTab === 'sample'}
@@ -108,7 +110,8 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         <p>{t('experiment.emptyBody')}</p>
         <p>{t('experiment.emptyHelp')}</p>
       </div>}
-      {detailTab && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
+      {detailTab && container && equipment && (container.contents.length > 0 || thermometer) && <SampleDetailDialog container={container}
+        thermometer={thermometer}
         presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {
           selectTab(detailTab)

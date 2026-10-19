@@ -179,6 +179,19 @@ and labels remain independent selection targets. Assembly clearances include the
 sensor information through resizing. Palette drag hides the empty introduction and
 uses one external drop instruction; the preview contains only equipment and name.
 
+Sample close-up and Enlarged View show the currently attached thermometer in the
+same relative pose, including honest empty/unsupported/solid measurement states.
+The modal remains an observation view. A reaction-time attached sensor can also
+participate in Teaching Replay: the reducer stores a bounded record of actual
+sensor observations (up to 60 simulated seconds / 61 frames). Replay freezes the
+available record when started, condenses it into the existing finite timeline,
+and selects sampled readings without interpolation or new thermal calculation.
+Auto repeats that same record and final hold; reduced motion keeps discrete states.
+Later attachments are not historical participants. Detach/rebind preserves history;
+material/result replacement and Reset invalidate it. Live sample/sensor evolution,
+R6 energy and chemistry/Replay identity remain independent. A short or missing
+recording is disclosed, never replaced by an invented curve.
+
 A fresh single allowlisted aqueous solution automatically uses disclosed fixed
 nominal load/heat-capacity defaults without Prepare. Quantities remain qualitative,
 never mL/g/mol. Prepare R6 on an empty known-temperature vessel supplies an explicit

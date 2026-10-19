@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ContainerState } from '../../../types/container'
 import type { ReactionResult } from '../../../simulation/reactions/types'
 import { completedPresentation, effectDurationMs, reactionPresentationDuration, type ReactionPresentation, type ReplayStage } from '../renderers/reactionDynamics'
+import type { ThermometerRecording } from '../../../types/thermometerObservation'
+import { replayThermometer, thermometerReplayOffsets } from '../renderers/thermometerReplay'
 
 // Teaching choices, never measured reaction time. Every cycle remains finite.
 export const replayInitialMs = 1000
@@ -14,6 +16,7 @@ interface ReplaySession {
   readonly startedAt: number
   readonly now: number
   readonly auto: boolean
+  readonly recording: ThermometerRecording | null
 }
 
 export function useReactionReplay(container: ContainerState, live: ReactionPresentation = completedPresentation) {
@@ -43,6 +46,7 @@ export function useReactionReplay(container: ContainerState, live: ReactionPrese
       })
     }
     const offsets = [replayInitialMs, ...current.result.effects.map((effect) => effectDurationMs[effect.type]),
+      ...thermometerReplayOffsets(current.recording, duration, replayInitialMs),
       ...(current.auto ? [duration + replayHoldMs] : [])]
     const timers = [...new Set(offsets)].map((offset) => current.startedAt + offset)
       .filter((deadline) => deadline > current.now)
@@ -65,9 +69,12 @@ export function useReactionReplay(container: ContainerState, live: ReactionPrese
   function start(auto = false) {
     if (!canReplay || result?.status !== 'reaction') return
     const now = performance.now()
-    setSession({ sourceId: container.id, contents: container.contents, result, startedAt: now, now, auto })
+    const recording = container.thermometerRecording?.result === result ? container.thermometerRecording : null
+    setSession({ sourceId: container.id, contents: container.contents, result, startedAt: now, now, auto, recording })
   }
 
   return { canReplay, presentation, stage, running, autoReplay: current?.auto ?? false,
+    recording: current?.recording ?? null,
+    thermometer: current ? replayThermometer(current.recording, elapsed, duration, replayInitialMs) : null,
     start, stop: () => setSession(null) }
 }

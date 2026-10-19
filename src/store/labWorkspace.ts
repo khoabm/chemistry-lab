@@ -15,6 +15,7 @@ import { ambientTemperature, emptyThermal, initialSample, invalidateThermal, ref
 import { releaseReferenceHeat } from '../simulation/thermal/model'
 import { advanceWorkspaceThermal } from './thermalLifecycle'
 import { thermometerTargetIssue } from './thermometerAttachment'
+import { reconcileThermometerRecordings } from './thermometerRecording'
 
 export interface LabWorkspaceState {
   equipment: EquipmentInstance[]
@@ -107,6 +108,13 @@ export function nextEquipmentPosition(count: number): Point {
 }
 
 export function labWorkspaceReducer(
+  state: LabWorkspaceState,
+  action: LabWorkspaceAction,
+): LabWorkspaceState {
+  return reconcileThermometerRecordings(state, reduceWorkspace(state, action), action)
+}
+
+function reduceWorkspace(
   state: LabWorkspaceState,
   action: LabWorkspaceAction,
 ): LabWorkspaceState {

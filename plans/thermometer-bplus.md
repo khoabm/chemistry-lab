@@ -522,6 +522,20 @@ stoichiometric cross-checks only, not measured endpoints, rates, or M11 portion 
 
 ## Data model
 
+### Authorized observation/replay extension — 2026-10-19
+
+Resume on the existing clean `feature-thermometer` at `ec1c16999bed716b85f01395085df8bff89485d7`, matching its remote. Do not merge later removal/water branches, create a branch, commit/push or advance M11 in this task. Existing independent attachment, hanging/immersion targeting, cancellation, thermal caps and R6 preparation remain authoritative.
+
+Add one optional application-owned thermometer recording to the container, explicitly associated with its successful `ReactionResult` reference (the existing M9 occurrence identity). Do not add fields to chemistry results or a second global store. Initial snapshot comes from the sensor attached at the actual reaction action, before an R6 heat impulse changes the sample; the sensor itself does not jump. No sensor at that event means no historical participant, even if attached later. Each new result replaces the old recording; contents/result invalidation and Reset clear it.
+
+Bound recording to 60 simulated seconds and at most 61 observations including the initial snapshot. Capture actual live-clock observations no more often than once per simulated second, plus validity changes; coalesce validity changes within the same sampling interval to its last state while preserving the immutable initial snapshot. Never backfill a delayed/large tick with invented intermediate readings. At window/capacity end, or loss/rebind of the recorded sensor's committed attachment, seal the available observations. Hidden time contributes nothing. No independent recording timer, energy calculation or changes to sample/sensor equations. Validity is recorded alongside nullable numeric readings; solids/unsupported/lifted contact cannot acquire fabricated liquid measurements.
+
+At Replay start freeze the available immutable recording in the existing replay session. Initial replay hold uses frame zero. Map the recorded elapsed range linearly onto the existing developing interval from `replayInitialMs` to the finite M9 duration; display the last actual observation at/before that mapped time, without interpolation. Final stage/Auto hold retain the final recorded frame. Auto cycles reuse the same frozen frames; new live ticks cannot change or restart the active session. A single snapshot remains a single supported state, not a synthesized curve. Add observation deadlines to the existing replay hook's finite checkpoint scheduling; no second clock. Disclose the recorded time range and that replay is sampled/condensed rather than real-time or recalculated kinetics.
+
+Share the existing thermometer glass SVG and content-based attachment projection between workspace, Sample close-up and Enlarged View. The latter views are decorative observation renderings with an adjacent localized numeric/unavailable description, no interactive sensor controls. Replay chooses only the recorded participant; normal viewing consumes the current attachment/reading. Extend empty-container observation opening only as needed to show an attached unavailable sensor. Correct any demonstrated focus/grip stacking conflict locally, retaining native button identity, 44px grip and vessel label targets; no collision framework or broad z-index escalation.
+
+Checkpoints: (1) bounded application recording with red/green lifecycle tests; (2) shared close-up/modal geometry and readout; (3) sampled Manual/Auto/reduced-motion Replay and isolation tests; (4) actual pointer/focus/browser regression, current docs and full validation. External scientific calibration gates remain unchanged.
+
 Keep one authoritative collection per physical relation and the existing reducer.
 
 - Add thermometer to EquipmentType and its catalog metadata; preserve all existing IDs.
@@ -777,6 +791,12 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 ## Progress
 
+- [x] Inspect current feature-thermometer baseline, prior interaction corrections, occurrence/replay identity and thermal clock; choose bounded application recording without changing the nominal model.
+- [x] Add and validate reaction-time snapshots, bounded observation lifecycle and invalidation (8 red tests before implementation, then 39 reducer/thermal/recording tests passed).
+- [x] Render the attached sensor/validity in close-up and modal using shared pose/SVG (5 UI cases reproduced the missing view before integration; dialog fixture now focuses its opener as a real click does).
+- [x] Integrate frozen recorded observations with Manual/Auto/reduced-motion finite Replay (3 red hook cases before integration; 30 existing/new Replay tests then passed).
+- [x] Verify the demonstrated host-focus/grip defect, browser EN/VI at three viewports, full regression and current documentation (final resumed validation 2026-10-20: 592 tests / 46 files, typecheck/lint/build/whitespace checks passed; viewport-emulation evidence below).
+
 - [x] Start four approved acceptance refinements at clean feature-thermometer HEAD 1f27196; reproduce all four with seven failing targeted regression cases before fixes.
 - [x] Decouple physical attachment from numerical measurement; add a fixed hanging pose, shared assembly clearances/projection, independent pointer targets and single palette-drag instruction.
 - [x] Implement pure single-result teaching cap for R7/R8, preserving domain maximum, cooling, reheating and result identity; targeted reducer/model/interaction tests pass.
@@ -812,6 +832,11 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 - [x] Prepare evidence-backed engineering review without advancing a milestone or releasing.
 
 ## Surprises and discoveries
+
+- 2026-10-19 observation/replay extension: actual browser hit testing confirmed that a keyboard-focused later-created Test tube covered the center of its older attached thermometer's grip in the immersed pose. Keep only a thermometer host's focus at its vessel layer (z-index 2); the existing sensor layer 3/4, narrow targets, 44×44 grip and native DOM order remain. Afterward elementFromPoint and an actual pointer click select the sensor, while the host's solid perimeter focus ring remains visible. No generic collision solver or button reparenting.
+- The existing Replay hook already has finite checkpoint scheduling and immutable result/contents guards. Observation checkpoints can share that mechanism without another clock or modifying M9 effects. An active session must freeze its recording reference because recording may still grow after the live effect finishes.
+- A long clock gap cannot provide missing sensor observations. Recording retains only actual tick states inside its window; a single snapshot is explicitly described, never backfilled or interpolated. Unchanged unavailable observations keep the same recording reference rather than accumulating duplicate null frames.
+- Development JSON hot updates preserve the old mounted i18n resource instance; final copy/solid QA uses a fresh page load. Viewport overrides affect the currently selected app-browser tab, not every existing tab, so QA verifies innerWidth/innerHeight and uses fresh per-layout fixtures. No misleading screenshot dimensions are claimed.
 
 - Acceptance-refinement QA exposed a remaining Test tube name/heating-badge overlap.
   Type-specific badge offsets now keep the two rectangles separate; real-browser
@@ -873,6 +898,10 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 | Date | Decision | Reason |
 | --- | --- | --- |
+| 2026-10-19 observation/replay | Keep one optional application-owned recording on ContainerState associated with the exact ReactionResult reference | Reuse the existing occurrence identity; no chemistry result metadata, hidden modal history or competing store |
+| 2026-10-19 observation/replay | Preserve initial state plus up to 60 actual sampled observations / 60 simulated seconds; validity changes coalesce within a bucket | Bound memory and reducer work, retain unavailable contact, avoid invented intermediate temperatures |
+| 2026-10-19 observation/replay | Freeze available frames on Start and map their timestamps into the existing finite developing interval, selecting actual frames without interpolation | Auto cycles and reduced motion remain reproducible and isolated; no thermal calculation or new replay clock |
+| 2026-10-19 observation/replay | Share the unchanged glass SVG and pure content-based pose for bench/close-up/dialog | Preserve bulb placement, sensor identity and nominal scientific contract; modal remains observation-only |
 | 2026-10-18, approved acceptance refinements | Physical eligibility checks only compatible equipment and occupancy; measurement applicability remains a separate application query | Empty/unsupported/solid vessels can hold a sensor without inventing a liquid measurement; existing atomic actions and the single relation collection are sufficient |
 | 2026-10-18, approved acceptance refinements | Use schematic bulb y=52 for empty/solid hanging, retain immersed pose for liquid-only contents, and reserve the worst-case upper extent | Current solid beds remain below the hanging bulb; the approximately 20px pose adjustment on default liquid changes stays local, while constant parent clearance prevents sample edits from shifting the whole assembly |
 | 2026-10-18, approved acceptance refinements | Share vessel projection/clearances across rendering, drafts, native controls, movement and resize; preview any necessary parent projection before attachment commit | Prevent responsive clipping and preview/drop divergence without storing SVG pixels, synchronizing dormant positions or adding reducer actions |
@@ -901,6 +930,38 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 | 2026-10-18, final validation | Record 531 passing tests in 42 files and three actual browser viewport checks; retain external scientific and release gates | Engineering evidence supports review, not experimental calibration, physical-device certification or milestone approval |
 
 ## Outcomes and retrospective
+
+### 2026-10-19 observation/replay extension
+
+Implemented bounded application recordings, shared sample-view thermometer rendering, sampled Manual/Auto/reduced-motion replay and the demonstrated paired focus/grip correction on clean feature-thermometer ec1c169. Current attachment remains independent of measurement, including empty/unsupported/solid samples. The replay participant is the sensor present at the event; later attachments cannot appear historically. Moving/removing/rebinding later does not replace the record with live data. Material edits, Dropper edits, Empty and result replacement/Reset invalidate the corresponding history. Closing/reopening or panel selection retains application history but stops the old modal-local replay as before.
+
+The pure reducer wrapper reconciles occurrence data after existing transitions, without adding actions or changing thermal/equipment algorithms. Only changed records replace their container; sealed records and unrelated invalid actions retain references. The original nominal thermal model, one sixfold clock, R6 energy budget, R7/R8 caps/definitions and Dropper/mounting semantics remain unchanged. No dependency, store, scene graph, event framework or numbered milestone update was added. No commit/push/main merge/release is authorized by this task; changes remain for user review.
+
+Checkpoint validation: 8 recording cases failed before implementation and then passed with existing reducer/thermal tests (39 total). Three new Replay hook cases failed before integration, then 30 hook/teaching Replay tests passed. Five new view-flow cases reproduced missing close-up/modal rendering before integration; later focused runs passed 27 interaction/view/geometry tests, followed by 15 recording/R6/R7/R8 UI tests. The first whole suite passed 590 tests / 46 files; final evidence below includes two subsequently added solid Replay cases and locale-at-progress assertions. No assertions were weakened or timeouts increased.
+
+Final validation, resumed on 2026-10-20: npm run typecheck and npm run lint passed; npm test -- --maxWorkers=2 passed 592 tests in 46 files (131.21s), including 23 added cases; npm run build passed (101 modules); git diff --check passed. No tests were skipped, assertions weakened or timeouts increased. New files were also checked for trailing whitespace. The complete diff remains limited to observation/replay, its focused rendering/focus correction, tests and current-contract documents. No nominal thermal model, simulation lifecycle, reaction definition, mounting algorithm, package/lockfile or historical milestone file changed.
+
+Actual in-app-browser QA used local viewport emulation, not physical touch hardware:
+
+| Verified viewport | Observed evidence |
+| --- | --- |
+| 1440×960, EN/VI | Thermometer created before Test tube exposed the focused-host hit-test defect. After the scoped CSS fix, elementFromPoint and actual grip click select the sensor, while the vessel retains its focus ring and label target. Complete native attach → Prepare R6 → Mix → live reading → modal → Manual/Auto Replay workflow: initial 25.0°C, recorded final 28.7°C while the live reading independently cools. Pointer detach followed by historical Replay retains the recorded participant. Beaker empty/solid observation and R7/R8 heating workflows also exercised. |
+| 390×844, EN/VI | Empty Beaker with attached unavailable sensor enlarges without a numeric column. Both vessel observation views/readouts remain readable and scrollable without horizontal overflow. Fresh VI Beaker R6 Replay advances from recorded 25.0°C to 29.7°C while the unrelated live sensor has cooled to 25.0°C. Dialog has one decorative sensor, no sensor controls; Escape restores its opener. |
+| 844×390, EN/VI | Fresh Test tube R6 and mounted Beaker/R8 fixtures verify the actual DOM viewport size and no horizontal page overflow. Modal uses existing vertical scrolling. R8 Replay retains a single solid/unavailable observation and explicitly says no progression was recorded, never a 240°C liquid reading. Test tube Arrow movement keeps the 44×44 sensor grip hittable with a solid host focus outline; actual grip click selects the sensor, Enter/Escape preserves attachment. |
+
+Screenshots are outside the repository under C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/:
+thermometer-observation-grip-before.png, thermometer-observation-grip-after.png,
+thermometer-observation-r6-manual-initial.png, thermometer-observation-r6-manual-final.png,
+thermometer-observation-tube-modal-portrait-vi.png,
+thermometer-observation-tube-modal-landscape-vi.png,
+thermometer-observation-beaker-empty-portrait-{en,vi}.png,
+thermometer-observation-beaker-r6-final-portrait-vi.png,
+thermometer-observation-r8-landscape-{en,vi}.png and
+thermometer-observation-grip-landscape-vi.png. The file named r6-auto-progress captured the final hold after the intermediate condition had been observed; it is not evidence of an intermediate screenshot. Browser gestures are complete drags; draft-only cancellation, reduced-motion replay stages, exact live-state/result/budget isolation and chemistry call counts are verified by automated tests, not a claimed held-pointer screenshot or physical-device/screen-reader certification.
+
+Limits: the 60-second window is a bounded teaching observation record, not the complete thermal experiment. Sampling can miss changes between actual observations; clock gaps are not reconstructed. Starting Replay early freezes a partial record for that session; one snapshot remains one state. Sensor pose follows the unchanged recorded occurrence's contents, with the same schematic vessel geometry, rather than replaying a physical handling path. Nominal scientific/teacher/release gates remain unchanged. Existing English chemistry fallback in VI is retained; all new UI copy has EN/VI resources. No hosted CI run is claimed: the current request ends at uncommitted review, and no commit/push/workflow dispatch was performed. Branch and HEAD remain feature-thermometer ec1c16999bed716b85f01395085df8bff89485d7; the scoped working changes are ready for technical review, not an official release or milestone completion.
+
+Earlier outcomes below are historical, not the current Git state.
 
 Approved four acceptance refinements (2026-10-18), starting from clean
 feature-thermometer 1f27196: physical attachment now accepts both compatible vessel

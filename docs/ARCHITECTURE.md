@@ -388,6 +388,29 @@ commit. Native buttons/SVGs stay independent. Scoped thermometer grip/stem hit r
 leave the vessel body accessible; palette feedback lives outside the usable bench.
 No actual flame temperature, general heat-transfer/kinetics solver or fluid physics.
 
+Thermometer observation views reuse the workspace's content-based pose and glass
+SVG. Close-up and Enlarged View consume the current application attachment and
+measurement validity, including an empty attached vessel. They contain no second
+interactive sensor or attachment owner.
+
+The optional ContainerState.thermometerRecording belongs to application state,
+associated with the exact successful ReactionResult reference used by M9 occurrence
+identity. A small pure reducer reconciliation captures the participant at the event,
+then actual readings/validity from existing thermal ticks. It does not calculate a
+new trajectory, change the thermal clock or put recording data in chemistry rules.
+The bounded policy retains frame zero plus at most 60 sampled frames over 60
+simulated seconds. No backfill of a large clock gap is performed; unchanged
+unavailable states need only one frame. Detach/rebind seals history, whereas material
+or result replacement clears/replaces it. Attaching after the event creates no past
+participant. Invalid actions and unrelated state changes preserve references.
+
+The existing finite replay session freezes its available recording at Start. Its
+own checkpoint scheduler maps recorded offsets into the developing interval after
+the initial hold. Only recorded frames are selected; no interpolation, chemistry
+evaluation or additional sensor/energy evolution runs during Replay. Auto reuses
+that frozen data through final holds. Temperature-only updates cannot invalidate
+the existing result/contents-based replay identity. No new store or replay clock.
+
 ---
 
 ## 12. Error and invalid-interaction behavior
