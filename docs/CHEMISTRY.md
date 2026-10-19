@@ -685,3 +685,31 @@ cannot exceed a reaction temperature. No change to R6 energy budgets is implied.
 Physical thermometer attachment is allowed in any compatible vessel, including
 empty/unsupported/solid samples. Hanging in such a vessel is not a valid liquid
 measurement or a claim of real instrument compatibility with heated solids.
+
+
+## Planned Water Boiling V1 — physical phenomenon (not yet implemented)
+
+Scope authorized for planning only. The authoritative proposal and implementation
+acceptance criteria are in `plans/feature-water-boiling.md`. Existing registered
+reactions R1–R8, chemistry triggers `mix`/`heat`, and finished-result/Replay
+identity remain unchanged.
+
+V1 will add stable `water` / H₂O as a pure-liquid catalog entry and a dedicated
+nominal thermal profile for Beaker and Test tube. The 20–60°C generic aqueous
+profile is **not** adequate for the reference boiling point of 100°C at 1 atm.
+For a supported pure-water batch, mounted-and-lit lamp heating will raise sample
+temperature to a nominal 100°C plateau. With power interrupted, the water
+will cool and its visible boiling will cease under the simplified V1 policy;
+reheating can resume boiling. The sample and thermometer retain independent
+temperature trajectories and sensor lag.
+
+Boiling is a *physical visual state*, not a chemical reaction, reaction product,
+new R9, ReactionEffect `gas` or Replay occurrence. Mixed/unsupported solutions
+do not inherit a 100°C boiling claim. No calibrated C/P/K, measured wait time,
+pressure correction, fluid physics, latent-heat calculation, steam quantity,
+evaporation/volume reduction or numerical mapping from qualitative portion
+counts is approved. Real-world boiling conditions depend on pressure and
+composition; this is explicitly a bounded classroom-reference illustration.
+
+**Status:** design/specification pending Codex analysis and implementation
+approval; no H₂O catalog entry or boiling implementation is claimed here.
