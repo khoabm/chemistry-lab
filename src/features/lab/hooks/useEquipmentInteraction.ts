@@ -228,6 +228,17 @@ export function useEquipmentInteraction(
     setMessage({ key: 'thermometer.invalid' })
   }
 
+  function removeEquipment(id: string) {
+    const equipment = state.equipment.find((item) => item.id === id)
+    if (drag || !equipment) return
+    const survivor = state.mounts.find((item) => item.lampEquipmentId === id)?.containerEquipmentId
+      ?? state.thermometerAttachments.find((item) => item.containerEquipmentId === id)?.thermometerEquipmentId
+    const visible = survivor ? renderedPositions.get(survivor) : undefined
+    if (survivor && !visible) return
+    dispatch({ type: 'remove-equipment', id,
+      ...(survivor && visible ? { released: { equipmentId: survivor, position: visible } } : {}) })
+    setMessage({ key: 'workspace.feedback.removed', equipmentType: equipment.equipmentType })
+  }
   function resetWorkspace() {
     cancelDrag()
     dispatch({ type: 'reset' })
@@ -358,7 +369,7 @@ export function useEquipmentInteraction(
     return prepared.issue
   }
   return { attachBench, drag, dragActive: drag !== null, message, getEquipmentHandlers, cancelDrag, resetWorkspace,
-    renderedPositions, supportPlacement: placement, liftedMountedContainerId, liftedThermometerId, mountOnSupport, removeFromSupport, pickupThermometer, removeThermometer }
+    renderedPositions, supportPlacement: placement, liftedMountedContainerId, liftedThermometerId, mountOnSupport, removeFromSupport, removeEquipment, pickupThermometer, removeThermometer }
 }
 
 export type EquipmentInteraction = ReturnType<typeof useEquipmentInteraction>

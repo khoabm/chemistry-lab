@@ -3,12 +3,14 @@ import { useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { isContainerEquipment, type ContainerState } from '../../../types/container'
 import type { EquipmentInstance } from '../../../types/equipment'
+import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 import type { AlcoholLampState } from '../../../types/heating'
 import { ContainerDetails } from './ContainerDetails'
 import { LampDetails } from './LampDetails'
 import { ReactionObservation } from './ReactionObservation'
 import { SampleDetailDialog } from './SampleDetailDialog'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
+import { EquipmentRemovalControls } from './EquipmentRemovalControls'
 
 type ExperimentTab = 'sample' | 'result'
 
@@ -20,6 +22,10 @@ interface ExperimentPanelProps {
   lifted?: boolean
   onMix: () => void
   onClear: () => void
+  onRemoveChemical?: (id: ChemicalId) => void
+  onRemoveEquipment?: () => void
+  equipmentLabel?: string | undefined
+  hasEquipmentConnections?: boolean
   onToggleLamp: () => void
   presentation?: ReactionPresentation | undefined
   dropperDetails?: ReactNode
@@ -29,7 +35,7 @@ interface ExperimentPanelProps {
   thermalDetails?: ReactNode
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, equipmentLabel, hasEquipmentConnections = false, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -85,6 +91,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
           presentation={presentation} visible={activeTab === 'sample'}
           onMix={() => { onMix(); resultTab.current?.focus() }}
           onClear={() => { setDetailTab(null); selectTab('sample'); onClear() }}
+          onRemoveChemical={(id) => { setDetailTab(null); selectTab('sample'); onRemoveChemical?.(id) }}
           onEnlarge={() => setDetailTab('sample')} />
       </div>
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-result-panel`} aria-labelledby={`${id}-result-tab`}
@@ -108,6 +115,9 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         <p>{t('experiment.emptyBody')}</p>
         <p>{t('experiment.emptyHelp')}</p>
       </div>}
+      {equipment && onRemoveEquipment && <EquipmentRemovalControls key={equipment.id}
+        name={equipmentLabel ?? t(`equipment.${equipment.equipmentType}`)} hasConnections={hasEquipmentConnections}
+        removesContents={!!container && container.contents.length > 0} disabled={disabled} onRemove={onRemoveEquipment} />}
       {detailTab && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
         presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {
