@@ -829,3 +829,18 @@ heat waits, finite live age and manual/Auto replay sessions. Only copy changes.
 Existing status regions suppress locale-only announcements until a semantic state
 change. Native focus, equation scrolling and responsive dialog/tool scrolling
 remain in place. See `LOCALIZATION.md` for resources and teacher-review terms.
+
+## Water Boiling V1 — planned visual acceptance
+
+See `plans/feature-water-boiling.md`. Water/H₂O in a Beaker or Test tube
+will show fine upward-moving bubbles, subtle surface ripples and light vapor
+when nominally boiling near 100°C under the mounted lit lamp. This visual
+phenomenon is independent of chemical gas/reaction Replay and of thermometer
+presence. Turning off or lifting the heated vessel stops the boiling
+animation while sample and sensor temperatures cool continuously; reheating
+may restart boiling. Do not add back the removed orange heating glow.
+
+Keep liquids clipped to the vessel shape; avoid covering thermometer,
+labels or hit regions. Provide reduced-motion alternatives. Test desktop
+1440×960 and mobile portrait/landscape 390×844 and 844×390, in both EN/VI.
+This is planned behavior, not yet a delivered feature.
