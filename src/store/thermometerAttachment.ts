@@ -4,7 +4,7 @@ import { isContainerEquipment, type ContainerState } from '../types/container'
 export function thermometerMeasurement(container: ContainerState | undefined): 'available' | 'empty' | 'solid' | 'unsupported' {
   if (!container || container.contents.length === 0) return 'empty'
   if (container.thermal.kind === 'r7' || container.thermal.kind === 'r8') return 'solid'
-  return ['aqueous', 'r6'].includes(container.thermal.kind) && container.thermal.temperature !== null ? 'available' : 'unsupported'
+  return ['aqueous', 'r6', 'water'].includes(container.thermal.kind) && container.thermal.temperature !== null ? 'available' : 'unsupported'
 }
 
 export function thermometerTargetIssue(state: LabWorkspaceState, thermometerId: string | null, containerId: string): 'invalid' | 'occupied' | null {

@@ -20,7 +20,8 @@ export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
   const normalize = (text: string) => text.normalize('NFKC').trim().toLowerCase()
   const search = normalize(query)
   const visibleChemicals = chemicals.filter((chemical) =>
-    [chemical.formula, chemical.name, chemicalName(chemical.id)].some((value) => normalize(value).includes(search)))
+    [chemical.formula, chemical.name, chemicalName(chemical.id), ...(chemical.id === 'water' ? [t('water.searchTerms')] : [])]
+      .some((value) => normalize(value).includes(search)))
   return (
     <section className="palette-section" aria-labelledby="chemicals-title">
       <h3 id="chemicals-title">{t('materials.chemicals')}</h3>
@@ -47,7 +48,7 @@ export function ChemicalPalette({ canAdd, onAdd }: ChemicalPaletteProps) {
             disabled={!canAdd} aria-label={t('action.add', { name: chemicalName(chemical.id) })} aria-describedby={`chemical-palette-hint chemical-${chemical.id}-details`}
             onClick={() => onAdd(chemical.id)}>
             <ChemicalSwatch chemical={chemical} />
-            <span id={`chemical-${chemical.id}-details`}><strong>{chemical.formula}</strong><span>{chemicalName(chemical.id)}</span><small>{chemical.state === 'liquid' ? t('sample.liquidMetadata') : t('sample.solidMetadata')}</small></span>
+            <span id={`chemical-${chemical.id}-details`}><strong>{chemical.formula}</strong><span>{chemicalName(chemical.id)}</span><small>{chemical.id === 'water' ? t('water.material') : chemical.state === 'liquid' ? t('sample.liquidMetadata') : t('sample.solidMetadata')}</small></span>
           </button>
         ))}
       </div>

@@ -687,19 +687,19 @@ empty/unsupported/solid samples. Hanging in such a vessel is not a valid liquid
 measurement or a claim of real instrument compatibility with heated solids.
 
 
-## Planned Water Boiling V1 — physical phenomenon (not yet implemented)
+## Water Boiling V1 — physical phenomenon
 
-Scope authorized for planning only. The authoritative proposal and implementation
+Implementation was authorized on 2026-10-19. The scientific contract and implementation
 acceptance criteria are in `plans/feature-water-boiling.md`. Existing registered
 reactions R1–R8, chemistry triggers `mix`/`heat`, and finished-result/Replay
 identity remain unchanged.
 
-V1 will add stable `water` / H₂O as a pure-liquid catalog entry and a dedicated
+V1 adds stable `water` / H₂O as a pure-liquid catalog entry and a dedicated
 nominal thermal profile for Beaker and Test tube. The 20–60°C generic aqueous
 profile is **not** adequate for the reference boiling point of 100°C at 1 atm.
-For a supported pure-water batch, mounted-and-lit lamp heating will raise sample
+For a supported pure-water batch, mounted-and-lit lamp heating raises sample
 temperature to a nominal 100°C plateau. With power interrupted, the water
-will cool and its visible boiling will cease under the simplified V1 policy;
+cools and its visible boiling ceases under the simplified V1 policy;
 reheating can resume boiling. The sample and thermometer retain independent
 temperature trajectories and sensor lag.
 
@@ -711,5 +711,23 @@ evaporation/volume reduction or numerical mapping from qualitative portion
 counts is approved. Real-world boiling conditions depend on pressure and
 composition; this is explicitly a bounded classroom-reference illustration.
 
-**Status:** design/specification pending Codex analysis and implementation
-approval; no H₂O catalog entry or boiling implementation is claimed here.
+The approved nominal references are 50g/4g, C=249/24.72J/K, P=150/15W and
+K=0.30/0.050W/K (Beaker/Test tube). At ambient 25°C, C dT/dt=uP−K(T−25)
+reaches 100°C in about 134.89/142.23 simulated seconds (22.48/23.71 real seconds
+at 6×), then holds while powered. These are educational assumptions, not lamp
+calibration. The rounded 100°C/1-atm reference and approximate water heat capacity
+are consistent with [IAPWS](https://iapws.org/faqs/faq1) and
+[NIST water data](https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Mask=32&Units=SI).
+
+Only a first direct Add into an eligible empty vessel initializes this reference.
+Known vessel warmth is balanced with fresh ambient water; unknown history or an
+initial estimate outside 20–100°C is unsupported, never silently reset or clamped.
+Additional Add, Dropper transfer and removal from a mixture conservatively leave
+numerical history unsupported. Empty retains known vessel warmth. Portion counts
+never determine mass/volume or a mixing temperature. Unchanged pure-water Mix may
+return the existing no-reaction result while physical boiling continues.
+
+The sensor integrates warming up to the exact crossing, then relaxes toward 100°C
+with the existing 30-s simulated liquid lag. It reads roughly 84.3/85.6°C at first
+boiling from ambient, not an instantaneous 100°C. No temperature is reset by the
+visual state, attachment or Replay. No boiling completion marker is stored.

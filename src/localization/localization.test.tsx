@@ -78,7 +78,7 @@ describe('M10 canonical resources and explicit fallback', () => {
     const copy = chemistryCopy(instance)
     expect(copy.reactionName('R7', 'Provided result name')).toBe('Provided result name')
     expect(copy.reactionExplanation('R7', 'Provided explanation')).toBe('Provided explanation')
-    for (const chemical of chemicals) expect(copy.chemicalName(chemical.id)).toBe(chemical.name)
+    for (const chemical of chemicals) expect(copy.chemicalName(chemical.id)).toBe(chemical.id === 'water' ? 'Nước' : chemical.name)
     for (const reaction of [...mixReactions, ...heatReactions]) {
       expect(copy.reactionName(reaction.id)).toBe(reaction.name)
       expect(copy.reactionExplanation(reaction.id)).toBe(reaction.observation)

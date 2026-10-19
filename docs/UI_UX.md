@@ -830,17 +830,27 @@ Existing status regions suppress locale-only announcements until a semantic stat
 change. Native focus, equation scrolling and responsive dialog/tool scrolling
 remain in place. See `LOCALIZATION.md` for resources and teacher-review terms.
 
-## Water Boiling V1 — planned visual acceptance
+## Water Boiling V1 — physical observation
 
 See `plans/feature-water-boiling.md`. Water/H₂O in a Beaker or Test tube
-will show fine upward-moving bubbles, subtle surface ripples and light vapor
-when nominally boiling near 100°C under the mounted lit lamp. This visual
+shows fine upward-moving bubbles, subtle surface ripples and light illustrative vapor
+when its supported sample reaches exactly 100°C under the mounted lit lamp. This visual
 phenomenon is independent of chemical gas/reaction Replay and of thermometer
 presence. Turning off or lifting the heated vessel stops the boiling
 animation while sample and sensor temperatures cool continuously; reheating
 may restart boiling. Do not add back the removed orange heating glow.
 
-Keep liquids clipped to the vessel shape; avoid covering thermometer,
-labels or hit regions. Provide reduced-motion alternatives. Test desktop
-1440×960 and mobile portrait/landscape 390×844 and 844×390, in both EN/VI.
-This is planned behavior, not yet a delivered feature.
+Liquid effects are clipped to the drawn liquid and glass; vapor is outside the
+clip above the rim. Every water visual ignores pointer events. Existing grip,
+vessel and label targets remain independent. Static bubbles/surface cues accompany
+the textual boiling status for reduced motion. Ordinary thermal ticks preserve
+SVG nodes/animation identity. Close-up and Enlarged View consume the same derived
+status; water alone never offers chemical Replay.
+
+EN/VI distinguish Pure water · liquid / Nước tinh khiết · chất lỏng and describe
+warming, boiling, cooling and unavailable measurement without announcing every
+temperature tick. Sample temperature is labeled nominal; the thermometer reading
+retains lag. The fixed-load, uncalibrated, 1-atm model and lack of evaporation
+calculation are disclosed. Search accepts Water/Nước/H₂O/H2O in either locale.
+Adding more water or another reagent invalidates numerical applicability;
+an unchanged pure-water Mix does not stop boiling.

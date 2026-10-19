@@ -467,13 +467,18 @@ never invokes Mix; normal Heat generations still apply. Presentation reads stabl
 eligibility reasons and catalog metadata for native controls and loaded cues.
 No product list is used as transferable material; contents remain starting portions.
 
-## Water Boiling V1 — planned integration
+## Water Boiling V1 — physical thermal integration
 
-The future H₂O boiling feature is specified in `plans/feature-water-boiling.md`.
-Keep the established reducer, single 6× thermal clock, existing pure thermal
-simulation functions and SVG liquid renderer. Boiling eligibility is a physical
-sample state, separate from the chemistry engine and its finite reaction gas
-effects. Rendering must not evaluate chemistry. Thermometer sensor lag and
-attachment, R1–R8, Replay and equipment/material removal remain independent.
+The H₂O extension is recorded in `plans/feature-water-boiling.md`. The existing
+reducer and single 6× thermal clock advance a dedicated water kind; the pure model
+splits warming at its exact 100°C crossing, then holds the reference plateau.
+Sensor evolution integrates the same two segments with its existing 30s lag.
+Cooling uses the original exponential model. No new clock, reaction marker,
+completion flag, Heat evaluation or chemistry trigger is introduced.
 
-This is a design note for a planned feature, not an implementation claim.
+`store/waterBoiling.ts` derives status from supported pure-water thermal state,
+mounted/lit source and lifted-container draft. Presentation consumes that status
+in the workbench, close-up and dialog; deterministic SVG/CSS loops remain separate
+from finite reaction effects and Replay. No persistent boiling boolean or particle
+state is stored. Thermometer attachment, R1–R8, Dropper and equipment/material
+removal retain their existing state contracts and stable identities.

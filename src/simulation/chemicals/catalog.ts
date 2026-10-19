@@ -10,6 +10,7 @@ export const chemicals = [
   { id: 'sodium-bicarbonate', name: 'Sodium bicarbonate', formula: 'NaHCO₃', state: 'solid', color: '#fffefa' },
   { id: 'copper-carbonate', name: 'Basic copper(II) carbonate', formula: 'Cu₂CO₃(OH)₂', state: 'solid', color: '#609d73' },
   { id: 'copper-sulfate-pentahydrate', name: 'Copper(II) sulfate pentahydrate', formula: 'CuSO₄·5H₂O', state: 'solid', color: '#478ecb' },
+  { id: 'water', name: 'Water', formula: 'H₂O', state: 'liquid', color: '#d7e9ed' },
 ] as const
 
 export type ChemicalDefinition = (typeof chemicals)[number]

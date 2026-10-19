@@ -11,6 +11,7 @@ import { HeatingStatus } from './HeatingStatus'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import type { ReactNode } from 'react'
+import type { WaterActivity } from '../../../store/waterBoiling'
 
 interface ContainerDetailsProps {
   container: ContainerState
@@ -25,9 +26,10 @@ interface ContainerDetailsProps {
   visible?: boolean
   mountControls?: ReactNode
   thermalDetails?: ReactNode
+  water?: WaterActivity
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onRemoveChemical, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onRemoveChemical, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails, water = null }: ContainerDetailsProps) {
   const { t } = useTranslation()
   const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
@@ -40,7 +42,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onRemoveCh
         {contentsSummary ? t('sample.selectedSummary', { contents: contentsSummary }) : t('sample.emptySummary')}
       </p>
       <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation}
-        lifted={lifted}
+        lifted={lifted} water={water}
         showInactive={isCompletedHeatReaction(container.reactionResult)} />
       {container.contents.length === 0 ? <p className="empty-caption">{t('sample.empty')}</p> : (
         <ul className="contents-list" aria-label={t('sample.contentsList')}>
@@ -50,7 +52,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onRemoveCh
               <ChemicalSwatch chemical={chemical} />
               <div className="contents-copy">
                 <strong>{chemical.formula} · {chemicalName(chemical.id)}</strong>
-                <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
+                <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.id === 'water' ? t('water.material') : chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
               </div>
               {container.reactionResult?.status !== 'reaction' && <button type="button" className="chemical-remove-button" disabled={disabled} aria-label={t('sample.removeChemical', { name: chemicalName(chemical.id) })} onClick={() => onRemoveChemical?.(chemical.id)}>{t('sample.removeOne')}</button>}
             </li>
@@ -73,7 +75,7 @@ export function ContainerDetails({ container, equipmentType, onClear, onRemoveCh
         <button type="button" disabled={disabled} aria-label={t('sample.enlarge')} aria-haspopup="dialog"
           onClick={onEnlarge}>
           <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
-            presentation={presentation} visible={visible}
+            presentation={presentation} visible={visible} boiling={water === 'boiling'}
             heating={container.heatingState.status === 'heating'} />
           <span className="sample-closeup-label">{t('sample.closeupCaption')} <span aria-hidden="true">↗</span></span>
         </button>

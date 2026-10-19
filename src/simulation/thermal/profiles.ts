@@ -6,6 +6,7 @@ export const ambientTemperature = 25
 export const simulationSpeed = 6
 export const liquidSensorLag = 30
 export const airSensorLag = 120
+export const waterBoilingPoint = 100
 
 // Explicit educational defaults, not measurements or portion-to-SI conversions.
 const aqueousIds = new Set(['silver-nitrate', 'sodium-chloride', 'copper-sulfate',
@@ -18,10 +19,10 @@ export function emptyThermal(temperature: number | null = ambientTemperature): S
 export function initialSample(contents: readonly ChemicalPortion[], previous: SampleThermalState, type: EquipmentType): SampleThermalState {
   const id = contents.length === 1 ? contents[0]?.chemicalId : null
   const kind = id === 'copper-carbonate' ? 'r7' : id === 'copper-sulfate-pentahydrate' ? 'r8'
-    : id && aqueousIds.has(id) ? 'aqueous' : 'unsupported'
+    : id === 'water' ? 'water' : id && aqueousIds.has(id) ? 'aqueous' : 'unsupported'
   let temperature = previous.temperature !== null && Number.isFinite(previous.temperature) ? previous.temperature : null
-  if (kind === 'aqueous' && temperature !== null) {
-    temperature = referenceStartingTemperature(temperature, type)
+  if ((kind === 'aqueous' || kind === 'water') && temperature !== null) {
+    temperature = referenceStartingTemperature(temperature, type, kind === 'water' ? waterBoilingPoint : 60)
   } else if ((kind === 'r7' || kind === 'r8') && temperature !== null) {
     const profile = thermalProfile(kind, type)!
     const vesselCapacity = type === 'test-tube' ? 8 : 40
@@ -34,18 +35,20 @@ export function initialSample(contents: readonly ChemicalPortion[], previous: Sa
     : { ...previous, kind, temperature }
 }
 
-export function referenceStartingTemperature(vesselTemperature: number | null, type: EquipmentType): number | null {
+export function referenceStartingTemperature(vesselTemperature: number | null, type: EquipmentType, maximum = 60): number | null {
   if (vesselTemperature === null || !Number.isFinite(vesselTemperature)) return null
   const capacity = type === 'test-tube' ? 24.72 : 249
   const vesselCapacity = type === 'test-tube' ? 8 : 40
   const temperature = ((capacity - vesselCapacity) * ambientTemperature + vesselCapacity * vesselTemperature) / capacity
-  return temperature >= 20 && temperature <= 60 ? temperature : null
+  return temperature >= 20 && temperature <= maximum ? temperature : null
 }
 
 export function thermalProfile(kind: SampleThermalState['kind'], type: EquipmentType): ThermalProfile | null {
   const tube = type === 'test-tube'
   if (kind === 'unsupported') return null
   if (kind === 'empty') return { capacity: tube ? 8 : 40, power: 0, loss: tube ? 0.05 : 0.30, maximum: 450 }
+  // Approved reference loads, not measured lamp power or qualitative unit conversions.
+  if (kind === 'water') return { capacity: tube ? 24.72 : 249, power: tube ? 15 : 150, loss: tube ? 0.05 : 0.30, maximum: waterBoilingPoint }
   if (kind === 'r7' || kind === 'r8') {
     // Experimental THCS teaching trajectory; not calibrated alcohol-lamp performance.
     // Include the same nominal vessel capacity used after Empty; the additional

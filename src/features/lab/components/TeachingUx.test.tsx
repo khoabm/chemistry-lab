@@ -42,7 +42,7 @@ describe('M7 teaching workflow', () => {
     for (const chemical of chemicals) {
       const button = within(palette).getByRole('button', { name: `Add ${chemical.name}` })
       expect(button).toHaveTextContent(chemical.formula)
-      expect(button).toHaveTextContent(chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample')
+      expect(button).toHaveTextContent(chemical.id === 'water' ? 'Pure water · liquid' : chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample')
       expect(button).toBeDisabled()
     }
     fireEvent.click(screen.getByRole('button', { name: 'Add Beaker' }))

@@ -13,7 +13,7 @@ export function ThermalDetails({ container, equipmentType, disabled, onPrepare }
 }) {
   const { t } = useTranslation()
   const thermal = container.thermal
-  const liquid = ['aqueous', 'r6'].includes(thermal.kind)
+  const liquid = ['aqueous', 'r6', 'water'].includes(thermal.kind)
   const solid = thermal.kind === 'r7' || thermal.kind === 'r8'
   const canPrepare = referenceStartingTemperature(thermal.temperature, equipmentType) !== null
   const prepareDisabled = disabled || container.contents.length > 0 || thermal.referenceUsed || !canPrepare
@@ -28,7 +28,7 @@ export function ThermalDetails({ container, equipmentType, disabled, onPrepare }
       <p className="empty-caption">{t('thermal.teachingCap')}</p>
     </>}
     {thermal.kind === 'unsupported' && <p className="empty-caption">{t('thermal.recovery')}</p>}
-    {liquid && <p className="empty-caption">{t('thermal.assumptions', { mass: equipmentType === 'test-tube' ? 4 : 50 })}</p>}
+    {liquid && <p className="empty-caption">{t(thermal.kind === 'water' ? 'water.assumptions' : 'thermal.assumptions', { mass: equipmentType === 'test-tube' ? 4 : 50 })}</p>}
     <p className="empty-caption">{t('thermal.disclosure')}</p>
     <button type="button" className="action-button action-button--secondary" onClick={() => { if (!prepareDisabled) onPrepare() }}
       disabled={disabled} aria-disabled={prepareDisabled}>{t('thermal.prepare')}</button>

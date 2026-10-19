@@ -11,6 +11,7 @@ import { findContainerMount, findLampMount } from '../../../store/mounting'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { findChemical } from '../../../simulation/chemicals/catalog'
 import { thermometerMeasurement } from '../../../store/thermometerAttachment'
+import { waterActivity } from '../../../store/waterBoiling'
 
 interface LabWorkspaceProps {
   state: LabWorkspaceState
@@ -38,6 +39,7 @@ export function LabWorkspace({
     const lifted = instance.id === liftedMountedContainerId
     const position = renderedPositions.get(instance.id) ?? instance.position
     const visibleHeating = container?.heatingState.status === 'heating' && !lifted
+    const water = waterActivity(state, instance.id, liftedMountedContainerId)
     const thermometer = state.thermometers.find((item) => item.equipmentInstanceId === instance.id)
     const attachment = state.thermometerAttachments.find((item) => item.thermometerEquipmentId === instance.id)
     const measured = state.containers.find((item) => item.equipmentInstanceId === attachment?.containerEquipmentId)
@@ -46,7 +48,7 @@ export function LabWorkspace({
     const hasThermometer = state.thermometerAttachments.some((item) => item.containerEquipmentId === instance.id)
     const supportApparatus = ['beaker', 'test-tube', 'alcohol-lamp'].includes(instance.equipmentType) && (supportPlacement
       || state.mounts.some((mount) => mount.containerEquipmentId === instance.id || mount.lampEquipmentId === instance.id))
-    return { instance, container, lamp, dropper, thermometer, attachment, measurement, sensorAvailable, hasThermometer, mount, lifted, position, visibleHeating, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
+    return { instance, container, lamp, dropper, thermometer, attachment, measurement, sensorAvailable, hasThermometer, mount, lifted, position, visibleHeating, water, supportApparatus, label: `${t(`equipment.${instance.equipmentType}`)} ${number}` }
   })
 
   return (
@@ -87,7 +89,7 @@ export function LabWorkspace({
           <p>{t('workspace.emptyBody')}</p>
           <p className="empty-detail">{t('workspace.emptyHint')}</p>
         </div>}
-        {labeledEquipment.map(({ instance, label, container, lamp, dropper, thermometer, attachment, measurement, sensorAvailable, hasThermometer, mount, lifted, position, visibleHeating, supportApparatus }) => (
+        {labeledEquipment.map(({ instance, label, container, lamp, dropper, thermometer, attachment, measurement, sensorAvailable, hasThermometer, mount, lifted, position, visibleHeating, water, supportApparatus }) => (
           <button
             key={instance.id}
             type="button"
@@ -106,7 +108,7 @@ export function LabWorkspace({
               payload={dropper?.payload}
               contents={container?.contents} reactionResult={container?.reactionResult ?? null}
               presentation={container ? presentations.get(container.id) : undefined}
-              lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} />
+              lampStatus={lamp?.status ?? 'extinguished'} heating={container?.heatingState.status === 'heating'} boiling={water === 'boiling'} />
             {thermometer ? <>
               <span className="thermometer-grip" aria-hidden="true" />
               <span className="thermometer-stem-target" aria-hidden="true" />
@@ -116,7 +118,7 @@ export function LabWorkspace({
               </span>
             </> : <span className="equipment-label">{label}</span>}
             {(lamp?.status === 'extinguished' || visibleHeating) && <span className="equipment-state" aria-hidden="true">
-              {lamp ? t('workspace.off') : t('workspace.heating')}
+              {lamp ? t('workspace.off') : water === 'boiling' ? t('water.badge') : t('workspace.heating')}
             </span>}
             <span className="visually-hidden" id={`${instance.id}-result`}>
               {attachment && `${t('thermometer.attached', { container: labeledEquipment.find(({ instance: item }) => item.id === attachment.containerEquipmentId)?.label })}. `}
@@ -129,7 +131,7 @@ export function LabWorkspace({
                 container: labeledEquipment.find(({ instance: item }) => item.id === findLampMount(state.mounts, instance.id)?.containerEquipmentId)?.label,
               }) : t('mount.supportEmpty'))}
               {dropper ? dropper.payload ? t('dropper.loaded', { name: chemicalName(dropper.payload.chemicalId), formula: findChemical(dropper.payload.chemicalId)?.formula }) : t('dropper.empty') : ''}
-              {' '}{lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : lifted ? `${t('heat.lifted')} ` : visibleHeating ? `${t('heat.heating')} ` : ''}
+              {' '}{lamp ? t(lamp.status === 'lit' ? 'workspace.litDescription' : 'workspace.offDescription') : water ? `${t(`water.${water}`)} ` : lifted ? `${t('heat.lifted')} ` : visibleHeating ? `${t('heat.heating')} ` : ''}
               {container?.reactionResult?.status === 'reaction'
                 ? `${reactionName(container.reactionResult.reactionId, container.reactionResult.name)}. ${describeReactionEffects(container.reactionResult.effects, t)}`
                 : container?.reactionResult ? t('result.noReaction') : null}

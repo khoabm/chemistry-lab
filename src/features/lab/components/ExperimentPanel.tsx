@@ -11,6 +11,7 @@ import { ReactionObservation } from './ReactionObservation'
 import { SampleDetailDialog } from './SampleDetailDialog'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { EquipmentRemovalControls } from './EquipmentRemovalControls'
+import type { WaterActivity } from '../../../store/waterBoiling'
 
 type ExperimentTab = 'sample' | 'result'
 
@@ -33,9 +34,10 @@ interface ExperimentPanelProps {
   lampSupportStatus?: ReactNode
   thermometerDetails?: ReactNode
   thermalDetails?: ReactNode
+  water?: WaterActivity
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, equipmentLabel, hasEquipmentConnections = false, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, equipmentLabel, hasEquipmentConnections = false, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails, water = null }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -85,7 +87,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-sample-panel`} aria-labelledby={`${id}-sample-tab`}
         tabIndex={0} hidden={activeTab !== 'sample'}>
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
-          lifted={lifted}
+          lifted={lifted} water={water}
           mountControls={mountControls}
           thermalDetails={thermalDetails}
           presentation={presentation} visible={activeTab === 'sample'}
@@ -119,6 +121,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
         name={equipmentLabel ?? t(`equipment.${equipment.equipmentType}`)} hasConnections={hasEquipmentConnections}
         removesContents={!!container && container.contents.length > 0} disabled={disabled} onRemove={onRemoveEquipment} />}
       {detailTab && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
+        water={water}
         presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {
           selectTab(detailTab)

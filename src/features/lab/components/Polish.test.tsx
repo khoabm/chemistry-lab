@@ -95,7 +95,7 @@ describe('M8 accessible laboratory feedback', () => {
     for (const chemical of chemicals) {
       const button = screen.getByRole('button', { name: `Add ${chemical.name}` })
       expect(button).toHaveAccessibleDescription(expect.stringContaining(chemical.formula))
-      expect(button).toHaveAccessibleDescription(expect.stringContaining(chemical.state === 'liquid' ? 'Solution' : 'Solid'))
+      expect(button).toHaveAccessibleDescription(expect.stringContaining(chemical.id === 'water' ? 'Pure water' : chemical.state === 'liquid' ? 'Solution' : 'Solid'))
     }
   })
 

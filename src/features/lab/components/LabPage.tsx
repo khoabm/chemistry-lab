@@ -16,6 +16,7 @@ import { DropperDetails } from './DropperDetails'
 import { supportPlacement } from '../interactions/supportPlacement'
 import { ContainerMountControls, LampSupportStatus } from './ContainerMountControls'
 import { ThermalDetails, ThermometerDetails } from './ThermometerDetails'
+import { waterActivity } from '../../../store/waterBoiling'
 
 export function LabPage() {
   return <LocalizationProvider><Laboratory /></LocalizationProvider>
@@ -66,6 +67,7 @@ function Laboratory() {
           }} />
         <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
+          water={waterActivity(state, state.selectedEquipmentId, interaction.liftedMountedContainerId)}
           equipmentLabel={selectedEquipment ? `${t(`equipment.${selectedEquipment.equipmentType}`)} ${selectedOrdinal}` : undefined}
           hasEquipmentConnections={hasEquipmentConnections}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}

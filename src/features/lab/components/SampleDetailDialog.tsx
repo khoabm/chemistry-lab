@@ -10,12 +10,14 @@ import { HeatingStatus } from './HeatingStatus'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { useReactionReplay } from '../hooks/useReactionReplay'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
+import type { WaterActivity } from '../../../store/waterBoiling'
 
-export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation }: {
+export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation, water = null }: {
   container: ContainerState
   equipmentType: EquipmentType
   onDismiss: () => void
   presentation?: ReactionPresentation | undefined
+  water?: WaterActivity
 }) {
   const { t } = useTranslation()
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -50,7 +52,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
         <div className="sample-detail-demonstration">
           <div className="sample-detail-visual">
             <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
-              presentation={replay.presentation} replayStage={replay.stage}
+              presentation={replay.presentation} replayStage={replay.stage} boiling={water === 'boiling'}
               heating={container.heatingState.status === 'heating'} />
           </div>
           {hasReplay && <div className="sample-replay">
@@ -76,7 +78,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
           </div>}
         </div>
         <div>
-          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation}
+          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} water={water}
             showInactive={isCompletedHeatReaction(container.reactionResult)} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
             : <p className="empty-caption">{t('dialog.starting')}</p>}
