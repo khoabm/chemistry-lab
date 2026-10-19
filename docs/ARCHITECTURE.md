@@ -466,3 +466,14 @@ Contents mutations reuse result invalidation and heating synchronization. Transf
 never invokes Mix; normal Heat generations still apply. Presentation reads stable
 eligibility reasons and catalog metadata for native controls and loaded cues.
 No product list is used as transferable material; contents remain starting portions.
+
+## Water Boiling V1 — planned integration
+
+The future H₂O boiling feature is specified in `plans/feature-water-boiling.md`.
+Keep the established reducer, single 6× thermal clock, existing pure thermal
+simulation functions and SVG liquid renderer. Boiling eligibility is a physical
+sample state, separate from the chemistry engine and its finite reaction gas
+effects. Rendering must not evaluate chemistry. Thermometer sensor lag and
+attachment, R1–R8, Replay and equipment/material removal remain independent.
+
+This is a design note for a planned feature, not an implementation claim.
