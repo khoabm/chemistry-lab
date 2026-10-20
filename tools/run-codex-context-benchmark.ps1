@@ -109,19 +109,32 @@ foreach ($test in $sequence) {
     foreach ($line in (Get-Content -LiteralPath $eventFile -Encoding UTF8 -ErrorAction SilentlyContinue)) {
       if (-not $line.Trim()) { continue }
       try { $event = $line | ConvertFrom-Json -ErrorAction Stop } catch { continue }
-      if ($event.type -eq 'turn.completed' -and $event.usage) { $usage = $event.usage }
-      if ($event.item -and $event.item.type -in @('command_execution','mcp_tool_call','web_search')) {
-        if ($event.item.id) { $toolIds[[string]$event.item.id] = $true }
-        elseif ($event.type -eq 'item.completed') { $toolEvents++ }
+      # JSONL event shapes vary: thread.started / turn.started have no item,
+      # and completion/usage fields are not present on every event.
+      $eventType = if ($event.PSObject.Properties['type']) { [string]$event.type } else { '' }
+      $usageProperty = $event.PSObject.Properties['usage']
+      if ($eventType -eq 'turn.completed' -and $usageProperty) { $usage = $usageProperty.Value }
+      $itemProperty = $event.PSObject.Properties['item']
+      if ($itemProperty -and $null -ne $itemProperty.Value) {
+        $item = $itemProperty.Value
+        $itemTypeProperty = $item.PSObject.Properties['type']
+        if ($itemTypeProperty -and $itemTypeProperty.Value -in @('command_execution','mcp_tool_call','web_search')) {
+          $itemIdProperty = $item.PSObject.Properties['id']
+          if ($itemIdProperty -and $itemIdProperty.Value) { $toolIds[[string]$itemIdProperty.Value] = $true }
+          elseif ($eventType -eq 'item.completed') { $toolEvents++ }
+        }
       }
     }
     $inputTokens = $null
     $outputTokens = $null
     $cachedTokens = $null
     if ($usage) {
-      if ($null -ne $usage.input_tokens) { $inputTokens = $usage.input_tokens }
-      if ($null -ne $usage.output_tokens) { $outputTokens = $usage.output_tokens }
-      if ($null -ne $usage.cached_input_tokens) { $cachedTokens = $usage.cached_input_tokens }
+      $inProp = $usage.PSObject.Properties['input_tokens']
+      $outProp = $usage.PSObject.Properties['output_tokens']
+      $cacheProp = $usage.PSObject.Properties['cached_input_tokens']
+      if ($inProp) { $inputTokens = $inProp.Value }
+      if ($outProp) { $outputTokens = $outProp.Value }
+      if ($cacheProp) { $cachedTokens = $cacheProp.Value }
     }
     $changed = ((& git -C $wt.Path status --porcelain) | Out-String).Trim()
     $row = [pscustomobject]@{
