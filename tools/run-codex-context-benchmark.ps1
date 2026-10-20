@@ -1,0 +1,141 @@
+# Read-only CP02 benchmark runner. No application source edits, dependencies or deployment.
+# Run from the optimization branch: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-codex-context-benchmark.ps1
+param(
+  [string]$ResultsDirectory = ''
+)
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+
+$baseline = 'e860963977bec297d10b1a9eda1e596071fe2ff0'
+$candidate = '6cde7280ada780ed46825f634a77bcd036bf56fc'
+$branch = 'docs/codex-context-optimization-20261020'
+$source = (git rev-parse --show-toplevel).Trim()
+if ($LASTEXITCODE -ne 0 -or -not $source) { throw 'Run from the chemistry-lab Git repository.' }
+$doc = Join-Path $source 'docs/CODEX_CONTEXT_BENCHMARK.md'
+if (-not (Test-Path -LiteralPath $doc)) { throw "Benchmark spec missing: $doc" }
+if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { throw 'Codex CLI is not on PATH. No runs started.' }
+
+$version = ((& codex --version) | Out-String).Trim()
+$cliHelp = ((& codex exec --help) | Out-String)
+foreach ($option in @('--json','--ephemeral','--sandbox','--output-last-message')) {
+  if (-not $cliHelp.Contains($option)) { throw "Codex CLI $version does not advertise $option; stop and inspect compatibility." }
+}
+
+$prompts = @{}
+$pending = $null
+foreach ($line in (Get-Content -LiteralPath $doc -Encoding UTF8)) {
+  if ($line -match '^### (T[123])\s+—') { $pending = $Matches[1]; continue }
+  if ($pending -and $line -match '^> (.+)$') {
+    $prompts[$pending] = $Matches[1]
+    $pending = $null
+  }
+}
+foreach ($task in @('T1','T2','T3')) {
+  if (-not $prompts.ContainsKey($task)) { throw "Prompt $task missing from $doc; no runs started." }
+}
+if (-not $ResultsDirectory) {
+  $ResultsDirectory = Join-Path (Split-Path -Parent $source) 'chemistry-bench-results'
+}
+$results = [IO.Path]::GetFullPath($ResultsDirectory)
+$parent = Split-Path -Parent $source
+$worktrees = @{
+  A = @{ Path = (Join-Path $parent 'chemistry-bench-base'); Sha = $baseline }
+  B = @{ Path = (Join-Path $parent 'chemistry-bench-candidate'); Sha = $candidate }
+}
+Write-Host "Codex $version; source $source"
+Write-Host "Results outside repo: $results"
+# Fetch only the fixed optimization branch. This does not checkout or reset the user's branch.
+& git -C $source fetch origin $branch
+if ($LASTEXITCODE -ne 0) { throw 'Git fetch failed. Nothing was checked out.' }
+foreach ($kind in @('A','B')) {
+  $wt = $worktrees[$kind]
+  & git -C $source cat-file -e "$($wt.Sha)^{commit}"
+  if ($LASTEXITCODE -ne 0) { throw "Missing commit $($wt.Sha). No benchmark should run." }
+  if (-not (Test-Path -LiteralPath $wt.Path)) {
+    & git -C $source worktree add --detach $wt.Path $wt.Sha
+    if ($LASTEXITCODE -ne 0) { throw "Could not create worktree $($wt.Path)" }
+  }
+  $actual = ((& git -C $wt.Path rev-parse HEAD) | Out-String).Trim()
+  if ($LASTEXITCODE -ne 0 -or $actual -ne $wt.Sha) {
+    throw "Worktree $($wt.Path) is at $actual rather than required $($wt.Sha). Refusing to reset it."
+  }
+  $dirty = ((& git -C $wt.Path status --porcelain) | Out-String).Trim()
+  if ($dirty) { throw "Worktree $($wt.Path) is dirty. Refusing to overwrite or benchmark it." }
+}
+
+New-Item -ItemType Directory -Path $results -Force | Out-Null
+$metadata = [ordered]@{
+  codex_version = $version
+  collected_at_utc = [DateTime]::UtcNow.ToString('o')
+  source_repo = $source
+  baseline_sha = $baseline
+  candidate_sha = $candidate
+  constraints = 'same local CLI/config; fresh ephemeral read-only runs; no runtime edits'
+  note = 'Correctness and which documents were necessary require independent evaluation.'
+}
+$metadata | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $results 'metadata.json') -Encoding UTF8
+$rows = New-Object System.Collections.Generic.List[object]
+
+# Alternate order to reduce straightforward warm-up bias.
+$sequence = @(
+  @{ Task = 'T1'; Order = @('A','B') },
+  @{ Task = 'T2'; Order = @('B','A') },
+  @{ Task = 'T3'; Order = @('A','B') }
+)
+foreach ($test in $sequence) {
+  foreach ($variant in $test.Order) {
+    $task = $test.Task
+    $wt = $worktrees[$variant]
+    $stem = "$variant-$task"
+    $eventFile = Join-Path $results "$stem.jsonl"
+    $stderrFile = Join-Path $results "$stem.stderr.txt"
+    $answerFile = Join-Path $results "$stem.answer.txt"
+    Write-Host "Running $stem at $($wt.Sha.Substring(0,12)) ..."
+    $watch = [Diagnostics.Stopwatch]::StartNew()
+    Push-Location $wt.Path
+    try {
+      & codex exec --json --ephemeral --sandbox read-only --output-last-message $answerFile $prompts[$task] 1> $eventFile 2> $stderrFile
+      $exit = $LASTEXITCODE
+    } finally {
+      Pop-Location
+      $watch.Stop()
+    }
+    $usage = $null
+    $toolIds = @{}
+    $toolEvents = 0
+    foreach ($line in (Get-Content -LiteralPath $eventFile -Encoding UTF8 -ErrorAction SilentlyContinue)) {
+      if (-not $line.Trim()) { continue }
+      try { $event = $line | ConvertFrom-Json -ErrorAction Stop } catch { continue }
+      if ($event.type -eq 'turn.completed' -and $event.usage) { $usage = $event.usage }
+      if ($event.item -and $event.item.type -in @('command_execution','mcp_tool_call','web_search')) {
+        if ($event.item.id) { $toolIds[[string]$event.item.id] = $true }
+        elseif ($event.type -eq 'item.completed') { $toolEvents++ }
+      }
+    }
+    $inputTokens = $null
+    $outputTokens = $null
+    $cachedTokens = $null
+    if ($usage) {
+      if ($null -ne $usage.input_tokens) { $inputTokens = $usage.input_tokens }
+      if ($null -ne $usage.output_tokens) { $outputTokens = $usage.output_tokens }
+      if ($null -ne $usage.cached_input_tokens) { $cachedTokens = $usage.cached_input_tokens }
+    }
+    $changed = ((& git -C $wt.Path status --porcelain) | Out-String).Trim()
+    $row = [pscustomobject]@{
+      task = $task; variant = $variant; sha = $wt.Sha; codex_version = $version
+      exit_code = $exit; duration_seconds = [math]::Round($watch.Elapsed.TotalSeconds,2)
+      input_tokens = $inputTokens; cached_input_tokens = $cachedTokens; output_tokens = $outputTokens
+      tool_calls_observed = ($toolIds.Count + $toolEvents)
+      working_tree_clean = (-not [bool]$changed)
+      correctness = 'NOT_EVALUATED'
+      event_log = $eventFile; answer = $answerFile
+    }
+    $rows.Add($row)
+    $rows | Export-Csv -LiteralPath (Join-Path $results 'results.csv') -NoTypeInformation -Encoding UTF8
+    Write-Host "$stem exit=$exit time=$($row.duration_seconds)s tokens-in=$inputTokens tokens-out=$outputTokens clean=$($row.working_tree_clean)"
+    if ($changed) { throw "Unexpected working tree changes in $($wt.Path): $changed. Stopping." }
+    if ($exit -ne 0) { throw "$stem failed with exit code $exit. Inspect $stderrFile. Stopping." }
+  }
+}
+Write-Host "Finished 6 read-only runs. Inspect $(Join-Path $results 'results.csv') and the six answers."
+Write-Host 'Codex accuracy and context relevance MUST still be reviewed; script does not issue a PASS.'
