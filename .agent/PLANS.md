@@ -67,6 +67,13 @@ code.
 
 ---
 
+## Reading an existing ExecPlan efficiently
+
+- For a large completed plan, read any short status/reading guide and **only the relevant design or acceptance headings first**; expand to dated Progress, decisions, experiments and QA logs only when needed for a specific question or conflict.
+- A historical branch SHA, unmerged warning, proposed design or old timing model describes that plan's recorded stage. Verify present branch state, approved specifications and checked-out implementation before treating it as a current contract. Never silently discard an approved constraint.
+- When an old plan repeatedly misdirects readers, a short navigation/status note can point to current specifications and the existing headings. Preserve the original decisions, gates, evidence and retrospective; do not duplicate their technical detail in a new summary or rewrite archived plans in bulk.
+- Add such a note to new plans only when it materially aids navigation, not as obligatory boilerplate.
+
 ## Required ExecPlan structure
 
 Every ExecPlan should keep approved scope and decisions easy to find near the
