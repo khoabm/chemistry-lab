@@ -69,7 +69,11 @@ code.
 
 ## Required ExecPlan structure
 
-Every ExecPlan must use the following structure.
+Every ExecPlan should keep approved scope and decisions easy to find near the
+top; preserve detailed progress and verification evidence below. An existing
+historical plan need not be rewritten merely to match a new template.
+
+Every new ExecPlan must use the following structure.
 
 # <Feature or milestone name>
 
@@ -132,35 +136,18 @@ Each step should produce a coherent improvement.
 
 ## Git and technology validation
 
-Before implementation begins, the ExecPlan must record:
-
-### Git state
-
-- active milestone
-- required milestone branch
-- current branch
-- base branch or previous milestone branch
-- whether the working tree is clean enough to begin work
-
-Implementation must not proceed on the wrong milestone branch.
+Before implementation begins, record the relevant current branch/commit,
+its approved base and material uncommitted changes. For numbered milestone
+work, record that milestone; for authorized auxiliary features, record the
+feature scope and branch instead. Do not infer the current checkout from a
+historical milestone label or hard-code an old commit as the current HEAD.
 
 ### Existing technology stack
 
-Record the relevant existing technologies discovered from the repository,
-including:
-
-- frontend framework
-- language
-- build tool
-- package manager
-- state-management solution
-- styling approach
-- animation solution
-- drag-and-drop solution
-- unit/component testing stack
-- end-to-end testing stack
-
-State explicitly whether the feature requires any new dependency.
+Refer to the established stack in the checked-out source and `AGENTS.md`.
+Record only task-specific stack constraints, proposed deviations and whether
+any new dependency is required; do not reproduce an unchanged full-stack
+inventory in every plan.
 
 If a new dependency is required, explain:
 
