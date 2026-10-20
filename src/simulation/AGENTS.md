@@ -159,17 +159,9 @@ Do not attempt to infer chemistry from chemical names or formulas.
 
 ## Heating
 
-Heating is a logical trigger.
+Registered chemical Heat reactions use the declared logical trigger. The approved Thermometer B+ and Water Boiling V1 specifications **already extend** this earlier restriction with bounded, deterministic nominal thermal calculations in pure TypeScript (including declared effective heat capacities and an educational 100°C pure-water plateau). Follow `docs/CHEMISTRY.md` for supported profiles, limits, and invalidation.
 
-Do not implement:
-
-- heat conduction
-- heat capacity
-- actual flame temperature
-- thermal differential equations
-- physical fluid simulation
-
-unless a future project specification explicitly changes this requirement.
+Do not infer general thermodynamics, heat conduction, actual flame temperature, pressure/evaporation/latent-heat physics, or a physical fluid simulator from that narrow approval. Water boiling does not add a chemical trigger, reaction result or Replay occurrence.
 
 ---
 
