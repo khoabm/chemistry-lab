@@ -98,6 +98,23 @@ For each run record:
 | T2 | NOT RUN | NOT RUN | — | — | — | |
 | T3 | NOT RUN | NOT RUN | — | — | — | |
 
+## Observed local run — 2026-10-20
+
+Evidence supplied by the user: six `*.answer.txt` files, `results.csv`, and `metadata.json` from Codex CLI 0.163.0. The JSONL tool traces were **not** included. Worktrees were clean according to the benchmark runner; individual agents sometimes saw Git `unsafe repository`, which did not invalidate the answers but limited their Git checks.
+
+| Task | A correctness | B correctness | A input / cached / output | B input / cached / output | A / B observed tool calls | A / B seconds |
+| --- | --- | --- | --- | --- | --- | --- |
+| T1 UI labels | PASS | PASS | 567941 / 483200 / 5415 | 415344 / 359552 / 4733 | 13 / 14 | 166.54 / 131.55 |
+| T2 Remove Lamp | PASS | PASS | 646049 / 575616 / 4631 | 262460 / 217088 / 3953 | 12 / 11 | 112.24 / 121.29 |
+| T3 Water Boiling | PASS | PASS | 415070 / 355840 / 4097 | 412633 / 357504 / 4516 | 10 / 8 | 119.08 / 143.22 |
+| **Total** | **3 PASS** | **3 PASS** | **1629060 / 1414656 / 14143** | **1090437 / 934144 / 13202** | **35 / 33** | **397.86 / 396.06** |
+
+**Comparison:** candidate input tokens −33.1%; noncached input (input minus cached) 214404 → 156293 (−27.1%); output tokens −6.7%; observed tool calls 35 → 33; elapsed time approximately unchanged (−0.5%). Input totals include cached input and are **not** direct measures of Markdown-read volume or billed cost. The strong T2 reduction and negligible T3 reduction show task dependence. One run per task/variant cannot prove reproducibility.
+
+**Independent answer-level review:** all six responses respected architecture and scoped behavior. T1 retained label hit areas, keyboard/pointer and EN/VI; both flagged a historic UI_UX pointer-interaction conflict. T2 retained Beaker/Thermometer/attachment while removing Lamp/mount/heat and highlighted missing test cases. T3 correctly distinguished 100°C sample boiling from lagging sensor readings and physical boiling from registered chemistry/Replay. No confirmed documentation-caused correctness regression.
+
+**Evidence limitations:** no JSONL to verify unique documents/sections read or repeated file reads, no local shell reproduction of the runner, no cost accounting or repetition for variance. Thus the answer-level correctness gate **PASSES**, while a reproducible context-reading-efficiency claim remains **PRELIMINARY**; CP02 is not an unconditional measured-efficiency PASS.
+
 ## Decision
 
 - **PASS:** B passes all correctness gates and shows a reproducible efficiency benefit or a justified non-regression; disclose any tasks with increased cost.
