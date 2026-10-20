@@ -178,6 +178,15 @@ Explain:
 
 Acceptance must be based on observable behavior whenever possible.
 
+### Validation scope and reuse
+
+- During implementation, run focused tests for affected behavior first; expand to related integration tests when shared state, chemistry, thermal logic, or interaction boundaries may be affected. Required new or updated regression tests remain mandatory.
+- At a major integration or final acceptance checkpoint, run the full appropriate typecheck, lint, test suite and production build, plus browser/Playwright QA when the changed behavior warrants it. Keep existing hosted CI gates unchanged.
+- `npm run build` already invokes `npm run typecheck` before Vite: when the **same unchanged source and environment** are being validated, a successful build covers that typecheck invocation; avoid rerunning it solely to repeat the same check. Running typecheck separately remains appropriate for faster failure isolation, independent evidence or CI reporting.
+- Reuse successful results only while the relevant source, tests, dependencies, configuration and validation environment are unchanged. Rerun affected checks after changes or when prior results are unavailable, failed, incomplete or from another revision.
+- Browser QA supplements tests for visual layout, pointer/keyboard interactions and accessibility; it does not establish chemical or scientific correctness. Report which checks actually ran, their revision/results and any omissions; never imply a skipped check passed.
+
+
 ## Progress
 
 Use checkboxes only in this section.
