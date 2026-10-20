@@ -122,3 +122,56 @@ Evidence supplied by the user: six `*.answer.txt` files, `results.csv`, and `met
 - **INCONCLUSIVE:** token metrics unavailable and trace evidence insufficient, materially different environments, or a single noisy pair. Gather more evidence; do not make up a percent improvement.
 
 Do **not** advance to context-summarization or Skills purely because the benchmark document exists. Obtain independent Codex review of any CP02 follow-up changes. Keep this optimization branch open; do not merge without user authorization.
+
+
+## JSONL trace audit — CP02.3
+
+The user supplied all six raw `A/B-T1/T2/T3.jsonl` event logs. They were
+decoded as **UTF-16 LE** (the Windows PowerShell redirection encoding), and
+`item.completed` command executions were counted once per item. Command
+strings and collected outputs were inspected to distinguish targeted reads
+from broad `Get-Content` and `rg` scans. Some PowerShell command strings
+contain mojibake for Vietnamese/scientific characters; avoid making scientific
+claims from the garbled search patterns.
+
+| Task | Baseline completed commands | Candidate completed commands | Baseline combined command-output characters | Candidate combined command-output characters |
+| --- | ---: | ---: | ---: | ---: |
+| T1 | 13 | 14 | 516,970 | 299,562 |
+| T2 | 12 | 11 | 387,312 | 154,478 |
+| T3 | 10 | 8 | 448,956 | 171,420 |
+| **Total** | **35** | **33** | **1,353,238** | **625,460** |
+
+Command-output characters are only a trace proxy: they include source, test
+results of searches, Git messages, and formatting, **not a token count or a
+precise measure of unique Markdown read**. Tool calls and file names mentioned
+in commands are not equivalent to successfully read files.
+
+**Evidence of improved selection:** A-T1 directly concatenated all of
+`AGENTS.md`, `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`,
+`docs/UI_UX.md` and `docs/MILESTONES.md` in one broad read, then
+searched several more specs and the lengthy historical
+`plans/m11-render-polish.md`. A-T3 similarly read root AGENTS plus several
+full specifications and ran further large full-document reads. B-T1 centered
+searching on UI labels, UI_UX and localization and inspected source/tests in
+smaller blocks; B-T2 read the reducer, removal tests and mounting/thermal
+helpers relevant to the requested scenario; B-T3 used scoped searches and
+direct thermal/source evidence. Candidate T1 nevertheless also inspected a
+small historical thermometer-plan excerpt; targeted reading is not uniformly
+minimal. Broad `rg` searches still occur on both revisions.
+
+**Environment overhead:** both variants attempted Git status/branch
+inspection in detached worktrees and several commands returned nonzero exit
+codes. In particular B-T1 tried multiple Git workarounds; B-T2 and B-T3
+also had failed shell commands. This is primarily a benchmark environment/
+PowerShell command-composition issue and **not** evidence that current
+chemistry or architecture documents are wrong. Improve the runner environment
+before comparing execution time; do not automatically teach Codex to suppress
+Git safety warnings or add `safe.directory=*` to project instructions.
+
+**CP02 final bounded finding:** The shorter instructions passed all three
+answer-correctness gates, and the raw traces substantiate materially less
+tool-output context on this sample. No confirmed need to change root
+`AGENTS.md` again. The benchmark does **not** prove that every individual
+document read is necessary or that the observed token/time savings will
+replicate across work types. Move to targeted CP03 plan-entry optimization
+only with these limitations preserved and independent review before merge.
