@@ -41,6 +41,7 @@ Communicate with the user in concise Vietnamese; preserve original code identifi
 - Clarify or flag genuine contract conflicts; otherwise complete approved scope without repeatedly asking permission for ordinary implementation choices.
 - For significant multi-module, architecture or simulation work, follow `.agent/PLANS.md` and update the relevant feature ExecPlan. Do not require an ExecPlan for trivial copy/CSS/isolated fixes.
 - Change the smallest coherent surface. Prefer targeted searches and focused tests before wider validation. Reuse already established knowledge within the task; do not repeatedly dump unchanged files or run identical validations without a reason.
+- Changes to simulation, chemistry or nominal thermal logic must add or update unit tests for the affected behavior. Changes to important UI interactions must add or update component/integration tests. Fix failures introduced by the change before reporting completion.
 - Run affected tests plus appropriate typecheck, lint, build and browser/Playwright checks according to risk. Browser can verify interactions and rendering but not prove scientific correctness. Perform full validation at major integration checkpoints.
 - Report **implemented**, **tested**, **browser-checked** and **approved/merged** separately. Name exact commands/results; never claim tests, physical-device QA or CI that were not actually run.
 
