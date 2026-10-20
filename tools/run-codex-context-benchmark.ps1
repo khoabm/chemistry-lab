@@ -23,9 +23,12 @@ foreach ($option in @('--json','--ephemeral','--sandbox','--output-last-message'
 
 $prompts = @{}
 $pending = $null
-foreach ($line in (Get-Content -LiteralPath $doc -Encoding UTF8)) {
-  if ($line -match '^### (T[123])\s+—') { $pending = $Matches[1]; continue }
-  if ($pending -and $line -match '^> (.+)$') {
+# Parse by ASCII task identifiers, not the Unicode punctuation in headings.
+# Read the entire file as UTF-8 so the Vietnamese prompt text stays intact.
+$spec = [IO.File]::ReadAllText($doc, [Text.Encoding]::UTF8)
+foreach ($line in ($spec -split '\r?\n')) {
+  if ($line -match '^###\s+(T[123])\b') { $pending = $Matches[1]; continue }
+  if ($pending -and $line -match '^>\s+(.+)$') {
     $prompts[$pending] = $Matches[1]
     $pending = $null
   }
