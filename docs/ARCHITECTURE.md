@@ -51,9 +51,10 @@ Responsibilities:
 - active reaction results
 - resetting laboratory state
 
-Zustand is the preferred state-management solution.
-
-The store coordinates interactions but should not contain reaction-definition
+The implemented laboratory state is owned by the existing React `useReducer`
+workspace and its pure application-state helpers. Preserve this ownership;
+do not introduce Zustand or another store merely to match an earlier proposal.
+Application state coordinates interactions but does not contain reaction-definition
 data.
 
 ---
