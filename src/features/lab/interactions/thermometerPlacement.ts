@@ -1,5 +1,6 @@
 import type { LabWorkspaceState, LabWorkspaceAction } from '../../../store/labWorkspace'
 import type { EquipmentType, Point } from '../../../types/equipment'
+import type { ChemicalPortion } from '../../../types/container'
 import { thermometerTargetIssue } from '../../../store/thermometerAttachment'
 import { getContentsLayout } from '../renderers/contentsPresentation'
 import { equipmentCenter, mountedPositions, projectSupport } from './supportGeometry'
@@ -24,12 +25,17 @@ export function sensorOffset(state: Pick<LabWorkspaceState, 'equipment' | 'conta
   const container = state.containers.find((item) => item.equipmentInstanceId === containerId)
   const type = state.equipment.find((item) => item.id === containerId)?.equipmentType ?? 'beaker'
   if (!container) return 0
-  const layout = getContentsLayout(container.contents, type)
+  return thermometerPoseOffset(container.contents, type) * svgUnit
+}
+
+// Shared SVG-relative pose; no workspace size or scientific state is stored in it.
+export function thermometerPoseOffset(contents: readonly ChemicalPortion[], type: EquipmentType): number {
+  const layout = getContentsLayout(contents, type)
   // Declared 25mm immersion relative to the reference liquid depth; schematic SVG units.
   const depth = type === 'test-tube' ? 37.367765 : 39.788736
   const centerY = layout.liquids.length && layout.solids.length === 0
     ? layout.surface + layout.height * 25 / depth - bulbRadius : hangingBulbY
-  return (centerY - bulbY) * svgUnit
+  return centerY - bulbY
 }
 
 export function sensorExtension(state: LabWorkspaceState, containerId: string): number {

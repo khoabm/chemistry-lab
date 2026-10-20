@@ -414,3 +414,26 @@ Temperature/sensor ticks preserve contents and ReactionResult references. Experi
 or claim measured completion. The new sensor reading is not the existing qualitative
 temperature-rise effect and never triggers a reaction. Reduced motion changes effects,
 not sample/sensor evolution. Scientific profile limits are defined in the B+ ExecPlan.
+
+The thermometer now participates through bounded application-owned observations,
+not through the qualitative temperature-rise effect. On the reaction action, record
+the existing attached sensor's reading and validity. Then sample actual live ticks
+at most once per simulated-second interval over a maximum 60 simulated seconds,
+coalescing validity changes within each interval and preserving the initial frame.
+No missing intermediate observations are generated. A detached/rebound sensor seals
+the record; changed contents/result or Reset invalidate the relevant occurrence.
+
+At Start, Manual/Auto Replay freeze that available record. For recorded offset s,
+last recorded offset L and existing duration D, its checkpoint is
+replayInitialMs + (s/L) × (D−replayInitialMs), when L>0. The initial hold uses frame
+zero, each checkpoint selects the last actual frame, and the final stage/Auto hold
+uses the last frame. A single snapshot remains unchanged. This is an explicit
+presentation time mapping, not an equation for sample/sensor temperature. Existing
+effect deadlines and these observation checkpoints share one replay session;
+there is no independent thermal/replay scheduler or new reaction occurrence.
+
+Reduced motion retains these discrete states. An unavailable observation remains
+unavailable; no high-temperature solid measurement or temperature inferred from
+reaction warmth is added. Moving/attaching a sensor later does not rewrite the
+recording, and an already-playing session does not consume later observations.
+The live model continues independently; Replay never rewinds, freezes or heats it.

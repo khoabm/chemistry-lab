@@ -16,6 +16,7 @@ import { DropperDetails } from './DropperDetails'
 import { supportPlacement } from '../interactions/supportPlacement'
 import { ContainerMountControls, LampSupportStatus } from './ContainerMountControls'
 import { ThermalDetails, ThermometerDetails } from './ThermometerDetails'
+import { currentThermometerObservation } from '../../../store/thermometerRecording'
 
 export function LabPage() {
   return <LocalizationProvider><Laboratory /></LocalizationProvider>
@@ -68,6 +69,7 @@ function Laboratory() {
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
           equipmentLabel={selectedEquipment ? `${t(`equipment.${selectedEquipment.equipmentType}`)} ${selectedOrdinal}` : undefined}
           hasEquipmentConnections={hasEquipmentConnections}
+          thermometer={selectedContainer ? currentThermometerObservation(state, selectedContainer.equipmentInstanceId, interaction.liftedThermometerId) : null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}
           lifted={!!selectedContainer && interaction.liftedMountedContainerId === selectedContainer.equipmentInstanceId}
           thermalDetails={selectedContainer && selectedEquipment && <ThermalDetails container={selectedContainer}

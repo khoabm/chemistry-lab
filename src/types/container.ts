@@ -3,6 +3,7 @@ import type { ReactionResult } from '../simulation/reactions/types'
 import type { EquipmentType } from './equipment'
 import type { HeatingState, HeatEvaluationState } from './heating'
 import type { SampleThermalState } from './thermal'
+import type { ThermometerRecording } from './thermometerObservation'
 
 export interface ChemicalPortion {
   readonly chemicalId: ChemicalId
@@ -17,6 +18,7 @@ export interface ContainerState {
   readonly heatingState: HeatingState
   readonly heatEvaluation: HeatEvaluationState
   readonly thermal: SampleThermalState
+  readonly thermometerRecording?: ThermometerRecording | null
 }
 
 export function isContainerEquipment(type: EquipmentType): boolean {
