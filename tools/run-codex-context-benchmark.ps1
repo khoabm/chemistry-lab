@@ -41,7 +41,8 @@ foreach ($task in @('T1','T2','T3')) {
   if (-not $prompts.ContainsKey($task)) { throw "Prompt $task missing from $doc; no runs started." }
 }
 if (-not $ResultsDirectory) {
-  $ResultsDirectory = Join-Path (Split-Path -Parent $source) 'chemistry-bench-results'
+  $runId = [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssfffZ') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
+  $ResultsDirectory = Join-Path (Split-Path -Parent $source) "chemistry-bench-results-$runId"
 }
 $results = [IO.Path]::GetFullPath($ResultsDirectory)
 $parent = Split-Path -Parent $source
@@ -73,7 +74,18 @@ foreach ($kind in @('A','B')) {
   if ($dirty) { throw "Worktree $($wt.Path) is dirty. Refusing to overwrite or benchmark it." }
 }
 
-New-Item -ItemType Directory -Path $results -Force | Out-Null
+# Do not write inside the source repo or either benchmark worktree.
+$pathSep = [IO.Path]::DirectorySeparatorChar
+$roots = @($source, $worktrees.A.Path, $worktrees.B.Path)
+foreach ($root in $roots) {
+  $rootPath = [IO.Path]::GetFullPath($root).TrimEnd([char[]]@('/','\'))
+  if ($results.Equals($rootPath, [StringComparison]::OrdinalIgnoreCase) -or
+      $results.StartsWith($rootPath + $pathSep, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Benchmark output is inside a protected repository/worktree: $results"
+  }
+}
+if (Test-Path -LiteralPath $results) { throw "Results directory already exists; refusing to overwrite: $results" }
+New-Item -ItemType Directory -Path $results -ErrorAction Stop | Out-Null
 $metadata = [ordered]@{
   codex_version = $version
   model_requested = $Model
