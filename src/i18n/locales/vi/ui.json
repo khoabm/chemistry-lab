@@ -234,5 +234,14 @@
   "equipmentRemoval.connected": "Dụng cụ liên kết khác vẫn ở trên bàn. Liên kết với dụng cụ này sẽ được tháo.",
   "workspace.feedback.removed": "Đã xóa {{equipment}} khỏi bàn. Dụng cụ khác được giữ lại.",
   "sample.removeChemical": "Bỏ {{name}} khỏi mẫu",
-  "sample.removeOne": "Bỏ"
+  "sample.removeOne": "Bỏ",
+  "water.material": "Nước tinh khiết · chất lỏng",
+  "water.searchTerms": "Water Nước H₂O H2O",
+  "water.warming": "Nước đang nóng lên — theo mô hình mẫu danh định.",
+  "water.boiling": "Nước đang sôi — giữ ở mốc tham chiếu 100°C tại 1 atm.",
+  "water.cooling": "Nước đang nguội — không còn sôi chủ động.",
+  "water.resting": "Nước không được cấp nhiệt từ đèn.",
+  "water.unavailable": "Mẫu nước đã thay đổi hoặc ngoài phạm vi: chưa có phép đo định lượng và mô phỏng sôi.",
+  "water.badge": "Đang sôi",
+  "water.assumptions": "Mẫu nước tinh khiết tham chiếu danh định {{mass}}g tại 1 atm; giữ ở 100°C khi sôi. Thông số nóng lên/nguội chưa hiệu chuẩn. Đơn vị chất không phải khối lượng hay thể tích. Số đo nhiệt kế có độ trễ so với nhiệt độ mẫu mô phỏng. Không tính lượng nước bay hơi."
 }

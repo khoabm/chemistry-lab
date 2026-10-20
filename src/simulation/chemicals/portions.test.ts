@@ -4,13 +4,14 @@ import { addChemicalPortion } from './portions'
 import type { ChemicalPortion } from '../../types/container'
 
 describe('M2 chemical data and portions', () => {
-  it('registers only the eleven specified initial chemicals with stable unique IDs', () => {
+  it('registers the eleven reaction substances plus pure water with stable unique IDs', () => {
     expect(chemicals.map((chemical) => chemical.id)).toEqual([
       'silver-nitrate', 'sodium-chloride', 'copper-sulfate', 'sodium-hydroxide',
       'iron-chloride', 'calcium-chloride', 'sodium-carbonate', 'hydrochloric-acid',
-      'sodium-bicarbonate', 'copper-carbonate', 'copper-sulfate-pentahydrate',
+      'sodium-bicarbonate', 'copper-carbonate', 'copper-sulfate-pentahydrate', 'water',
     ])
-    expect(new Set(chemicals.map((chemical) => chemical.id)).size).toBe(11)
+    expect(new Set(chemicals.map((chemical) => chemical.id)).size).toBe(12)
+    expect(findChemical('water')).toMatchObject({ formula: 'H₂O', state: 'liquid', name: 'Water' })
     expect(chemicals.filter((chemical) => chemical.state === 'solid').map((chemical) => chemical.id))
       .toEqual(['sodium-bicarbonate', 'copper-carbonate', 'copper-sulfate-pentahydrate'])
     expect(findChemical('copper-sulfate')).toMatchObject({ state: 'liquid', color: '#478ecb' })

@@ -1,7 +1,7 @@
 import type { LabWorkspaceState } from './labWorkspace'
 import { findMountedHeatingLamp } from './mounting'
 import { invalidateThermal, thermalProfile } from '../simulation/thermal/profiles'
-import { crossingTime, evolveSensor, evolveTemperature, evolveTeachingTemperature } from '../simulation/thermal/model'
+import { crossingTime, evolveSensor, evolveTemperature, evolveTeachingTemperature, evolveWaterTemperature, evolveWaterSensor } from '../simulation/thermal/model'
 import { thermometerMeasurement } from './thermometerAttachment'
 import { evaluateReaction } from '../simulation/engine/evaluateReaction'
 
@@ -30,8 +30,10 @@ export function advanceWorkspaceThermal(state: LabWorkspaceState, time: number, 
         ...container, thermal: { ...container.thermal, vesselTemperature: cooled },
       }
     }
-    const temperature = evolveTeachingTemperature(sample.temperature, seconds, sample.profile, sample.powered)
-    const crossing = sample.powered && !container.thermal.completed ? crossingTime(sample.temperature, sample.profile) : null
+    const temperature = container.thermal.kind === 'water' ? evolveWaterTemperature(sample.temperature, seconds, sample.profile, sample.powered)
+      : evolveTeachingTemperature(sample.temperature, seconds, sample.profile, sample.powered)
+    const crossing = sample.powered && ['r7', 'r8'].includes(container.thermal.kind) && !container.thermal.completed
+      ? crossingTime(sample.temperature, sample.profile) : null
     const complete = crossing !== null && crossing <= seconds + 1e-9
     const outOfRange = temperature < 20 || temperature > sample.profile.maximum
     return temperature === sample.temperature && !complete ? container : {
@@ -47,7 +49,8 @@ export function advanceWorkspaceThermal(state: LabWorkspaceState, time: number, 
     const sample = relation && thermometer.equipmentInstanceId !== liftedThermometerId ? contact(relation.containerEquipmentId) : undefined
     // Unknown contact uses the air fallback internally, never a fabricated sample reading.
     const liquid = sample && thermometerMeasurement(state.containers.find((item) => item.equipmentInstanceId === relation?.containerEquipmentId)) === 'available'
-    const reading = evolveSensor(thermometer.reading, seconds, liquid ? sample : undefined)
+    const water = relation && state.containers.find((item) => item.equipmentInstanceId === relation.containerEquipmentId)?.thermal.kind === 'water'
+    const reading = (water ? evolveWaterSensor : evolveSensor)(thermometer.reading, seconds, liquid ? sample : undefined)
     return reading === thermometer.reading ? thermometer : { ...thermometer, reading }
   })
   return { ...state, simulationTime: time,

@@ -78,7 +78,7 @@ describe('M2 chemical and container interactions', () => {
   })
   it('shows the full catalog and accepts only a selected supported container', () => {
     const palette = screen.getByRole('region', { name: 'Chemicals' })
-    expect(within(palette).getAllByRole('button')).toHaveLength(11)
+    expect(within(palette).getAllByRole('button')).toHaveLength(12)
     for (const chemical of chemicals) {
       expect(within(palette).getByText(chemical.formula)).toBeInTheDocument()
       expect(within(palette).getByRole('button', { name: `Add ${chemical.name}` })).toBeDisabled()

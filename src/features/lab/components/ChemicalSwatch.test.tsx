@@ -40,9 +40,9 @@ describe('shared starting-substance visual identity', () => {
       }
       expect(sampleCue?.style.backgroundColor).toBe(paletteCue?.style.backgroundColor)
       expect(row).toHaveTextContent(`${chemical.formula} · ${chemical.name}`)
-      expect(row).toHaveTextContent(`${index + 1} ${index === 0 ? 'unit' : 'units'} · ${chemical.state === 'liquid' ? 'Solution' : 'Solid'}`)
+      expect(row).toHaveTextContent(`${index + 1} ${index === 0 ? 'unit' : 'units'} · ${chemical.id === 'water' ? 'Pure water · liquid' : chemical.state === 'liquid' ? 'Solution' : 'Solid'}`)
       expect(action).toHaveAccessibleDescription(expect.stringContaining(chemical.formula))
-      expect(action).toHaveAccessibleDescription(expect.stringContaining(chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample'))
+      expect(action).toHaveAccessibleDescription(expect.stringContaining(chemical.id === 'water' ? 'Pure water · liquid' : chemical.state === 'liquid' ? 'Solution · liquid' : 'Solid · sample'))
     }
   })
 

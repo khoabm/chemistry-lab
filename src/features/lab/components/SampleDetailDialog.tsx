@@ -12,13 +12,15 @@ import { useReactionReplay } from '../hooks/useReactionReplay'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 import type { ThermometerObservation } from '../../../types/thermometerObservation'
 import { SampleThermometerReading } from './SampleThermometerReading'
+import type { WaterActivity } from '../../../store/waterBoiling'
 
-export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation, thermometer = null }: {
+export function SampleDetailDialog({ container, equipmentType, onDismiss, presentation, thermometer = null, water = null }: {
   container: ContainerState
   equipmentType: EquipmentType
   onDismiss: () => void
   presentation?: ReactionPresentation | undefined
   thermometer?: ThermometerObservation | null
+  water?: WaterActivity
 }) {
   const { t } = useTranslation()
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -54,7 +56,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
         <div className="sample-detail-demonstration">
           <div className="sample-detail-visual">
             <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
-              presentation={replay.presentation} replayStage={replay.stage} thermometer={visibleThermometer}
+              presentation={replay.presentation} replayStage={replay.stage} thermometer={visibleThermometer} boiling={water === 'boiling'}
               heating={container.heatingState.status === 'heating'} />
           </div>
           <SampleThermometerReading observation={visibleThermometer} recorded={replay.stage !== undefined} />
@@ -85,7 +87,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
           </div>}
         </div>
         <div>
-          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation}
+          <HeatingStatus state={container.heatingState} evaluation={container.heatEvaluation} water={water}
             showInactive={isCompletedHeatReaction(container.reactionResult)} />
           {container.reactionResult ? <ReactionObservation result={container.reactionResult} />
             : <p className="empty-caption">{t('dialog.starting')}</p>}

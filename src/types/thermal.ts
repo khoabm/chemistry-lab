@@ -1,4 +1,4 @@
-export type ThermalKind = 'empty' | 'aqueous' | 'r6' | 'r7' | 'r8' | 'unsupported'
+export type ThermalKind = 'empty' | 'aqueous' | 'water' | 'r6' | 'r7' | 'r8' | 'unsupported'
 
 export interface SampleThermalState {
   readonly kind: ThermalKind

@@ -258,5 +258,14 @@
   "equipmentRemoval.connected": "Other linked equipment stays on the bench. Connections to this tool are released.",
   "workspace.feedback.removed": "{{equipment}} removed from the bench. Other equipment is kept.",
   "sample.removeChemical": "Remove {{name}} from this sample",
-  "sample.removeOne": "Remove"
+  "sample.removeOne": "Remove",
+  "water.material": "Pure water · liquid",
+  "water.searchTerms": "Water Nước H₂O H2O",
+  "water.warming": "Water warming — nominal sample model.",
+  "water.boiling": "Water boiling — 100°C reference plateau at 1 atm.",
+  "water.cooling": "Water cooling — no active boiling.",
+  "water.resting": "Water is not receiving lamp heat.",
+  "water.unavailable": "Water sample changed or outside the model: numerical measurement and boiling simulation unavailable.",
+  "water.badge": "Boiling",
+  "water.assumptions": "Nominal {{mass}}g pure-water reference at 1 atm; 100°C plateau. Heating/cooling parameters are uncalibrated. Portion units are not mass or volume. The thermometer reading lags the simulated sample temperature. No evaporation quantity is calculated."
 }

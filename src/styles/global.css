@@ -480,7 +480,19 @@ h3 { font-size: 14px; font-weight: 600; }
 @keyframes warmth-emphasis { 0%, 100% { opacity: 0; } 20%, 55% { opacity: 0.85; } }
 @keyframes gas-development { 0% { opacity: calc(var(--gas-peak) * 0.25); } 15%, 45% { opacity: var(--gas-peak); } 75% { opacity: calc(var(--gas-peak) * 0.5); } 100% { opacity: 0; } }
 @keyframes solid-transform { from { fill: var(--initial-solid-color); } to { fill: var(--final-solid-color); } }
+/* Continuous physical water phenomenon; independent from finite reaction/Replay animation names. */
+.water-boiling-bubble { animation: water-boiling-rise var(--water-duration) linear infinite; animation-delay: var(--water-delay); }
+.water-boiling-ring { opacity: 0; transform-box: fill-box; transform-origin: center; animation: water-boiling-release var(--water-duration) linear infinite; animation-delay: var(--water-delay); }
+.water-boiling-ripple { transform-box: fill-box; transform-origin: center; animation: water-boiling-surface 2.4s ease-in-out infinite; }
+.water-boiling-wisp { opacity: 0.4; animation: water-boiling-vapor 3s ease-in-out infinite; animation-delay: var(--water-delay); }
+@keyframes water-boiling-rise { 0% { opacity: 0; transform: translateY(0); } 15%, 70% { opacity: 0.85; } 90%, 100% { opacity: 0; transform: translateY(var(--water-rise)); } }
+@keyframes water-boiling-release { 0%, 70% { opacity: 0; transform: scale(0.6); } 85% { opacity: 0.6; } 100% { opacity: 0; transform: scale(1.4); } }
+@keyframes water-boiling-surface { 0%, 100% { transform: scaleX(0.85); opacity: 0.5; } 50% { transform: scaleX(1.15); opacity: 0.8; } }
+@keyframes water-boiling-vapor { 0%, 100% { opacity: 0.12; transform: translateY(0); } 50% { opacity: 0.45; transform: translateY(-1px); } }
 @media (prefers-reduced-motion: reduce) {
+  .water-boiling-bubble, .water-boiling-ring, .water-boiling-ripple, .water-boiling-wisp { animation: none; }
+  .water-boiling-bubble { opacity: 0.65; transform: translateY(calc(var(--water-rise) * 0.5)); }
+  .water-boiling-ring { opacity: 0.3; }
   .reacted-solid.is-transforming { animation: none; }
   .lamp-flame { animation: none; }
   .precipitate-cloud, .precipitate-bed, .precipitate-particle, .reaction-gas, .reaction-bubble, .bubble-surface-ring, .reaction-warmth, .warmth-indicator { animation: none; }

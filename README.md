@@ -115,8 +115,8 @@ Focus equipment and use arrow keys (Shift moves farther). Escape cancels a drag;
 clears the bench without reloading the page.
 
 Select a beaker or test tube, then click/tap a chemical in the palette to add one
-simplified unit. All eleven specified chemicals are available, with name,
-formula and solution/solid labels. Containers display basic starting liquid/solid
+simplified unit. The catalog includes the eleven reaction substances plus pure
+water (H₂O), with name, formula and solution/pure-liquid/solid labels. Containers display basic starting liquid/solid
 appearance and keep independent contents while moving. For a selected beaker or
 test tube, the right Experiment panel separates Sample (contents, heating,
 Mix/Empty and close-up) from Result (observation,
@@ -167,7 +167,7 @@ This is a classroom convention, not a physical maximum or a changed model domain
 A glass-liquid thermometer is independent equipment with its own lagging reading.
 Drag its bulb into a compatible Beaker/Test tube to preview/attach; drag out to detach
 or rebind. Empty, unsupported and solid samples also allow physical attachment;
-only supported aqueous/R6 samples provide a liquid measurement. Empty/solid vessels
+only supported aqueous/R6/pure-water samples provide a liquid measurement. Empty/solid vessels
 use a hanging pose clear of the sample bed, walls and bottom.
 It follows its Beaker/Test tube and lamp assembly. Enter/Arrows/Shift/Escape support
 keyboard pickup/drop; native pickup then click/tap and Remove provide alternatives.
@@ -199,6 +199,19 @@ reference recipe and preserves residual vessel heat; only its first explicit Mix
 releases the finite energy budget. Repeated Mix/Replay never replenishes it. Add and
 Dropper edits invalidate unsupported numerical history without changing material
 conservation or explicit Mix semantics. These models are not experimentally calibrated.
+
+Pure H₂O has a separate nominal 20–100°C profile in both vessels. Mounted/lit heating
+reaches a 100°C plateau at the 1-atm reference; continuous clipped bubbles, surface
+ripples and light illustrative vapor are physical visuals, never a chemical result
+or Replay occurrence. Lamp-off, lifting or unmounting stops active boiling and lets
+water cool; reheating resumes from its retained temperature. The delayed thermometer
+does not jump to 100°C. Fixed nominal loads (50g/4g) and uncalibrated C/P/K give about
+22.5/23.7 real seconds from 25°C at 6×. Portion counts never define SI quantities.
+Additional Add/Dropper edits conservatively invalidate numerical history, including
+adding more water; removing a foreign substance does not restore applicability.
+Empty retains known vessel warmth; unknown or out-of-domain initial states are
+unsupported. Unchanged pure-water Mix may return no reaction without stopping boiling.
+Reduced motion uses static boiling cues. No evaporation quantity is calculated.
 
 Open How to use this lab for a short, non-blocking Mix/Heat guide, keyboard
 controls and sample labels. Closing/reopening Help does not change experiments.
@@ -270,7 +283,9 @@ lint, `npm test -- --maxWorkers=2` and build.
 - `src/types/equipment.ts`: stable equipment IDs/types and normalized positions.
 - `src/types/container.ts`: container associations and chemical portions.
 - `src/types/heating.ts`: lamp status and source-associated container heating state.
-- `src/features/lab/hooks/useHeatReactions.ts`: cancellable per-container delay orchestration.
+- `src/features/lab/hooks/useHeatReactions.ts`: single 6× thermal clock with hidden-tab pause/no catch-up.
+- `src/store/waterBoiling.ts`: derived water applicability/contact status, without a second scheduler.
+- `src/features/lab/renderers/WaterBoilingVisual.tsx`: independent continuous physical SVG/CSS cues.
 - `src/store/mounting.ts`: shared mount eligibility, occupancy queries and mounted Heat source resolution.
 - `src/simulation/chemicals/`: the specified catalog and pure portion additions.
 - `src/simulation/reactions/`: typed R1–R8 rules, products and semantic effects.

@@ -13,14 +13,16 @@ import { findChemical } from '../../../simulation/chemicals/catalog'
 import { ThermometerVisual } from '../renderers/ThermometerVisual'
 import { thermometerPoseOffset } from '../interactions/thermometerPlacement'
 import type { ThermometerObservation } from '../../../types/thermometerObservation'
+import { WaterBoilingVisual, WaterBoilingVapor } from '../renderers/WaterBoilingVisual'
 
-export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], payload, reactionResult = null, lampStatus = 'extinguished', heating = false, presentation = completedPresentation, visible = true, replayStage, reading = 25, thermometer = null }: {
+export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], payload, reactionResult = null, lampStatus = 'extinguished', heating = false, boiling = false, presentation = completedPresentation, visible = true, replayStage, reading = 25, thermometer = null }: {
   equipmentType: EquipmentType
   contents?: readonly ChemicalPortion[] | undefined
   payload?: ChemicalPortion | null | undefined
   reactionResult?: ReactionResult | null
   lampStatus?: AlcoholLampState['status']
   heating?: boolean
+  boiling?: boolean
   presentation?: ReactionPresentation | undefined
   visible?: boolean
   replayStage?: ReplayStage | undefined
@@ -44,7 +46,9 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
           <g clipPath={`url(#${clipId})`}>
             <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} presentation={presentation} replayStage={replayStage} />
             <ReactionEffectsVisual effects={effects} layout={layout} presentation={presentation} />
+            {boiling && <WaterBoilingVisual layout={layout} narrow={false} />}
           </g>
+          {boiling && <WaterBoilingVapor narrow={false} />}
           <path d="M24 26h42M31 39h9M31 50h6M31 61h9M31 72h6M63 37v37" />
         </>}
         {equipmentType === 'test-tube' && <>
@@ -53,7 +57,9 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
           <g clipPath={`url(#${clipId})`}>
             <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} presentation={presentation} replayStage={replayStage} />
             <ReactionEffectsVisual effects={effects} layout={layout} presentation={presentation} />
+            {boiling && <WaterBoilingVisual layout={layout} narrow />}
           </g>
+          {boiling && <WaterBoilingVapor narrow />}
           <path d="M32 15h36M32 20h36M43 30v41M55 78h1" />
         </>}
         {equipmentType === 'dropper' && <>

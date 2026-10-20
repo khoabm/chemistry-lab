@@ -51,4 +51,18 @@ describe('shared observation attachment geometry', () => {
     expect(container.querySelector('.thermometer-scale--beside-vessel')).not.toBeInTheDocument()
     expect(container.querySelector('.thermometer-column')).toBeInTheDocument()
   })
+  it('composes Water Boiling V1 and an attached thermometer without obscuring historical sensor visuals', () => {
+    for (const equipmentType of ['beaker', 'test-tube'] as const) {
+      const { container, unmount } = render(<EquipmentVisual equipmentType={equipmentType}
+        contents={[{ chemicalId: 'water', quantity: 1 }]} boiling
+        thermometer={{ thermometerId: 'attached-water-sensor', reading: 95, availability: 'available' }} />)
+      expect(container.querySelector('.water-boiling-liquid')).toBeInTheDocument()
+      expect(container.querySelector('.water-boiling-vapor')).toBeInTheDocument()
+      expect(container.querySelector('.sample-thermometer')).toBeInTheDocument()
+      expect(container.querySelector('.thermometer-scale--beside-vessel')).toBeInTheDocument()
+      expect(container.querySelector('.sample-thermometer .thermometer-column')).toBeInTheDocument()
+      unmount()
+    }
+  })
+
 })

@@ -29,7 +29,7 @@ describe('chemical catalog search', () => {
       const button = within(catalog()).getByRole('button', { name: `Add ${chemical.name}` })
       expect(button).toBeDisabled()
       expect(button).toHaveAccessibleDescription(expect.stringContaining(chemical.formula))
-      expect(button).toHaveAccessibleDescription(expect.stringContaining(chemical.state === 'liquid' ? 'Solution' : 'Solid'))
+      expect(button).toHaveAccessibleDescription(expect.stringContaining(chemical.id === 'water' ? 'Pure water' : chemical.state === 'liquid' ? 'Solution' : 'Solid'))
     }
     expect(search()).toHaveAttribute('type', 'search')
     expect(document.getElementById(search().getAttribute('aria-controls') ?? '')).toBeInTheDocument()
