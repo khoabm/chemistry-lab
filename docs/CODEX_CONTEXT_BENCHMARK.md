@@ -1,6 +1,6 @@
 # CP02 — Codex context-loading benchmark
 
-Status: **PREPARED — NOT YET EXECUTED**. This document defines a controlled, read-only benchmark, not measured results or permission to change application code.
+Status: **EXECUTED (2026-10-20), ANSWERS REVIEWED, TRACE AUDITED; reproducibility limitations remain**. The original read-only protocol and observed results are recorded below. This is not permission to change application code.
 
 ## Goal
 
@@ -26,7 +26,7 @@ Static observation only: root `AGENTS.md` is 18,758 characters at A and 7,140 ch
 5. Save CLI JSONL events and the final answer **outside the repository**, together with exit status, duration, Codex version, model, reasoning setting and optional token-usage fields. Verify both working trees remain unchanged.
 6. Evaluate answers with the rubric below. Do not show the rubric to Codex as part of each task's prompt. Do not count a task as successful just because the agent reports that it has read fewer files.
 
-### PowerShell setup (run in the existing repository)
+### Historical manual PowerShell setup (example only; use the runner below for new runs)
 
 ```powershell
 git fetch origin main
@@ -36,7 +36,7 @@ New-Item -ItemType Directory -Force ../chemistry-bench-results | Out-Null
 codex --version
 ```
 
-Example for one task: use the *same* literal `$prompt` in both worktrees (paste the appropriate prompt below into the here-string). Do not run inside the long-running Codex chat; use a new CLI execution for each test.
+Historical one-task example: use the *same* literal `$prompt` in both worktrees (paste the appropriate prompt below into the here-string). Do not run inside the long-running Codex chat; use a new CLI execution for each test.
 
 ```powershell
 $prompt = @'
@@ -54,6 +54,8 @@ Pop-Location
 ```
 
 To time runs, execute the above CLI invocation inside PowerShell `Measure-Command { ... }`; keep timing and exit status for each run. `codex exec --json` emits event logs suitable for inspecting tool actions and any reported usage fields (for example a completed-turn usage event); log structure can differ by version. Inspect rather than assuming exact field availability. Missing token-usage metrics must be reported as **unavailable**, never estimated as actual usage. The results must not include authentication keys or private paths/secrets.
+
+For new benchmark runs, invoke `tools/run-codex-context-benchmark.ps1` with both `-Model <Codex model ID>` and `-ReasoningEffort high` (or another CLI-supported level). The runner pins these values for both revisions, records the requested configuration (not independently verified effective settings), creates a unique result directory outside the repository/worktrees by default, and refuses to overwrite an existing destination. Output must be kept outside both worktrees and the source repository. Historical manual examples above do not provide these safeguards.
 
 ## Fixed task prompts
 
@@ -90,7 +92,7 @@ For each run record:
 - Count of tool calls and **unique document files** read; list irrelevant full-document reads and repeated reads of unchanged sections when verifiable from logs
 - Correctness verdict (PASS/FAIL), decisive evidence, unsupported claims, and risk/uncertainty
 
-### Results (to fill after executing local Codex)
+### Initial empty results template (before execution; superseded by observed run below)
 
 | Task | A correctness | B correctness | A input/output tokens | B input/output tokens | A/B document reads | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -100,7 +102,7 @@ For each run record:
 
 ## Observed local run — 2026-10-20
 
-Evidence supplied by the user: six `*.answer.txt` files, `results.csv`, and `metadata.json` from Codex CLI 0.163.0. The JSONL tool traces were **not** included. Worktrees were clean according to the benchmark runner; individual agents sometimes saw Git `unsafe repository`, which did not invalidate the answers but limited their Git checks.
+Evidence supplied by the user: six `*.answer.txt` files, `results.csv`, and `metadata.json` from Codex CLI 0.163.0. At the time of this initial answer review, the JSONL traces had **not yet** been provided; they were supplied and audited subsequently in CP02.3 below. Worktrees were clean according to the benchmark runner; individual agents sometimes saw Git `unsafe repository`, which did not invalidate the answers but limited their Git checks.
 
 | Task | A correctness | B correctness | A input / cached / output | B input / cached / output | A / B observed tool calls | A / B seconds |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -113,7 +115,7 @@ Evidence supplied by the user: six `*.answer.txt` files, `results.csv`, and `met
 
 **Independent answer-level review:** all six responses respected architecture and scoped behavior. T1 retained label hit areas, keyboard/pointer and EN/VI; both flagged a historic UI_UX pointer-interaction conflict. T2 retained Beaker/Thermometer/attachment while removing Lamp/mount/heat and highlighted missing test cases. T3 correctly distinguished 100°C sample boiling from lagging sensor readings and physical boiling from registered chemistry/Replay. No confirmed documentation-caused correctness regression.
 
-**Evidence limitations:** no JSONL to verify unique documents/sections read or repeated file reads, no local shell reproduction of the runner, no cost accounting or repetition for variance. Thus the answer-level correctness gate **PASSES**, while a reproducible context-reading-efficiency claim remains **PRELIMINARY**; CP02 is not an unconditional measured-efficiency PASS.
+**Evidence limitations at initial review:** no JSONL was available then; the later CP02.3 trace audit addresses command-level reads but not unique Markdown sections exactly. There is still no local shell reproduction of the runner, model/reasoning settings were not explicitly pinned or recorded for this historical run, and there is no cost accounting or repetition for variance. The historical runner also did not check Git status exit codes or protect existing output, so its clean-worktree report cannot be treated as independently verified proof. Thus the answer-level correctness gate **PASSES**, while a reproducible context-reading-efficiency claim remains **PRELIMINARY**; CP02 is not an unconditional measured-efficiency PASS.
 
 ## Decision
 
