@@ -247,5 +247,16 @@
   "thermometer.unavailableSample": "Attached — numerical measurement is unavailable for this changed or unsupported sample.",
   "thermal.teachingCap": "After qualification, this classroom model stops at the teaching milestone while heated. It cools without power; reheating cannot exceed the milestone or repeat the reaction. This is not a physical maximum temperature.",
   "thermometer.placed": "Thermometer placed.",
-  "thermal.prepareRange": "This vessel cannot prepare a supported 20–60°C reference batch. Use a fresh known-temperature vessel."
+  "thermal.prepareRange": "This vessel cannot prepare a supported 20–60°C reference batch. Use a fresh known-temperature vessel.",
+  "action.removeEquipment": "Remove from bench",
+  "action.confirmRemoveEquipment": "Remove equipment",
+  "action.cancelRemove": "Cancel",
+  "equipmentRemoval.title": "Confirm equipment removal",
+  "equipmentRemoval.manage": "Equipment",
+  "equipmentRemoval.confirm": "Remove {{equipment}} from the bench?",
+  "equipmentRemoval.contents": "Its contents and result will also be removed.",
+  "equipmentRemoval.connected": "Other linked equipment stays on the bench. Connections to this tool are released.",
+  "workspace.feedback.removed": "{{equipment}} removed from the bench. Other equipment is kept.",
+  "sample.removeChemical": "Remove {{name}} from this sample",
+  "sample.removeOne": "Remove"
 }

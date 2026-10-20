@@ -2,6 +2,7 @@ import { useChemistryCopy } from '../../../localization/chemistry'
 import { useTranslation } from 'react-i18next'
 import { useStatusLive } from '../../../localization/useStatusLive'
 import { findChemical } from '../../../simulation/chemicals/catalog'
+import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 import type { ContainerState } from '../../../types/container'
 import type { EquipmentType } from '../../../types/equipment'
 import { EquipmentVisual } from './EquipmentVisual'
@@ -17,6 +18,7 @@ interface ContainerDetailsProps {
   container: ContainerState
   equipmentType: EquipmentType
   onClear: () => void
+  onRemoveChemical?: (id: ChemicalId) => void
   onMix: () => void
   onEnlarge: () => void
   disabled: boolean
@@ -28,7 +30,7 @@ interface ContainerDetailsProps {
   thermometer?: ThermometerObservation | null
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails, thermometer = null }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onRemoveChemical, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails, thermometer = null }: ContainerDetailsProps) {
   const { t } = useTranslation()
   const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
@@ -47,12 +49,13 @@ export function ContainerDetails({ container, equipmentType, onClear, onMix, onE
         <ul className="contents-list" aria-label={t('sample.contentsList')}>
           {container.contents.map((portion) => {
             const chemical = findChemical(portion.chemicalId)
-            return chemical && <li key={portion.chemicalId}>
+            return chemical && <li key={portion.chemicalId} className={container.reactionResult?.status === 'reaction' ? '' : 'is-editable'}>
               <ChemicalSwatch chemical={chemical} />
               <div className="contents-copy">
                 <strong>{chemical.formula} · {chemicalName(chemical.id)}</strong>
                 <span>{portion.quantity} {t('sample.unit', { count: portion.quantity })} · {chemical.state === 'liquid' ? t('sample.solution') : t('sample.solid')}</span>
               </div>
+              {container.reactionResult?.status !== 'reaction' && <button type="button" className="chemical-remove-button" disabled={disabled} aria-label={t('sample.removeChemical', { name: chemicalName(chemical.id) })} onClick={() => onRemoveChemical?.(chemical.id)}>{t('sample.removeOne')}</button>}
             </li>
           })}
         </ul>

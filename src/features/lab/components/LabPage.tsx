@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { useLayoutEffect, useReducer } from 'react'
+import { useLayoutEffect, useReducer, useRef } from 'react'
+import type { ChemicalId } from '../../../simulation/chemicals/catalog'
 import { createLabWorkspaceState, labWorkspaceReducer } from '../../../store/labWorkspace'
 import { useEquipmentInteraction } from '../hooks/useEquipmentInteraction'
 import { EquipmentDragPreview } from './EquipmentDragPreview'
@@ -24,6 +25,14 @@ export function LabPage() {
 function Laboratory() {
   const { t } = useTranslation()
   const [state, reducerDispatch] = useReducer(labWorkspaceReducer, undefined, createLabWorkspaceState)
+  const laboratory = useRef<HTMLElement>(null)
+  const removedEquipment = useRef<string | null>(null)
+  useLayoutEffect(() => {
+    if (removedEquipment.current && !state.equipment.some((item) => item.id === removedEquipment.current)) {
+      removedEquipment.current = null
+      laboratory.current?.focus({ preventScroll: true })
+    }
+  }, [state.equipment])
   const { dispatch, setContact } = useHeatReactions(state, reducerDispatch)
   const interaction = useEquipmentInteraction(state, dispatch, supportPlacement)
   useLayoutEffect(() => { setContact(interaction.liftedMountedContainerId, interaction.liftedThermometerId) },
@@ -34,6 +43,10 @@ function Laboratory() {
   const selectedLamp = state.lamps.find((lamp) => lamp.equipmentInstanceId === state.selectedEquipmentId)
   const selectedDropper = state.droppers.find((dropper) => dropper.equipmentInstanceId === state.selectedEquipmentId)
   const selectedThermometer = state.thermometers.find((item) => item.equipmentInstanceId === state.selectedEquipmentId)
+  const selectedOrdinal = selectedEquipment ? state.equipment.slice(0, state.equipment.indexOf(selectedEquipment) + 1)
+    .filter((item) => item.equipmentType === selectedEquipment.equipmentType).length : 0
+  const hasEquipmentConnections = state.mounts.some((item) => item.lampEquipmentId === state.selectedEquipmentId || item.containerEquipmentId === state.selectedEquipmentId)
+    || state.thermometerAttachments.some((item) => item.thermometerEquipmentId === state.selectedEquipmentId || item.containerEquipmentId === state.selectedEquipmentId)
   return (
     <div
       className="lab-page"
@@ -47,13 +60,15 @@ function Laboratory() {
       <a className="skip-link" href="#laboratory">{t('app.skip')}</a>
       <LabHeader canReset={state.equipment.length > 0} onReset={interaction.resetWorkspace} />
       <LabHelp />
-      <main id="laboratory" className="lab-layout" tabIndex={-1}>
+      <main ref={laboratory} id="laboratory" className="lab-layout" tabIndex={-1}>
         <LabPalette interaction={interaction} canAddChemical={!!selectedContainer && !interaction.dragActive}
           onAddChemical={(chemicalId) => {
             if (selectedContainer && !interaction.dragActive) dispatch({ type: 'add-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId, quantity: 1 })
           }} />
         <LabWorkspace state={state} interaction={interaction} presentations={presentations} />
         <ExperimentPanel key={selectedEquipment?.id ?? 'empty'} equipment={selectedEquipment ?? null}
+          equipmentLabel={selectedEquipment ? `${t(`equipment.${selectedEquipment.equipmentType}`)} ${selectedOrdinal}` : undefined}
+          hasEquipmentConnections={hasEquipmentConnections}
           thermometer={selectedContainer ? currentThermometerObservation(state, selectedContainer.equipmentInstanceId, interaction.liftedThermometerId) : null}
           container={selectedContainer ?? null} lamp={selectedLamp ?? null} disabled={interaction.dragActive}
           lifted={!!selectedContainer && interaction.liftedMountedContainerId === selectedContainer.equipmentInstanceId}
@@ -76,6 +91,13 @@ function Laboratory() {
           presentation={selectedContainer ? presentations.get(selectedContainer.id) : undefined}
           onMix={() => { if (selectedContainer) dispatch({ type: 'mix', equipmentId: selectedContainer.equipmentInstanceId }) }}
           onClear={() => { if (selectedContainer) dispatch({ type: 'clear-container', equipmentId: selectedContainer.equipmentInstanceId }) }}
+          onRemoveChemical={(chemicalId: ChemicalId) => { if (selectedContainer && !interaction.dragActive) dispatch({ type: 'remove-chemical', equipmentId: selectedContainer.equipmentInstanceId, chemicalId }) }}
+          onRemoveEquipment={() => {
+            if (selectedEquipment && !interaction.dragActive) {
+              removedEquipment.current = selectedEquipment.id
+              interaction.removeEquipment(selectedEquipment.id)
+            }
+          }
           onToggleLamp={() => { if (selectedLamp) dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId }) }} />
       </main>
       {interaction.drag?.source.kind === 'palette' && <EquipmentDragPreview preview={interaction.drag} />}

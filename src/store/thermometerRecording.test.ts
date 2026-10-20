@@ -120,4 +120,29 @@ describe('application-owned thermometer occurrence recording', () => {
     expect(transferred.droppers[0]!.payload).toBeNull()
     expect(reduce(state, { type: 'reset' }).containers).toHaveLength(0)
   })
+
+  it('preserves or seals thermometer recordings when equipment and unfinished reagents are removed', () => {
+    let state = at(mix(prepared()), 2)
+    const recorded = state.containers[0]!.thermometerRecording!
+    state = reduce(state, { type: 'remove-equipment', id: 'equipment-2' })
+    expect(state.thermometers).toHaveLength(0)
+    expect(state.thermometerAttachments).toHaveLength(0)
+    expect(state.containers[0]!.thermometerRecording).toMatchObject({
+      result: recorded.result, thermometerId: recorded.thermometerId, complete: true,
+    })
+
+    let removedVessel = at(mix(prepared()), 2)
+    removedVessel = reduce(removedVessel, {
+      type: 'remove-equipment', id: 'equipment-1',
+      released: { equipmentId: 'equipment-2', position: { x: 0.6, y: 0.45 } },
+    })
+    expect(removedVessel.containers).toHaveLength(0)
+    expect(removedVessel.thermometers).toHaveLength(1)
+    expect(removedVessel.thermometerAttachments).toHaveLength(0)
+
+    const unfinished = reduce(prepared(), { type: 'remove-chemical', equipmentId: 'equipment-1', chemicalId: 'hydrochloric-acid' })
+    expect(unfinished.containers[0]!.contents).toEqual([{ chemicalId: 'sodium-hydroxide', quantity: 1 }])
+    expect(unfinished.containers[0]!.reactionResult).toBeNull()
+    expect(unfinished.containers[0]!.thermometerRecording ?? null).toBeNull()
+  })
 })
