@@ -97,7 +97,7 @@ function Laboratory() {
               removedEquipment.current = selectedEquipment.id
               interaction.removeEquipment(selectedEquipment.id)
             }
-          }
+          }}
           onToggleLamp={() => { if (selectedLamp) dispatch({ type: 'toggle-lamp', equipmentId: selectedLamp.equipmentInstanceId }) }} />
       </main>
       {interaction.drag?.source.kind === 'palette' && <EquipmentDragPreview preview={interaction.drag} />}
