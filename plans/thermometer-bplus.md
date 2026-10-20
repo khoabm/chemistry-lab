@@ -791,6 +791,9 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 ## Progress
 
+- [x] Inspect the 2026-10-20 close-up scale-overlap correction on clean feature-thermometer 4c7b9a229b0739b18cb57aba5a8093d544945b73; confirm the Beaker collision in an actual 1440×960 browser view and shared Test tube/close-up rendering code.
+- [x] Separate observation scale graphics from vessel contents in the shared SVG renderer; preserve bulb/column pose and all recording/measurement/Replay behavior; validate focused tests, browser layouts and the full suite (593 tests / 46 files).
+
 - [x] Inspect current feature-thermometer baseline, prior interaction corrections, occurrence/replay identity and thermal clock; choose bounded application recording without changing the nominal model.
 - [x] Add and validate reaction-time snapshots, bounded observation lifecycle and invalidation (8 red tests before implementation, then 39 reducer/thermal/recording tests passed).
 - [x] Render the attached sensor/validity in close-up and modal using shared pose/SVG (5 UI cases reproduced the missing view before integration; dialog fixture now focuses its opener as a real click does).
@@ -833,6 +836,7 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 ## Surprises and discoveries
 
+- 2026-10-20 scale correction: the observation sensor retained the workspace's inline ticks at SVG x=54 and labels at x=61. Those glyphs intersect the vessel outline, graduations and contents after insertion. Both vessel types, live close-up and every modal Replay stage use the same composite renderer, so one presentation-only scale layout can address all contexts without changing attachment projection.
 - 2026-10-19 observation/replay extension: actual browser hit testing confirmed that a keyboard-focused later-created Test tube covered the center of its older attached thermometer's grip in the immersed pose. Keep only a thermometer host's focus at its vessel layer (z-index 2); the existing sensor layer 3/4, narrow targets, 44×44 grip and native DOM order remain. Afterward elementFromPoint and an actual pointer click select the sensor, while the host's solid perimeter focus ring remains visible. No generic collision solver or button reparenting.
 - The existing Replay hook already has finite checkpoint scheduling and immutable result/contents guards. Observation checkpoints can share that mechanism without another clock or modifying M9 effects. An active session must freeze its recording reference because recording may still grow after the live effect finishes.
 - A long clock gap cannot provide missing sensor observations. Recording retains only actual tick states inside its window; a single snapshot is explicitly described, never backfilled or interpolated. Unchanged unavailable observations keep the same recording reference rather than accumulating duplicate null frames.
@@ -898,6 +902,7 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 
 | Date | Decision | Reason |
 | --- | --- | --- |
+| 2026-10-20 scale correction | Keep the bulb, glass body and reading column in the existing attachment pose; move only the observation scale into a side rail outside the vessel silhouette | Retain the full Celsius scale and quiet numeric/unavailable readout while preventing glyph/contents collisions; standalone bench equipment keeps its inline scale and no Replay/state/thermal semantics change |
 | 2026-10-19 observation/replay | Keep one optional application-owned recording on ContainerState associated with the exact ReactionResult reference | Reuse the existing occurrence identity; no chemistry result metadata, hidden modal history or competing store |
 | 2026-10-19 observation/replay | Preserve initial state plus up to 60 actual sampled observations / 60 simulated seconds; validity changes coalesce within a bucket | Bound memory and reducer work, retain unavailable contact, avoid invented intermediate temperatures |
 | 2026-10-19 observation/replay | Freeze available frames on Start and map their timestamps into the existing finite developing interval, selecting actual frames without interpolation | Auto cycles and reduced motion remain reproducible and isolated; no thermal calculation or new replay clock |
@@ -930,6 +935,18 @@ limits, and current feature branch. Run runtime validation and browser QA as bel
 | 2026-10-18, final validation | Record 531 passing tests in 42 files and three actual browser viewport checks; retain external scientific and release gates | Engineering evidence supports review, not experimental calibration, physical-device certification or milestone approval |
 
 ## Outcomes and retrospective
+
+### 2026-10-20 close-up scale-overlap correction
+
+Starting state: clean feature-thermometer 4c7b9a229b0739b18cb57aba5a8093d544945b73, containing the approved observation/Replay work. Actual 1440×960 before screenshots confirmed scale labels/ticks crossing the Beaker rim, vessel graduations and contents, and the Test tube opening/interior. Both also affected the shared live close-up and Replay composition.
+
+Extend only the existing ThermometerVisual with an inline/beside-vessel scale layout. Attached observation compositions use the latter: translate only the Celsius scale 28 SVG units right, with a thin vertical rail outside the vessel silhouette. Preserve all 21 ticks, 0–100°C labels, the glass body, bulb/column position and the existing relative attachment pose. Standalone workspace equipment keeps its original inline scale. The same EquipmentVisual path applies this to live sample close-up, normal Enlarged View and Manual/Auto/reduced-motion Replay; there is no second renderer, new interaction or modal layout. Existing numeric/unavailable descriptions remain unchanged. No recording, Replay timing, measurement eligibility, sample/sensor evolution, chemistry or attachment logic changed. Other current documentation remains accurate because pose and behavior are unchanged.
+
+Focused tests add a standalone-layout case and strengthen existing two-vessel, empty/solid, modal and Manual/Auto/reduced-motion assertions. Four visual cases failed before the renderer change. The initial sandbox run stopped at EPERM/cache rename before tests ran; the established unsandboxed npm test path was used for real evidence. The first three-file focused run passed 20/21 but an existing R7 UI case exceeded 5000ms (5404ms); its assertions and timeout were not changed. A controlled one-worker rerun of all seven observation-flow cases passed (38.79s total). Final npm test -- --maxWorkers=2 passed all 593 tests in 46 files (228.01s), including the unchanged R7 case; no tests were skipped and no timeout was increased. npm run typecheck, npm run lint, npm run build (101 modules) and git diff --check passed. No hosted CI run is claimed.
+
+Actual browser viewport emulation checked 1440×960, 390×844 and 844×390, including EN/VI. Both vessels retain a visible sensor and complete external scale; supported R6 shows numeric readings, empty Test tube and solid Beaker show unavailable without a numeric column. Desktop Manual Replay showed recorded initial 25.0°C then final 29.7°C; Auto Replay restarted at 25.0°C and showed progressing readings with the same layout on portrait. Existing short-landscape modal scrolling remains; DOM checks confirm the scale stays within its SVG and to the right of the vessel silhouette, with no horizontal page overflow. Browser screenshots, not jsdom, substantiate alignment. No physical touch-device, screen-reader certification or new browser reduced-motion emulation is claimed; automated reduced-motion Replay remains covered.
+
+Before/after screenshots are outside the repository under C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/: thermometer-scale-before-{beaker,tube}.png, thermometer-scale-after-{beaker,tube}-desktop.png, thermometer-scale-closeup-desktop.png, thermometer-scale-replay-initial-desktop.png, thermometer-scale-beaker-auto-portrait-vi.png, thermometer-scale-tube-portrait-vi.png, thermometer-scale-tube-landscape-vi.png and thermometer-scale-tube-empty-landscape-vi.png, thermometer-scale-beaker-solid-landscape-vi.png. Only two source files, two focused test files and this ExecPlan are in scope. Changes remain uncommitted for user review; no merge, dependency, milestone or release change.
 
 ### 2026-10-19 observation/replay extension
 

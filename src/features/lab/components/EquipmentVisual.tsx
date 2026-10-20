@@ -89,7 +89,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
         </g>}
         {thermometer && <g className="sample-thermometer" pointerEvents="none"
           data-thermometer-id={thermometer.thermometerId} transform={`translate(0 ${thermometerPoseOffset(contents, equipmentType)})`}>
-          <ThermometerVisual reading={thermometer.reading} />
+          <ThermometerVisual reading={thermometer.reading} scaleLayout="beside-vessel" />
         </g>}
       </g>
     </svg>
