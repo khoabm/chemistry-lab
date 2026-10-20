@@ -18,6 +18,75 @@ beforeEach(() => vi.useFakeTimers())
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers() })
 
 describe('dialog-local teaching replay', () => {
+  function recorded(): ContainerState {
+    const container = sample()
+    if (container.reactionResult?.status !== 'reaction') throw new Error('Reaction fixture required')
+    return { ...container, thermometerRecording: { result: container.reactionResult, thermometerId: 'sensor-original',
+      startedAt: 0, complete: true, frames: [
+        { at: 0, reading: 25, availability: 'available' },
+        { at: 30, reading: 28, availability: 'available' },
+        { at: 60, reading: 29, availability: 'available' },
+      ] } }
+  }
+
+  it('maps actual recorded observations onto the existing finite timeline without interpolation', () => {
+    const source = recorded()
+    const { result } = renderHook(() => useReactionReplay(source))
+    act(() => result.current.start())
+    expect(result.current.thermometer?.reading).toBe(25)
+    tick(4500)
+    expect(result.current.thermometer?.reading).toBe(28)
+    tick(3500)
+    expect(result.current.thermometer?.reading).toBe(29)
+    expect(result.current.running).toBe(false)
+    tick(10000)
+    expect(result.current.thermometer?.reading).toBe(29)
+    act(() => result.current.stop())
+    expect(result.current.thermometer).toBeNull()
+  })
+
+  it('freezes sampled observations for Manual/Auto cycles, including initial/final holds and unavailable states', () => {
+    const source = recorded()
+    const { result, rerender } = renderHook(({ container }) => useReactionReplay(container), { initialProps: { container: source } })
+    act(() => result.current.start(true))
+    expect(result.current.thermometer).toMatchObject({ thermometerId: 'sensor-original', reading: 25 })
+    tick(4499)
+    expect(result.current.thermometer?.reading).toBe(25)
+    tick(1)
+    expect(result.current.thermometer?.reading).toBe(28)
+    const presentation = result.current.presentation
+    rerender({ container: { ...source, thermal: { ...source.thermal, temperature: 40 },
+      thermometerRecording: { ...source.thermometerRecording!, frames: [{ at: 0, reading: null, availability: 'unsupported' }] } } })
+    expect(result.current.presentation).toBe(presentation)
+    expect(result.current.thermometer?.reading).toBe(28)
+    tick(3500)
+    expect(result.current.stage).toBe('final')
+    expect(result.current.thermometer?.reading).toBe(29)
+    tick(replayHoldMs - 1)
+    expect(result.current.thermometer?.reading).toBe(29)
+    tick(1)
+    expect(result.current.stage).toBe('initial')
+    expect(result.current.thermometer?.reading).toBe(25)
+    tick(4500)
+    expect(result.current.thermometer?.reading).toBe(28)
+    tick(3500 + replayHoldMs)
+    expect(result.current.thermometer?.reading).toBe(25)
+  })
+
+  it('uses a single unsupported snapshot honestly and never creates a missing historical participant', () => {
+    const container = recorded()
+    const unavailable: ContainerState = { ...container, thermometerRecording: { ...container.thermometerRecording!,
+      frames: [{ at: 0, reading: null, availability: 'solid' }] } }
+    const { result, rerender } = renderHook(({ source }) => useReactionReplay(source), { initialProps: { source: unavailable } })
+    act(() => result.current.start())
+    expect(result.current.thermometer).toMatchObject({ reading: null, availability: 'solid' })
+    tick(8000)
+    expect(result.current.thermometer?.reading).toBeNull()
+    rerender({ source: sample() })
+    act(() => result.current.start())
+    expect(result.current.thermometer).toBeNull()
+  })
+
   it('follows live age and requires explicit intent after every live effect has finished', () => {
     const container = sample()
     const { result, rerender } = renderHook(({ live }) => useReactionReplay(container, live), {

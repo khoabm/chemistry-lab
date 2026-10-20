@@ -10,9 +10,12 @@ import { solidProductColors } from '../renderers/reactionPresentation'
 import { completedPresentation, type ReactionPresentation, type ReplayStage } from '../renderers/reactionDynamics'
 import { useReactionAnimationSync } from '../hooks/useReactionAnimationSync'
 import { findChemical } from '../../../simulation/chemicals/catalog'
+import { ThermometerVisual } from '../renderers/ThermometerVisual'
+import { thermometerPoseOffset } from '../interactions/thermometerPlacement'
+import type { ThermometerObservation } from '../../../types/thermometerObservation'
 import { WaterBoilingVisual, WaterBoilingVapor } from '../renderers/WaterBoilingVisual'
 
-export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], payload, reactionResult = null, lampStatus = 'extinguished', heating = false, boiling = false, presentation = completedPresentation, visible = true, replayStage, reading = 25 }: {
+export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, contents = [], payload, reactionResult = null, lampStatus = 'extinguished', heating = false, boiling = false, presentation = completedPresentation, visible = true, replayStage, reading = 25, thermometer = null }: {
   equipmentType: EquipmentType
   contents?: readonly ChemicalPortion[] | undefined
   payload?: ChemicalPortion | null | undefined
@@ -24,6 +27,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
   visible?: boolean
   replayStage?: ReplayStage | undefined
   reading?: number | null | undefined
+  thermometer?: ThermometerObservation | null | undefined
 }) {
   const clipId = useId()
   const svgRef = useReactionAnimationSync(presentation, visible, heating)
@@ -33,18 +37,9 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
   const solidColor = solidEffect?.type === 'solid-color-change' ? solidProductColors[solidEffect.color] : undefined
   const effects = resultEffects.filter((effect) => effect.type !== 'gas' || effect.context !== 'heated-solid' || heating || replayStage !== undefined)
   return (
-    <svg ref={svgRef} className="equipment-visual" viewBox="0 0 100 100" fill="none" aria-hidden="true" data-replay-stage={replayStage}>
+    <svg ref={svgRef} className="equipment-visual" viewBox={thermometer ? '0 -34 100 134' : '0 0 100 100'} fill="none" aria-hidden="true" data-replay-stage={replayStage}>
       <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {equipmentType === 'thermometer' && <g className="glass-thermometer">
-          <path d="M47 84V8a3 3 0 0 1 6 0v76a5 5 0 1 1-6 0Z" fill="#eef7f5" strokeWidth="1" />
-          <path d="M50 86V12" stroke="#cbdad7" strokeWidth="2" />
-          <circle className="thermometer-bulb" cx="50" cy="88" r="4" fill="#bd4941" strokeWidth="0.8" />
-          {reading !== null && <path className="thermometer-column" d={`M50 88V${83 - Math.max(0, Math.min(100, reading)) * 0.66}`} stroke="#bd4941" strokeWidth="2" />}
-          {Array.from({ length: 21 }, (_, i) => <path key={i} d={`M54 ${83 - i * 3.3}h${i % 2 ? 3 : 5}`} strokeWidth="0.6" />)}
-          {[0, 20, 40, 60, 80, 100].map((temperature) => <text key={temperature} x="61" y={85 - temperature * 0.66}
-            fill="currentColor" stroke="none" fontSize="4.5">{temperature}</text>)}
-          <text x="62" y="11" fill="currentColor" stroke="none" fontSize="5">°C</text>
-        </g>}
+        {equipmentType === 'thermometer' && <ThermometerVisual reading={reading} />}
         {equipmentType === 'beaker' && <>
           <path fill="#fffefa90" d="M24 20h47l6 7-5 4v48a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6Z" />
           <defs><clipPath id={clipId}><path d="M26 32h44v47a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4Z" /></clipPath></defs>
@@ -97,6 +92,10 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
             <path fill="#b8c5b1" d="M35 64h30v7H35Z" />
             <path d="M46 64V54h8v10M32 85c10 5 26 5 36 0M33 77v6" />
           </g>
+        </g>}
+        {thermometer && <g className="sample-thermometer" pointerEvents="none"
+          data-thermometer-id={thermometer.thermometerId} transform={`translate(0 ${thermometerPoseOffset(contents, equipmentType)})`}>
+          <ThermometerVisual reading={thermometer.reading} scaleLayout="beside-vessel" />
         </g>}
       </g>
     </svg>

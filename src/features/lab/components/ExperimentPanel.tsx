@@ -9,8 +9,9 @@ import { ContainerDetails } from './ContainerDetails'
 import { LampDetails } from './LampDetails'
 import { ReactionObservation } from './ReactionObservation'
 import { SampleDetailDialog } from './SampleDetailDialog'
-import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import { EquipmentRemovalControls } from './EquipmentRemovalControls'
+import type { ReactionPresentation } from '../renderers/reactionDynamics'
+import type { ThermometerObservation } from '../../../types/thermometerObservation'
 import type { WaterActivity } from '../../../store/waterBoiling'
 
 type ExperimentTab = 'sample' | 'result'
@@ -34,10 +35,11 @@ interface ExperimentPanelProps {
   lampSupportStatus?: ReactNode
   thermometerDetails?: ReactNode
   thermalDetails?: ReactNode
+  thermometer?: ThermometerObservation | null
   water?: WaterActivity
 }
 
-export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, equipmentLabel, hasEquipmentConnections = false, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails, water = null }: ExperimentPanelProps) {
+export function ExperimentPanel({ equipment, container, lamp, disabled, lifted = false, onMix, onClear, onRemoveChemical, onRemoveEquipment, equipmentLabel, hasEquipmentConnections = false, onToggleLamp, presentation, dropperDetails, mountControls, lampSupportStatus, thermometerDetails, thermalDetails, thermometer = null, water = null }: ExperimentPanelProps) {
   const { t } = useTranslation()
   const id = useId()
   const sampleTab = useRef<HTMLButtonElement>(null)
@@ -87,7 +89,7 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
       <div role="tabpanel" className="experiment-tabpanel" id={`${id}-sample-panel`} aria-labelledby={`${id}-sample-tab`}
         tabIndex={0} hidden={activeTab !== 'sample'}>
         <ContainerDetails container={container} equipmentType={equipment.equipmentType} disabled={disabled}
-          lifted={lifted} water={water}
+          lifted={lifted} thermometer={thermometer} water={water}
           mountControls={mountControls}
           thermalDetails={thermalDetails}
           presentation={presentation} visible={activeTab === 'sample'}
@@ -120,8 +122,8 @@ export function ExperimentPanel({ equipment, container, lamp, disabled, lifted =
       {equipment && onRemoveEquipment && <EquipmentRemovalControls key={equipment.id}
         name={equipmentLabel ?? t(`equipment.${equipment.equipmentType}`)} hasConnections={hasEquipmentConnections}
         removesContents={!!container && container.contents.length > 0} disabled={disabled} onRemove={onRemoveEquipment} />}
-      {detailTab && container && equipment && container.contents.length > 0 && <SampleDetailDialog container={container}
-        water={water}
+      {detailTab && container && equipment && (container.contents.length > 0 || thermometer) && <SampleDetailDialog container={container}
+        thermometer={thermometer} water={water}
         presentation={presentation}
         equipmentType={equipment.equipmentType} onDismiss={() => {
           selectTab(detailTab)

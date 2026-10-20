@@ -471,6 +471,12 @@ hides empty-bench artwork after the threshold and shows one stable instruction
 outside the bench; preview contains only visual/name. Cancel/invalid drop restores
 the empty introduction without adding equipment. Target feedback changes only on
 eligibility transitions, not pointer coordinates.
+Sample close-up and Enlarged View also show an attached sensor in the same relative
+pose, with a separate quiet numeric/unavailable description. The observation view
+does not expose a grip or sensor controls. An attached empty sample may be enlarged.
+When a vessel with its own thermometer has keyboard focus, its existing perimeter
+ring stays visible at the vessel layer; it must not mask the sensor's 44px grip,
+regardless of equipment creation order. Button DOM/focus order stays unchanged.
 The solid details panel shows current simulated temperature separately from the
 fixed teaching milestone, explicitly excluding liquid-thermometer measurement.
 Unsupported samples explain how Empty plus a retained cooling vessel estimate can
@@ -586,6 +592,23 @@ starts in normal viewing with Auto off. Keep native focus behavior, wrapping
 controls, existing narrow/short landscape scrolling, and a concise status that
 does not repeatedly announce every Auto cycle. Reduced motion retains static
 initial/developing/final stages rather than showing only the final solid/deposit.
+
+Replay thermometer data are historical observations, explicitly labeled Recorded
+thermometer. Initial hold shows the event snapshot; developing/final stages select
+recorded readings with validity retained. The recorded simulated interval is
+condensed into the existing finite visual duration after its initial hold, without
+interpolation. Auto uses the same frozen observations each cycle, including the
+final hold. Reduced motion retains discrete initial/progressing/final readings
+without continuous thermometer animation or per-reading live announcements.
+
+Only the sensor present at the reaction event can appear in that replay. A later
+attachment does not create a participant; subsequent movement/removal cannot
+replace its history with the unrelated live reading. Recording uses at most 60
+simulated seconds of actual observations; starting Replay early freezes only the
+data then available. A single recorded state is described as such, without a fake
+curve. R7/R8 solids show unavailable measurement, never a 240°C/350°C liquid sensor.
+Closing the dialog ends Replay as before; panel navigation preserves the stored
+occurrence/observations and reopening normally shows the current live attachment.
 
 Possible structure:
 
@@ -829,7 +852,6 @@ heat waits, finite live age and manual/Auto replay sessions. Only copy changes.
 Existing status regions suppress locale-only announcements until a semantic state
 change. Native focus, equation scrolling and responsive dialog/tool scrolling
 remain in place. See `LOCALIZATION.md` for resources and teacher-review terms.
-
 ## Water Boiling V1 — physical observation
 
 See `plans/feature-water-boiling.md`. Water/H₂O in a Beaker or Test tube

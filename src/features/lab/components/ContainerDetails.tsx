@@ -11,6 +11,8 @@ import { HeatingStatus } from './HeatingStatus'
 import { isCompletedHeatReaction } from '../../../simulation/reactions/types'
 import type { ReactionPresentation } from '../renderers/reactionDynamics'
 import type { ReactNode } from 'react'
+import type { ThermometerObservation } from '../../../types/thermometerObservation'
+import { SampleThermometerReading } from './SampleThermometerReading'
 import type { WaterActivity } from '../../../store/waterBoiling'
 
 interface ContainerDetailsProps {
@@ -26,10 +28,11 @@ interface ContainerDetailsProps {
   visible?: boolean
   mountControls?: ReactNode
   thermalDetails?: ReactNode
+  thermometer?: ThermometerObservation | null
   water?: WaterActivity
 }
 
-export function ContainerDetails({ container, equipmentType, onClear, onRemoveChemical, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails, water = null }: ContainerDetailsProps) {
+export function ContainerDetails({ container, equipmentType, onClear, onRemoveChemical, onMix, onEnlarge, disabled, lifted = false, presentation, visible = true, mountControls, thermalDetails, thermometer = null, water = null }: ContainerDetailsProps) {
   const { t } = useTranslation()
   const { chemicalName } = useChemistryCopy()
   const contentsLive = useStatusLive(container.contents)
@@ -71,14 +74,15 @@ export function ContainerDetails({ container, equipmentType, onClear, onRemoveCh
       {container.contents.length > 0 && <p id="empty-container-hint" className="empty-caption">{t('sample.emptyHint')}</p>}
       {mountControls}
       {thermalDetails}
-      {container.contents.length > 0 && <figure className="sample-closeup" aria-label={t('sample.closeup')}>
+      {(container.contents.length > 0 || thermometer) && <figure className="sample-closeup" aria-label={t('sample.closeup')}>
         <button type="button" disabled={disabled} aria-label={t('sample.enlarge')} aria-haspopup="dialog"
           onClick={onEnlarge}>
           <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
-            presentation={presentation} visible={visible} boiling={water === 'boiling'}
+            presentation={presentation} visible={visible} thermometer={thermometer} boiling={water === 'boiling'}
             heating={container.heatingState.status === 'heating'} />
           <span className="sample-closeup-label">{t('sample.closeupCaption')} <span aria-hidden="true">↗</span></span>
         </button>
+        <SampleThermometerReading observation={thermometer} />
       </figure>}
       {isCompletedHeatReaction(container.reactionResult) && <p className="empty-caption">{t('sample.transformedHint')}</p>}
       {container.contents.length > 0 && <p className="empty-caption">{t('sample.quantityHint')}</p>}
