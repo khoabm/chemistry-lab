@@ -66,7 +66,10 @@ foreach ($kind in @('A','B')) {
   if ($LASTEXITCODE -ne 0 -or $actual -ne $wt.Sha) {
     throw "Worktree $($wt.Path) is at $actual rather than required $($wt.Sha). Refusing to reset it."
   }
-  $dirty = ((& git -C $wt.Path status --porcelain) | Out-String).Trim()
+  $statusOutput = & git -C $wt.Path status --porcelain
+  $statusExit = $LASTEXITCODE
+  if ($statusExit -ne 0) { throw "Initial Git status failed for $($wt.Path) (exit $statusExit)." }
+  $dirty = ($statusOutput | Out-String).Trim()
   if ($dirty) { throw "Worktree $($wt.Path) is dirty. Refusing to overwrite or benchmark it." }
 }
 
@@ -113,7 +116,7 @@ foreach ($test in $sequence) {
     $usage = $null
     $toolIds = @{}
     $toolEvents = 0
-    foreach ($line in (Get-Content -LiteralPath $eventFile -Encoding UTF8 -ErrorAction SilentlyContinue)) {
+    foreach ($line in ([IO.File]::ReadAllLines($eventFile))) {
       if (-not $line.Trim()) { continue }
       try { $event = $line | ConvertFrom-Json -ErrorAction Stop } catch { continue }
       # JSONL event shapes vary: thread.started / turn.started have no item,
@@ -143,7 +146,10 @@ foreach ($test in $sequence) {
       if ($outProp) { $outputTokens = $outProp.Value }
       if ($cacheProp) { $cachedTokens = $cacheProp.Value }
     }
-    $changed = ((& git -C $wt.Path status --porcelain) | Out-String).Trim()
+    $statusOutput = & git -C $wt.Path status --porcelain
+    $statusExit = $LASTEXITCODE
+    if ($statusExit -ne 0) { throw "Post-run Git status failed for $stem (exit $statusExit); clean state not verified." }
+    $changed = ($statusOutput | Out-String).Trim()
     $row = [pscustomobject]@{
       task = $task; variant = $variant; sha = $wt.Sha; codex_version = $version
       model_requested = $Model; reasoning_effort_requested = $ReasoningEffort
