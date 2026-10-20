@@ -1,10 +1,14 @@
 # Read-only CP02 benchmark runner. No application source edits, dependencies or deployment.
 # Run from the optimization branch: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-codex-context-benchmark.ps1
 param(
-  [string]$ResultsDirectory = ''
+  [string]$ResultsDirectory = '',
+  [string]$Model = '',
+  [string]$ReasoningEffort = ''
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+if (-not $Model -or -not $ReasoningEffort) { throw 'Both -Model and -ReasoningEffort are required.' }
+if ($ReasoningEffort -notin @('minimal','low','medium','high','xhigh')) { throw 'Unsupported reasoning effort.' }
 
 $baseline = 'e860963977bec297d10b1a9eda1e596071fe2ff0'
 $candidate = '6cde7280ada780ed46825f634a77bcd036bf56fc'
@@ -17,7 +21,7 @@ if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { throw 'Codex CLI i
 
 $version = ((& codex --version) | Out-String).Trim()
 $cliHelp = ((& codex exec --help) | Out-String)
-foreach ($option in @('--json','--ephemeral','--sandbox','--output-last-message')) {
+foreach ($option in @('--json','--ephemeral','--sandbox','--output-last-message','--model','--config')) {
   if (-not $cliHelp.Contains($option)) { throw "Codex CLI $version does not advertise $option; stop and inspect compatibility." }
 }
 
@@ -69,6 +73,9 @@ foreach ($kind in @('A','B')) {
 New-Item -ItemType Directory -Path $results -Force | Out-Null
 $metadata = [ordered]@{
   codex_version = $version
+  model_requested = $Model
+  reasoning_effort_requested = $ReasoningEffort
+  effective_settings_verified = $false
   collected_at_utc = [DateTime]::UtcNow.ToString('o')
   source_repo = $source
   baseline_sha = $baseline
@@ -97,7 +104,7 @@ foreach ($test in $sequence) {
     $watch = [Diagnostics.Stopwatch]::StartNew()
     Push-Location $wt.Path
     try {
-      & codex exec --json --ephemeral --sandbox read-only --output-last-message $answerFile $prompts[$task] 1> $eventFile 2> $stderrFile
+      & codex exec --json --ephemeral --sandbox read-only --model $Model --config "model_reasoning_effort=$ReasoningEffort" --output-last-message $answerFile $prompts[$task] 1> $eventFile 2> $stderrFile
       $exit = $LASTEXITCODE
     } finally {
       Pop-Location
@@ -139,6 +146,7 @@ foreach ($test in $sequence) {
     $changed = ((& git -C $wt.Path status --porcelain) | Out-String).Trim()
     $row = [pscustomobject]@{
       task = $task; variant = $variant; sha = $wt.Sha; codex_version = $version
+      model_requested = $Model; reasoning_effort_requested = $ReasoningEffort
       exit_code = $exit; duration_seconds = [math]::Round($watch.Elapsed.TotalSeconds,2)
       input_tokens = $inputTokens; cached_input_tokens = $cachedTokens; output_tokens = $outputTokens
       tool_calls_observed = ($toolIds.Count + $toolEvents)
