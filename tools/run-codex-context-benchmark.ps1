@@ -74,6 +74,22 @@ foreach ($kind in @('A','B')) {
   if ($dirty) { throw "Worktree $($wt.Path) is dirty. Refusing to overwrite or benchmark it." }
 }
 
+# Reject junctions/symlinks in every existing ancestor, including the output
+# parent. Lexical GetFullPath/StartsWith checks alone are not sufficient.
+function Assert-NoReparseAncestor([string]$Path) {
+  $node = [IO.DirectoryInfo]::new([IO.Path]::GetFullPath($Path))
+  while ($null -ne $node) {
+    if ($node.Exists -and (($node.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) {
+      throw "Refusing benchmark path through junction/symlink/reparse point: $($node.FullName)"
+    }
+    $node = $node.Parent
+  }
+}
+Assert-NoReparseAncestor $results
+Assert-NoReparseAncestor $source
+Assert-NoReparseAncestor $worktrees.A.Path
+Assert-NoReparseAncestor $worktrees.B.Path
+
 # Do not write inside the source repo or either benchmark worktree.
 $pathSep = [IO.Path]::DirectorySeparatorChar
 $roots = @($source, $worktrees.A.Path, $worktrees.B.Path)
