@@ -3,6 +3,12 @@
 This ExecPlan is a living document and must remain synchronized with the implementation.
 This plan follows `.agent/PLANS.md`.
 
+> **Current integration status (2026-10-20):** Water Boiling V1 was merged
+> into `main` via PR #6 at `e860963977bec297d10b1a9eda1e596071fe2ff0`.
+> The final feature commit `51c43412f155` passed GitHub CI. This note supersedes
+> the earlier pending-CI/merge statements retained below as chronological
+> execution evidence; it does not change any approved scientific or UI contract.
+
 ## Purpose
 
 Enable a learner to place pure H₂O in a Beaker or Test tube, heat it with the existing mounted, lit alcohol lamp, observe the nominal sample temperature approach the 100°C teaching boiling point, see recognizable continuous boiling bubbles/surface disturbance/light vapor, stop boiling when heating stops, and reheat to boil again. This is a **physical educational phenomenon**, not a chemical reaction. The product owner authorized implementation on 2026-10-19 after the technical review, including nominal parameters, limits and conservative invalidation. No main merge, numbered milestone transition or release is authorized.

@@ -67,9 +67,20 @@ code.
 
 ---
 
+## Reading an existing ExecPlan efficiently
+
+- For a large completed plan, read any short status/reading guide and **only the relevant design or acceptance headings first**; expand to dated Progress, decisions, experiments and QA logs only when needed for a specific question or conflict.
+- A historical branch SHA, unmerged warning, proposed design or old timing model describes that plan's recorded stage. Verify present branch state, approved specifications and checked-out implementation before treating it as a current contract. Never silently discard an approved constraint.
+- When an old plan repeatedly misdirects readers, a short navigation/status note can point to current specifications and the existing headings. Preserve the original decisions, gates, evidence and retrospective; do not duplicate their technical detail in a new summary or rewrite archived plans in bulk.
+- Add such a note to new plans only when it materially aids navigation, not as obligatory boilerplate.
+
 ## Required ExecPlan structure
 
-Every ExecPlan must use the following structure.
+Every ExecPlan should keep approved scope and decisions easy to find near the
+top; preserve detailed progress and verification evidence below. An existing
+historical plan need not be rewritten merely to match a new template.
+
+Every new ExecPlan must use the following structure.
 
 # <Feature or milestone name>
 
@@ -132,35 +143,18 @@ Each step should produce a coherent improvement.
 
 ## Git and technology validation
 
-Before implementation begins, the ExecPlan must record:
-
-### Git state
-
-- active milestone
-- required milestone branch
-- current branch
-- base branch or previous milestone branch
-- whether the working tree is clean enough to begin work
-
-Implementation must not proceed on the wrong milestone branch.
+Before implementation begins, record the relevant current branch/commit,
+its approved base and material uncommitted changes. For numbered milestone
+work, record that milestone; for authorized auxiliary features, record the
+feature scope and branch instead. Do not infer the current checkout from a
+historical milestone label or hard-code an old commit as the current HEAD.
 
 ### Existing technology stack
 
-Record the relevant existing technologies discovered from the repository,
-including:
-
-- frontend framework
-- language
-- build tool
-- package manager
-- state-management solution
-- styling approach
-- animation solution
-- drag-and-drop solution
-- unit/component testing stack
-- end-to-end testing stack
-
-State explicitly whether the feature requires any new dependency.
+Refer to the established stack in the checked-out source and `AGENTS.md`.
+Record only task-specific stack constraints, proposed deviations and whether
+any new dependency is required; do not reproduce an unchanged full-stack
+inventory in every plan.
 
 If a new dependency is required, explain:
 
@@ -183,6 +177,15 @@ Explain:
 - manual verification
 
 Acceptance must be based on observable behavior whenever possible.
+
+### Validation scope and reuse
+
+- During implementation, run focused tests for affected behavior first; expand to related integration tests when shared state, chemistry, thermal logic, or interaction boundaries may be affected. Required new or updated regression tests remain mandatory.
+- At a major integration or final acceptance checkpoint, run the full appropriate typecheck, lint, test suite and production build, plus browser/Playwright QA when the changed behavior warrants it. Keep existing hosted CI gates unchanged.
+- `npm run build` already invokes `npm run typecheck` before Vite: when the **same unchanged source and environment** are being validated, a successful build covers that typecheck invocation; avoid rerunning it solely to repeat the same check. Running typecheck separately remains appropriate for faster failure isolation, independent evidence or CI reporting.
+- Reuse successful results only while the relevant source, tests, dependencies, configuration and validation environment are unchanged. Rerun affected checks after changes or when prior results are unavailable, failed, incomplete or from another revision.
+- Browser QA supplements tests for visual layout, pointer/keyboard interactions and accessibility; it does not establish chemical or scientific correctness. Report which checks actually ran, their revision/results and any omissions; never imply a skipped check passed.
+
 
 ## Progress
 

@@ -1,33 +1,21 @@
 # Web Chemistry Lab — Development Milestones
 
-## Active milestone
+## Latest explicitly recorded numbered milestone
 
 `M11 — Dropper Transfer & 2D Material Presentation`
 
-## Active milestone branch
+The numbered milestone record remains M11 until the user approves a transition.
+This is a **product roadmap label**, not an instruction to checkout branch
+`M11` for every subsequent change. Auxiliary approved work has continued on
+feature branches and merged into `main` (including thermometer, equipment/
+material removal, and Water Boiling V1). Consult local Git history for the
+actual branch and merged state; current feature scope belongs to its approved
+ExecPlan and the relevant specifications.
 
-`M11`
-
-Each milestone must be developed on the Git branch matching its milestone ID.
-
-Examples:
-
-- M0 → branch `M0`
-- M1 → branch `M1`
-- M2 → branch `M2`
-- M3 → branch `M3`
-
-The next milestone branch must be based on the completed state of the previous
-milestone.
-
-Codex must not automatically advance the active milestone or milestone branch.
-The user explicitly approves milestone transitions.
-
-IMPORTANT:
-
-Codex must not change the active milestone automatically.
-
-The user explicitly decides when development moves to the next milestone.
+Historical milestone branches (`M0`, `M1`, …, `M11`) preserve the earlier
+sequence. Newly approved feature branches need not follow that naming scheme.
+Codex must not advance the numbered milestone, assume feature approval from a
+commit, or merge/release without explicit authorization.
 
 ---
 

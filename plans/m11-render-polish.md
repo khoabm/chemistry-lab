@@ -4,6 +4,14 @@ This ExecPlan is a living document and must remain synchronized with the impleme
 
 This plan follows `.agent/PLANS.md`.
 
+## Reading guide — archived implementation plan (2026-10-20)
+
+- **Status:** The direct bench-drag/mounted-lamp behavior described here is present in current `main` after subsequent integrations. Pass-specific branch statuses and "no commit/merge" statements below are historical snapshots, not instructions for the current checkout.
+- **Current contracts first:** Use `docs/UI_UX.md` and `docs/ARCHITECTURE.md` for live drag, Mount/Remove, source-of-Heat, responsive and accessibility behavior; inspect current `src/store/`, `src/features/lab/` and tests for implementation. Later Thermometer B+ replaced this plan's per-container 2000ms Heat wait with the **single 6× nominal thermal clock**; the old **Timer orchestration** section is historical.
+- **Navigate by topic:** For mount/rebind invariants see **Mounting state and source of truth** and **Reducer invariants and transitions**. For pointer/keyboard behavior see **Direct bench drag and palette placement**, **Target detection and cancellation** and **Keyboard and native Mount/Remove**. For rendering constraints see **Geometry and rendering**; for final label/heating-cue changes see **Pass 5 final presentation and review preparation**.
+- **Read history on demand:** **Progress**, **Surprises and discoveries**, **Decision log** and **Outcomes and retrospective** record implementation passes and verification; they should not be loaded wholesale for a current feature change.
+- **Limits:** Keep existing mounting and cancellation invariants. This guide does not modify architecture, heating behavior, product approval or milestone status.
+
 ## Purpose
 
 Make moving existing bench equipment feel like moving the actual laboratory object,

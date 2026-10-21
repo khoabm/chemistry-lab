@@ -70,30 +70,25 @@ Execution-plan standard:
 
 ## Development workflow
 
-Development is milestone-driven.
-
-The active milestone is recorded in:
-
-`docs/MILESTONES.md`
-
-Do not move to the next milestone until the current milestone has been
-reviewed.
+The numbered milestone history is recorded in `docs/MILESTONES.md`.
+Approved auxiliary features can use their own feature branches/ExecPlans.
+Always inspect the actual local branch and current approved scope; do not
+advance numbered milestones without user approval.
 
 For significant milestone implementation, create an ExecPlan under:
 
 `plans/`
 
-## Planned technical stack
+## Implemented technical stack
 
 - React
 - TypeScript
 - Vite
-- Zustand
-- Motion
-- dnd-kit
+- React `useReducer` and pure application-state helpers
+- Plain SVG/CSS animation and existing pointer/keyboard interactions
 - Vitest
 - React Testing Library
-- Playwright when needed
+- Local browser/Playwright verification when needed (not a required npm dependency)
 
 Dependencies should be introduced only when required by the current milestone.
 

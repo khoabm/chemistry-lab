@@ -4,6 +4,14 @@ This ExecPlan is a living document and must remain synchronized with the impleme
 
 This plan follows `.agent/PLANS.md`.
 
+## Reading guide — archived implementation plan (2026-10-20)
+
+- **Status:** Thermometer work is integrated into `main` through merged PR #3 and PR #5; Water Boiling V1 was integrated later through PR #6. The original branch checkpoints, "not merged" statements and pre-thermal 2000ms Heat wait below document their historical stages, **not today's Git or runtime state**.
+- **Current contracts first:** For approved behavior use `docs/ARCHITECTURE.md` (heating/thermometer), `docs/CHEMISTRY.md` (Thermometer B+ and Water Boiling limits), `docs/UI_UX.md` (attachment/interaction) and `docs/REACTION_DYNAMICS.md` (observation/Replay); verify the checked-out source and tests.
+- **Navigate by topic:** For profile mathematics and temperature qualification see **Scientific reference contract**, **Evolution, time, and qualification** and **Reference lifecycle and R6 anti-retrigger contract**. For instrument layout/controls see **Working Beaker and Test tube measurement proposal** and **Attachment geometry and accessible interaction**. For recorded sensor Replay see **Authorized observation/replay extension** under Data model.
+- **Read history on demand:** **Git and technology validation**, **Progress**, **Surprises and discoveries**, **Decision log** and **Outcomes and retrospective** preserve dated evidence, earlier decisions and their rationale; do not load them wholesale for unrelated tasks.
+- **Limits:** Integration into `main` does not imply experimental calibration or teacher/scientific certification. This guide changes no approved assumptions or acceptance gates; do not silently prefer outdated implementation notes over current specifications.
+
 ## Purpose
 
 Enable a learner to place an independent liquid-in-glass Celsius thermometer in a
