@@ -12,6 +12,12 @@ material removal, and Water Boiling V1). Consult local Git history for the
 actual branch and merged state; current feature scope belongs to its approved
 ExecPlan and the relevant specifications.
 
+The original roadmap's **Advanced 2D Phenomena** phase is being scoped on
+branch `M13`, with design input in `docs/ADVANCED_2D_PHENOMENA.md`.
+This authorizes **feasibility analysis and a Codex-authored ExecPlan only**;
+it does not register R9, approve implementation, or change the latest completed
+numbered milestone (M11). Implementation scope requires a separate decision.
+
 Historical milestone branches (`M0`, `M1`, …, `M11`) preserve the earlier
 sequence. Newly approved feature branches need not follow that naming scheme.
 Codex must not advance the numbered milestone, assume feature approval from a
