@@ -174,8 +174,13 @@ describe('semantic reaction presentation', () => {
       }
       else {
         expect(sample?.querySelectorAll('path').length).toBeGreaterThan(1)
-        expect(sample?.querySelector('.solid-mound')).toBeInTheDocument()
-        expect(sample?.querySelector('.solid-grain')).toBeInTheDocument()
+        if (chemical.id === 'zinc') {
+          expect(sample).toHaveAttribute('data-substrate', 'zinc')
+          expect(sample?.querySelectorAll('path')).toHaveLength(2)
+        } else {
+          expect(sample?.querySelector('.solid-mound')).toBeInTheDocument()
+          expect(sample?.querySelector('.solid-grain')).toBeInTheDocument()
+        }
         expect(container.querySelector('.liquid-surface')).not.toBeInTheDocument()
         expect(container.querySelector('.liquid-depth')).not.toBeInTheDocument()
       }

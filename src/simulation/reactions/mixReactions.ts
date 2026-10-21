@@ -1,6 +1,6 @@
 import type { ReactionDefinition } from './types'
 
-// Only the mix reactions registered in docs/CHEMISTRY.md (R1–R6).
+// Only the mix reactions registered in docs/CHEMISTRY.md (R1–R6, R9).
 export const mixReactions: readonly ReactionDefinition[] = [
   {
     id: 'R1', name: 'Silver chloride precipitation', trigger: 'mix',
@@ -68,5 +68,18 @@ export const mixReactions: readonly ReactionDefinition[] = [
     ],
     effects: [{ id: 'r6-temperature-rise', type: 'temperature-rise', intensity: 'low' }],
     observation: 'Hydrochloric acid and sodium hydroxide neutralize each other to form water and sodium chloride.',
+  },
+  {
+    id: 'R9', name: 'Zinc displaces copper', trigger: 'mix',
+    reactants: ['zinc', 'copper-sulfate'], equation: 'Zn + CuSO4 → ZnSO4 + Cu',
+    products: [
+      { id: 'zinc-sulfate', name: 'Zinc sulfate', formula: 'ZnSO4' },
+      { id: 'copper-metal', name: 'Copper metal', formula: 'Cu' },
+    ],
+    effects: [
+      { id: 'r9-solution-color', type: 'solution-color-change', from: 'blue', to: 'paler-blue' },
+      { id: 'r9-surface-copper', type: 'surface-deposit', substrate: 'zinc', product: 'copper-metal', appearance: 'copper' },
+    ],
+    observation: 'Zinc displaces copper from copper(II) sulfate. Copper develops on the zinc surface as the blue solution becomes less strongly blue. Real contact can initiate this exothermic reaction without stirring; Mix starts this illustrative demonstration. No numerical temperature or extent is modeled.',
   },
 ]

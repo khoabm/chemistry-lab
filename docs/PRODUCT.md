@@ -268,3 +268,7 @@ without reading technical documentation:
 - freely try another experiment
 
 The product should feel polished enough to demonstrate in a teaching context.
+
+## M13 — Authorized additional phenomenon
+
+One registered zinc/CuSO4 displacement demonstration adds solution fading and surface-localized copper deposition, preserving explicit Mix and qualitative amounts. See `docs/CHEMISTRY.md` and `plans/m13-advanced-2d-phenomena.md` for the finite visual and scientific limits. This does not authorize general redox inference or quantitative chemistry.

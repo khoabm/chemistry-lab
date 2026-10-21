@@ -4,6 +4,7 @@ import type { ReactionPresentation } from '../renderers/reactionDynamics'
 const reactionAnimationNames = new Set([
   'precipitate-form', 'sediment-form', 'precipitate-settle',
   'bubble-rise', 'bubble-release', 'gas-development', 'warmth-emphasis', 'solid-transform',
+  'solution-fade', 'surface-develop',
 ])
 
 // Browser API access is isolated: seek existing CSS animations, never evaluate chemistry.

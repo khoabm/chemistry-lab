@@ -1,8 +1,12 @@
 import { useId, type CSSProperties } from 'react'
 import type { ContentsLayout } from '../renderers/contentsPresentation'
+import type { ReactionEffect } from '../../../simulation/reactions/types'
+import { zincGranules } from '../renderers/solidSampleGeometry'
+import { SurfaceDepositVisual } from '../renderers/SurfaceDepositVisual'
+import { solutionColors } from '../renderers/reactionPresentation'
 import { completedPresentation, effectDurationMs, effectIsActive, type ReactionPresentation, type ReplayStage } from '../renderers/reactionDynamics'
 
-export function ContainerContentsVisual({ layout, reacted = false, solidColor, presentation = completedPresentation, replayStage }: { layout: ContentsLayout; reacted?: boolean; solidColor?: string | undefined; presentation?: ReactionPresentation; replayStage?: ReplayStage | undefined }) {
+export function ContainerContentsVisual({ layout, reacted = false, solidColor, effects = [], presentation = completedPresentation, replayStage }: { layout: ContentsLayout; reacted?: boolean; solidColor?: string | undefined; effects?: readonly ReactionEffect[]; presentation?: ReactionPresentation; replayStage?: ReplayStage | undefined }) {
   const sheenId = useId()
   const depthId = useId()
   const { liquids, solids, total, height, surface, bottom, x, width } = layout
@@ -10,6 +14,11 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, p
   const reactedLiquid = reacted && !solidColor
   const hasLiquid = reactedLiquid || liquids.length > 0
   const surfaceColor = reactedLiquid ? '#d7e9ed' : liquids.at(-1)?.chemical.color
+  const solution = effects.find((effect) => effect.type === 'solution-color-change')
+  const deposit = effects.find((effect) => effect.type === 'surface-deposit')
+  const liquidClass = solution ? `displacement-liquid ${effectIsActive(solution.type, presentation) ? 'is-developing' : 'is-complete'}` : ''
+  const liquidStyle = solution ? { '--solution-initial': solutionColors[solution.from], '--solution-final': solutionColors[solution.to],
+    '--effect-duration': `${effectDurationMs[solution.type]}ms` } as CSSProperties : undefined
   return (
     <g stroke="none">
       <defs>
@@ -24,8 +33,9 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, p
         </linearGradient>
       </defs>
       {/* Separate bands identify starting substances, not physical immiscible layers. */}
-      {reactedLiquid ? <rect className="reacted-liquid" data-content-state="liquid" x={x} y={surface}
-        width={width} height={height} fill="#d7e9ed" fillOpacity="0.55" /> : liquids.map((sample, index) => {
+      {reactedLiquid ? <rect className={`reacted-liquid ${liquidClass}`} data-content-state="liquid" x={x} y={surface}
+        data-reaction-effect={solution?.type} data-stage={replayStage} style={liquidStyle}
+        width={width} height={height} fill={solution ? solutionColors[solution.to] : '#d7e9ed'} fillOpacity={solution ? '0.65' : '0.55'} /> : liquids.map((sample, index) => {
         const bandHeight = height * (sample.visualQuantity / total)
         const top = bottom - height * liquids.slice(0, index + 1).reduce((sum, portion) => sum + portion.visualQuantity, 0) / total
         return <rect key={sample.chemicalId} data-content-state="liquid" x={x} y={top} width={width} height={bandHeight}
@@ -34,13 +44,17 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, p
       {hasLiquid && <>
         <rect x={x} y={surface} width={width} height={height} fill={`url(#${sheenId})`} />
         <rect className="liquid-depth" x={x} y={surface} width={width} height={height} fill={`url(#${depthId})`} />
-        <ellipse className="liquid-surface" cx={x + width / 2} cy={surface + 0.6} rx={width / 2} ry="1.4"
+        <ellipse className={`liquid-surface ${liquidClass}`} data-stage={replayStage} style={liquidStyle} cx={x + width / 2} cy={surface + 0.6} rx={width / 2} ry="1.4"
           fill={surfaceColor} fillOpacity="0.55" stroke="#69858c" strokeOpacity="0.5" strokeWidth="0.5" />
         <path className="liquid-meniscus" d={`M${x + 0.5} ${surface - 1}q${width / 2 - 0.5} 4 ${width - 1} 0`}
           fill="none" stroke="#69858c" strokeOpacity="0.65" strokeWidth="0.7" />
         <path d={`M${x + 2} ${surface + 4}v${Math.max(0, height - 10)}`} stroke="#fffefa" strokeWidth="1.2" strokeOpacity="0.65" />
       </>}
-      {(!reacted || solidColor) && solids.map((sample, index) => {
+      {solids.map((sample, index) => {
+        if (reacted && !solidColor && deposit?.substrate !== sample.chemicalId) return null
+        if (sample.chemicalId === 'zinc') return <g key={sample.chemicalId} data-substrate="zinc" data-content-state="solid" fill={sample.chemical.color} stroke="#5d6b71" strokeWidth="0.5">
+          {zincGranules(layout, index).map((granule, i) => <path key={i} d={granule.body} />)}
+        </g>
         const base = bottom - index * 7
         return <g key={sample.chemicalId} data-content-state="solid" data-reaction-effect={solidColor ? 'solid-color-change' : undefined}
           className={solidColor ? `reacted-solid${effectIsActive('solid-color-change', presentation) ? ' is-transforming' : ''}` : undefined}
@@ -54,6 +68,7 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, p
             fill="none" stroke="#fffefa" strokeOpacity="0.65" />
         </g>
       })}
+      {deposit && <SurfaceDepositVisual effect={deposit} layout={layout} presentation={presentation} replayStage={replayStage} />}
     </g>
   )
 }

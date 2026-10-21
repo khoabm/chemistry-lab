@@ -44,7 +44,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
           <path fill="#fffefa90" d="M24 20h47l6 7-5 4v48a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6Z" />
           <defs><clipPath id={clipId}><path d="M26 32h44v47a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4Z" /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
-            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} presentation={presentation} replayStage={replayStage} />
+            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} effects={resultEffects} presentation={presentation} replayStage={replayStage} />
             <ReactionEffectsVisual effects={effects} layout={layout} presentation={presentation} />
             {boiling && <WaterBoilingVisual layout={layout} narrow={false} />}
           </g>
@@ -55,7 +55,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
           <path fill="#fffefa90" d="M36 15h28v60a14 14 0 0 1-28 0Z" />
           <defs><clipPath id={clipId}><path d="M38 23h24v52a12 12 0 0 1-24 0Z" /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
-            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} presentation={presentation} replayStage={replayStage} />
+            <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} effects={resultEffects} presentation={presentation} replayStage={replayStage} />
             <ReactionEffectsVisual effects={effects} layout={layout} presentation={presentation} />
             {boiling && <WaterBoilingVisual layout={layout} narrow />}
           </g>

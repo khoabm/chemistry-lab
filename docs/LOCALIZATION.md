@@ -280,3 +280,7 @@ and reaction chaining remain deferred; no related behavior was introduced.
 Non-developers should follow `TRANSLATION_GUIDE.md`; `VI_CHEMISTRY_TERMS.md` records
 the pending curriculum review table and stable keys. Content editing requires no
 React, reducer, simulation or TypeScript-source edit.
+
+## M13 additions
+
+R9 and zinc use canonical English chemistry metadata/fallback pending teacher/SGK terminology review. Generic solution-fading/surface-deposition descriptions and the contact-versus-Mix/qualitative-extent legend are available in EN/VI. IDs, equations and semantic effect types are unchanged by locale.

@@ -1,7 +1,7 @@
 import type { ChemicalId } from '../chemicals/catalog'
 
 export type SimulationTrigger = 'mix' | 'heat'
-export type ReactionId = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7' | 'R8'
+export type ReactionId = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7' | 'R8' | 'R9'
 
 export interface ProductDefinition {
   readonly id: string
@@ -14,6 +14,8 @@ export type ReactionEffect =
   | { readonly id: string; readonly type: 'gas'; readonly intensity: 'low' | 'medium'; readonly context: 'liquid' | 'heated-solid' }
   | { readonly id: string; readonly type: 'solid-color-change'; readonly color: 'black' | 'pale-white' }
   | { readonly id: string; readonly type: 'temperature-rise'; readonly intensity: 'low' }
+  | { readonly id: string; readonly type: 'solution-color-change'; readonly from: 'blue'; readonly to: 'paler-blue' }
+  | { readonly id: string; readonly type: 'surface-deposit'; readonly substrate: ChemicalId; readonly product: string; readonly appearance: 'copper' }
 
 export interface ReactionDefinition {
   readonly id: ReactionId

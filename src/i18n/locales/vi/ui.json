@@ -243,5 +243,8 @@
   "water.resting": "Nước không được cấp nhiệt từ đèn.",
   "water.unavailable": "Mẫu nước đã thay đổi hoặc ngoài phạm vi: chưa có phép đo định lượng và mô phỏng sôi.",
   "water.badge": "Đang sôi",
-  "water.assumptions": "Mẫu nước tinh khiết tham chiếu danh định {{mass}}g tại 1 atm; giữ ở 100°C khi sôi. Thông số nóng lên/nguội chưa hiệu chuẩn. Đơn vị chất không phải khối lượng hay thể tích. Số đo nhiệt kế có độ trễ so với nhiệt độ mẫu mô phỏng. Không tính lượng nước bay hơi."
+  "water.assumptions": "Mẫu nước tinh khiết tham chiếu danh định {{mass}}g tại 1 atm; giữ ở 100°C khi sôi. Thông số nóng lên/nguội chưa hiệu chuẩn. Đơn vị chất không phải khối lượng hay thể tích. Số đo nhiệt kế có độ trễ so với nhiệt độ mẫu mô phỏng. Không tính lượng nước bay hơi.",
+  "effect.solutionFades": "Màu xanh của dung dịch nhạt dần.",
+  "effect.surfaceDeposit": "Lớp kim loại hình thành trên bề mặt mẫu rắn.",
+  "result.displacementLegend": "Lớp kim loại bám trên mẫu rắn ngập trong dung dịch, không phải kết tủa lắng xuống. Màu và lớp bám chỉ minh họa, không đo mức chuyển hóa. Tiếp xúc có thể làm phản ứng thật bắt đầu mà không cần khuấy; nút Trộn khởi động minh họa."
 }

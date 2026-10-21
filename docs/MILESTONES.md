@@ -1,10 +1,10 @@
 # Web Chemistry Lab — Development Milestones
 
-## Latest explicitly recorded numbered milestone
+## Latest completed numbered milestone
 
 `M11 — Dropper Transfer & 2D Material Presentation`
 
-The numbered milestone record remains M11 until the user approves a transition.
+The latest completed numbered milestone remains M11; active authorized M13 work is described below.
 This is a **product roadmap label**, not an instruction to checkout branch
 `M11` for every subsequent change. Auxiliary approved work has continued on
 feature branches and merged into `main` (including thermometer, equipment/
@@ -12,11 +12,13 @@ material removal, and Water Boiling V1). Consult local Git history for the
 actual branch and merged state; current feature scope belongs to its approved
 ExecPlan and the relevant specifications.
 
-The original roadmap's **Advanced 2D Phenomena** phase is being scoped on
-branch `M13`, with design input in `docs/ADVANCED_2D_PHENOMENA.md`.
-This authorizes **feasibility analysis and a Codex-authored ExecPlan only**;
-it does not register R9, approve implementation, or change the latest completed
-numbered milestone (M11). Implementation scope requires a separate decision.
+**M13 — Advanced 2D Phenomena** implementation was explicitly authorized on
+2026-10-21 on branch `M13`, following review of ExecPlan baseline `3f7488c`.
+Scope: one zinc/CuSO4 displacement (R9), solution fading and surface deposition,
+finite shared rendering/Replay and regression/browser validation. See
+`plans/m13-advanced-2d-phenomena.md` and `docs/ADVANCED_2D_PHENOMENA.md`.
+This records active authorization, not completion, merge, release or advancement
+beyond M13. M11 remains the latest completed numbered milestone recorded above.
 
 Historical milestone branches (`M0`, `M1`, …, `M11`) preserve the earlier
 sequence. Newly approved feature branches need not follow that naming scheme.

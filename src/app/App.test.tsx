@@ -26,7 +26,7 @@ describe('laboratory foundation', () => {
     }
     expect(equipment.getByText('Dropper')).toBeVisible()
     expect(within(materials).getByRole('button', { name: 'Add Beaker' })).toBeEnabled()
-    expect(within(screen.getByRole('region', { name: 'Chemicals' })).getAllByRole('button')).toHaveLength(12)
+    expect(within(screen.getByRole('region', { name: 'Chemicals' })).getAllByRole('button')).toHaveLength(13)
     expect(within(materials).getByRole('button', { name: 'Add Silver nitrate' })).toBeDisabled()
     expect(screen.getByText('Empty workspace')).toBeInTheDocument()
     expect(within(screen.getByRole('complementary', { name: 'Experiment' })).getByText(/No observations yet/)).toBeInTheDocument()

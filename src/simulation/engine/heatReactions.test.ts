@@ -16,7 +16,7 @@ describe('M6 registered heat reactions', () => {
   it('registers only R7/R8 and keeps all reaction/effect IDs unique across both triggers', () => {
     expect(heatReactions.map((reaction) => reaction.id)).toEqual(['R7', 'R8'])
     const all = [...mixReactions, ...heatReactions]
-    expect(new Set(all.map((reaction) => reaction.id)).size).toBe(8)
+    expect(new Set(all.map((reaction) => reaction.id)).size).toBe(9)
     const effects = all.flatMap((reaction) => reaction.effects.map((effect) => effect.id))
     expect(new Set(effects).size).toBe(effects.length)
   })

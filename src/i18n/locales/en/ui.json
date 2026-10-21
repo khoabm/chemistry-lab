@@ -267,5 +267,8 @@
   "water.resting": "Water is not receiving lamp heat.",
   "water.unavailable": "Water sample changed or outside the model: numerical measurement and boiling simulation unavailable.",
   "water.badge": "Boiling",
-  "water.assumptions": "Nominal {{mass}}g pure-water reference at 1 atm; 100°C plateau. Heating/cooling parameters are uncalibrated. Portion units are not mass or volume. The thermometer reading lags the simulated sample temperature. No evaporation quantity is calculated."
+  "water.assumptions": "Nominal {{mass}}g pure-water reference at 1 atm; 100°C plateau. Heating/cooling parameters are uncalibrated. Portion units are not mass or volume. The thermometer reading lags the simulated sample temperature. No evaporation quantity is calculated.",
+  "effect.solutionFades": "The blue solution becomes less strongly blue.",
+  "effect.surfaceDeposit": "Copper develops on the zinc surface.",
+  "result.displacementLegend": "Copper coats the immersed zinc; it is not settling precipitate. Residual blue and coating are qualitative, not a conversion measurement. Real contact can start the reaction without stirring; Mix starts this demonstration."
 }

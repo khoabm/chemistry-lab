@@ -1,4 +1,4 @@
-# M13 — Advanced 2D Phenomena: displacement feasibility and conditional implementation
+# M13 — Advanced 2D Phenomena: approved zinc displacement implementation
 
 This ExecPlan is a living document and must remain synchronized with the implementation.
 
@@ -8,21 +8,23 @@ This plan follows `.agent/PLANS.md`.
 
 After implementation is separately approved, a learner should be able to add a metal sample and an existing solution to a Beaker or Test tube, press Mix, and recognize two phenomena not currently represented: a solution becoming less strongly colored and a new metal depositing on the immersed solid surface. The final illustration and Teaching Replay must distinguish surface deposition from precipitation out of a liquid.
 
-**Current authorization: planning only.** The user authorized creating and committing this document on `M13`, not adding chemicals, R9, effects or application behavior. `docs/ADVANCED_2D_PHENOMENA.md` is the authoritative planning input. All implementation steps below are conditional on explicit user scope approval. The latest completed numbered milestone remains the record in `docs/MILESTONES.md`; this document does not advance it.
+**Current authorization: implementation approved on 2026-10-21 from reviewed baseline `3f7488c`.** All nine decisions in the user approval are accepted: R9/zinc only, explicit Mix/contact explanation, residual blue, surface copper on gray zinc, 6000ms finite effects, existing Replay/state, no numerical displacement thermal model, retained inventory/repeated Mix, and chemistry English fallback. Commit/push to M13 is authorized; PR/merge/deployment and advancement beyond M13 are not. The following planning authorization is historical evidence, superseded by this approval.
+
+**Original planning authorization:** The user authorized creating and committing this document on `M13`, not adding chemicals, R9, effects or application behavior. `docs/ADVANCED_2D_PHENOMENA.md` is the authoritative planning input. All implementation steps below are conditional on explicit user scope approval. The latest completed numbered milestone remains the record in `docs/MILESTONES.md`; this document does not advance it.
 
 ## Scope
 
-Planning delivers feasibility, one recommended reaction, alternatives, minimal technical design, approval gates, concrete implementation checkpoints and observable acceptance criteria. Labels used below distinguish **Fact** (inspected implementation), **Proposal** (recommended design), **Scientific assumption** (educational simplification) and **Approval required** (not decided by this plan).
+M13 delivers the approved single zinc displacement demonstration, its minimal semantic/rendering extension, regression tests and documented validation. The feasibility/alternative analysis below preserves the reviewed rationale. Labels used below distinguish **Fact** (inspected implementation), **Proposal** (recommended design), **Scientific assumption** (educational simplification) and **Approval required** (not decided by this plan).
 
 The recommended implementation boundary, if approved, is **one** displacement demonstration: Zn(s) + CuSO4(aq) → ZnSO4(aq) + Cu(s), provisionally R9. Add one selectable reagent, stable ID `zinc`, and two semantic effects for solution color change and surface deposition. Support both existing container types, shared workspace/close-up/dialog rendering, finite live progression, Manual/Auto Replay and reduced motion. Add focused chemistry, lifecycle, accessibility and rendering regression coverage. Preserve current interaction and thermal behavior.
 
 ## Non-goals
 
-No runtime change in this planning task. A future implementation must not add the alternatives as extra reactions, automatic contact reactions, a new trigger, quantitative conversion/consumption/concentration/yield, product reuse, reaction chaining, dissolution geometry, exact kinetics or a new thermal profile. No invented gas, precipitate, flame, boiling, measured temperature rise or glow for the candidate. No reworking R1–R8 or Water Boiling V1 absent a confirmed regression. No new equipment, lesson system, 3D, physics/particle/collision engine, scene graph, global store, persistence or dependency. Do not rewrite historical plans/closeouts or complete Vietnamese chemistry terminology without teacher review. No automatic milestone advancement, merge, deployment or release.
+The approved implementation must not add the alternatives as extra reactions, automatic contact reactions, a new trigger, quantitative conversion/consumption/concentration/yield, product reuse, reaction chaining, dissolution geometry, exact kinetics or a new thermal profile. No invented gas, precipitate, flame, boiling, measured temperature rise or glow for the candidate. No reworking R1–R8 or Water Boiling V1 absent a confirmed regression. No new equipment, lesson system, 3D, physics/particle/collision engine, scene graph, global store, persistence or dependency. Do not rewrite historical plans/closeouts or complete Vietnamese chemistry terminology without teacher review. No automatic milestone advancement, merge, deployment or release.
 
 ## Existing system
 
-### Confirmed implementation facts
+### Confirmed baseline implementation facts (reviewed `3f7488c`, before M13 source changes)
 
 - `src/features/lab/components/LabPage.tsx` owns the workspace through React `useReducer`. Equipment, mounts, independent thermometer attachments, original portions and `ReactionResult` belong to application state.
 - `src/simulation/reactions/{types,mixReactions,heatReactions}.ts` register R1–R8 and `mix`/`heat` only. `src/simulation/engine/evaluateReaction.ts` matches an order-independent exact set of known positive portions. It does not model spectator mixtures or stoichiometric ratios. Existing chemical catalog has CuSO4 solution but no zinc or iron metal.
@@ -46,7 +48,7 @@ The accepted baseline audit found no confirmed blocker in existing reactions/wat
 
 ### Feasibility and scientific basis
 
-**Recommendation, pending approval:** choose zinc displacement. It introduces a meaningful interface-localized phenomenon using one new catalog reagent, while retaining the exact-set engine and explicit Mix. No chemistry inference or simulation restructuring is necessary. Drawing and validating the substrate/coating composition is the principal implementation risk.
+**Approved choice:** zinc displacement. It introduces a meaningful interface-localized phenomenon using one new catalog reagent, while retaining the exact-set engine and explicit Mix. No chemistry inference or simulation restructuring is necessary. Drawing and validating the substrate/coating composition is the principal implementation risk.
 
 | Candidate | Scientific/teaching value | Integration and visual trade-off | Recommendation |
 | --- | --- | --- | --- |
@@ -62,9 +64,9 @@ Sources checked on 2026-10-21:
 
 No numerical reaction rate, temperature, concentration or conversion is inferred from these sources. Brown/dark copper is still elemental Cu, not the black CuO of R7; text and its location must make that distinction clear.
 
-### Scientific assumptions and product approval gate
+### Scientific assumptions and approved product gate
 
-The following are recommended defaults, **not approvals**. Record the user's choices here before implementation and update the applicable living specifications first. If rejected, revise the plan; do not silently register the candidate.
+**Gate satisfied on 2026-10-21:** the user approved all recommended defaults below; teacher/SGK terminology review is still pending and no calibration is claimed. The following table preserves the reviewed recommendations and their consequences. Record the user's choices here before implementation and update the applicable living specifications first. If rejected, revise the plan; do not silently register the candidate.
 
 | Decision requiring approval | Recommended default | Consequence / boundary |
 | --- | --- | --- |
@@ -74,7 +76,7 @@ The following are recommended defaults, **not approvals**. Record the user's cho
 | Exothermy and numerical measurement | Acknowledge real heat release in explanation, but omit a temperature-rise effect and numerical displacement thermal profile in this minimal scope. | Zinc/mixed sample remains numerically unsupported, with sensor unavailable and existing fallback. Do not show a constant 25°C or synthesize thermal observations. Adding quantitative exothermy requires separate approval/design. |
 | Retained starting inventory / repeated Mix | Keep the existing starting-substances list, result products as information, and existing repeated-Mix occurrence behavior. Explain that final drawing is a qualitative outcome, not a product inventory. | No depletion, additional R6 energy, recoverable copper, transferred products or reaction chaining. A repeated demonstration is not evidence of extra available material/energy. |
 
-The planning brief explicitly leaves these choices open. Its candidate section and this recommendation do not override `AGENTS.md`/`docs/CHEMISTRY.md` restricting production to R1–R8. After scope approval, deliberately update current chemistry and instruction wording to permit the approved registered extension, retaining the prohibition on inference and leaving boiling separate. No such update is authorized by the present planning-only task.
+The original brief left these choices open; explicit user authorization now resolves them. Current chemistry, instruction and roadmap wording has been aligned to R1–R9, retaining exact registration/no-inference constraints and keeping water boiling physical. No further reaction or numerical displacement thermal profile is authorized.
 
 ### Responsibilities and data flow
 
@@ -120,17 +122,17 @@ Reduced motion: before Mix retain initial material; after Mix show a restrained 
 
 ## Data model
 
-**Proposed, conditional additions only:**
+**Implemented bounded additions:**
 
 - `ChemicalId` gains `zinc` through the existing catalog, with solid state, Zn formula and a neutral gray presentation color. No new equipment type or amount units.
-- `ReactionId` gains the approved new identifier (recommend R9) only after approval. Product definitions add unique `zinc-sulfate` / ZnSO4 and `copper-metal` / Cu metadata; neither becomes reusable contents.
+- `ReactionId` gains the approved R9 identifier. Product definitions add unique `zinc-sulfate` / ZnSO4 and `copper-metal` / Cu metadata; neither becomes reusable contents.
 - Extend `ReactionEffect` with two discriminated variants. `solution-color-change` carries qualitative initial/final appearance such as blue/paler-blue; `surface-deposit` carries stable substrate chemical identity, product identity and copper appearance. Keep CSS, RGB values, paths, durations, coverage percentages and React names out of simulation types. Exact field spelling can follow existing conventions during implementation without expanding meaning.
 - Add two duration entries and presentation color/description mappings. The geometry helper derives substrate paths from existing contents/layout; it is not persisted attachment state.
 - No additions to `LabWorkspaceState`, `ContainerState`, mount/thermometer relation arrays, `SampleThermalState`, reducer actions or sensor recordings are expected. Reuse existing immutable result and action lifecycle. Stop and review if implementation appears to require new persistent scene/progress/thermal state.
 
 ## Implementation steps
 
-These checkpoints are executable **only after** the scope gate above is approved.
+The scope gate above is approved. Execute these checkpoints in order and record actual evidence below.
 
 1. **Authorize and align current contracts.** Record reaction/abstraction/palette/thermal-limit decisions. Update only relevant current sections of `docs/ADVANCED_2D_PHENOMENA.md`, `docs/CHEMISTRY.md`, `docs/REACTION_DYNAMICS.md`, `docs/UI_UX.md`, `docs/ARCHITECTURE.md` and instruction/roadmap wording where stale. Do not declare milestone completion. Recommend teacher review of explanatory claims/palette and report whether it occurred; a source URL is not sign-off. The mandatory implementation gate is explicit user scope approval. Completing Vietnamese chemistry terminology still requires the existing teacher/SGK review; use English fallback meanwhile.
 2. **Register one bounded rule with red/green tests.** Add catalog/type/rule metadata and semantic effects; keep `evaluateReaction` algorithm unchanged. Extend explicit registry-count tests for the new authorized entry, retaining all R1–R8 cases and unique-ID/product checks. Test exact-set, order, positive/invalid quantities, extra substances and wrong trigger. No renderer or automatic reaction yet.
@@ -156,7 +158,7 @@ Paths here are relative to the repository root. Listed tests should be extended 
 | Renderer tests; `useReactionAnimationSync.test.tsx`; `ReactionDynamicsFlow.test.tsx`; `TeachingReactionReplay.test.tsx`; new focused displacement flow suite if clearer | Progression, final state, same-age views, replay isolation, cancellation and lifecycle regression. |
 | Current specifications/instructions listed in checkpoint 1, this plan | Intentional authorization/contract updates only, no historical rewrite. |
 
-Expected unchanged production modules include `evaluateReaction.ts`, `labWorkspace.ts`, mounting/thermometer/Dropper helpers, thermal model/clock and Replay scheduler. Their existing tests must remain meaningful. No changes are currently authorized outside this planning document.
+Expected unchanged production modules include `evaluateReaction.ts`, `labWorkspace.ts`, mounting/thermometer/Dropper helpers, thermal model/clock and Replay scheduler. Their existing tests must remain meaningful. Only changes within this approved M13 scope are authorized.
 
 ## Git and technology validation
 
@@ -175,7 +177,7 @@ Keep the installed React/strict TypeScript/Vite/npm/useReducer/SVG/CSS/Vitest/RT
 
 Validate all required headings, relative repository links/paths, source-based claims, scientific sources/limitations, gate consistency and checkbox placement. Run `git diff --check` and verify only the new plan is staged/committed. Do not run application implementation, install tools, create browser debug UI or claim new application tests/browser QA for a document-only change. Actual planning-check results belong in Outcomes below.
 
-### Conditional automated implementation coverage
+### Automated implementation coverage
 
 - **Chemistry/unit:** both containers can receive the reagent; exact Zn/CuSO4 in either order matches only the new Mix rule. Missing/extra/wrong/invalid inputs do not match. In particular Zn + HCl must not invent a registered H2 reaction. Preserve all R1–R8 equations/effects, heat wrong-trigger cases and product identities. Never register water boiling as chemistry.
 - **Geometry/rendering:** zinc and copper share actual silhouette paths/coordinates in each vessel; coating remains inside metal and liquid/glass clips at supported levels, with unique SVG IDs per instance. Initial blue/gray, intermediate localized coating and paler-blue final remain distinct. No suspended precipitate, detached copper bed, gas, glow or warmth. Existing R1–R8 default reacted-liquid/solid behavior remains unchanged.
@@ -194,7 +196,7 @@ npm test -- --maxWorkers=2 src/features/lab/components/ReactionDynamicsFlow.test
 
 Include the new geometry/displacement tests and affected state/interaction suites as they are added; these examples do not replace mandatory regression coverage. At final implementation acceptance run `npm run typecheck`, `npm run lint`, `npm test -- --maxWorkers=2`, `npm run build` and `git diff --check`. Build already includes typecheck; avoid redundant reruns on unchanged code except for independent evidence/failure isolation. Revalidate after relevant changes; prior baseline green results do not validate new variants. Investigate timing/cache/environment failures, preserve assertions, and never skip tests or increase timeouts merely to obtain PASS.
 
-### Conditional browser matrix and observable acceptance
+### Browser matrix and observable acceptance
 
 Use the existing local browser workflow and production build as appropriate. Test **1440×960**, **390×844** and **844×390**, EN and VI. Capture before Mix, developing and final states in Beaker and Test tube; inspect actual motion as well as screenshots. Report real browser viewport emulation separately from physical devices. Without working browser access, mark visual acceptance incomplete, not PASS.
 
@@ -231,11 +233,12 @@ The visual acceptance gate fails if copper reads as suspended precipitate, the z
 - [x] 2026-10-21: Inspect relevant engine/types/catalog, reducer/transfer/thermal boundaries, shared renderers, finite timing/Replay, localization and affected tests/specifications.
 - [x] 2026-10-21: Compare zinc displacement, iron displacement and existing-effect-only alternative; identify scientific assumptions and user approval gates.
 - [x] 2026-10-21: Author this planning-only ExecPlan with conditional implementation, regression/browser gates and file-change boundaries.
-- [ ] User approves reaction registration, Mix abstraction, final appearance, thermal omission and inventory/repeated-demonstration policy; record any teacher review separately.
-- [ ] After authorization: align current contracts and implement/register the single approved rule with focused tests.
-- [ ] Implement shared surface/solution rendering and finite/reduced-motion behavior; validate both vessels.
-- [ ] Complete lifecycle, Replay/Auto, interaction, thermal and existing-feature regression.
-- [ ] Perform and record browser/concurrency QA, final full validation and independent implementation review.
+- [x] 2026-10-21: User approves reaction registration, Mix abstraction, final appearance, thermal omission and inventory/repeated-demonstration policy; record any teacher review separately.
+- [x] 2026-10-21: Align current contracts and register R9/zinc with exact-set chemistry tests.
+- [x] 2026-10-21: Implement shared surface/solution rendering and finite/static reduced-motion styles; focused tests cover both vessels.
+- [x] 2026-10-21: Lifecycle, finite/Manual/Auto Replay, interaction and thermal regression validated; full suite passes 654 tests / 57 files.
+- [x] 2026-10-21: Record normal-motion desktop/portrait/landscape browser QA, concurrency observations and full local validation.
+- [ ] Direct reduced-motion browser verification (tooling does not expose media emulation) and final independent review; do not mark this visual gate PASS from jsdom/CSS tests alone.
 - [ ] Obtain separate merge/release authorization; do not infer milestone completion from this plan.
 
 ## Surprises and discoveries
@@ -249,6 +252,7 @@ The visual acceptance gate fails if copper reads as suspended precipitate, the z
 ## Decision log
 
 | Date / status | Decision | Reason |
+| 2026-10-21 / implementation approved | All nine product decisions approved; implement, validate, commit and push to M13, then stop for independent review. | Explicit user authorization supersedes original planning-only restrictions; no PR/merge/release authorization. |
 | --- | --- | --- |
 | 2026-10-21 / authorized task boundary | Produce and locally commit only this plan. Implementation approval remains pending. | User request and the design brief explicitly separate planning, registration, implementation and merge. |
 | 2026-10-21 / recommended, pending scope approval | Prefer zinc over iron; introduce only one reaction. | Stronger blue/gray/copper contrast without the alternative's additional pale-green endpoint interpretation; same small effect infrastructure. |
@@ -259,6 +263,30 @@ The visual acceptance gate fails if copper reads as suspended precipitate, the z
 
 ## Outcomes and retrospective
 
-Planning-only outcome: a source-grounded, conditional single-reaction design is prepared for independent review. No reagent, R9, runtime effect, test, dependency, workflow, milestone completion or deployment is delivered by this task. Product/scientific choices in the approval table remain open. Implementation is feasible in the existing architecture, conditional on accepting those boundaries and passing small-scale visual verification.
+Historical planning-only outcome: a source-grounded, conditional single-reaction design is prepared for independent review. No reagent, R9, runtime effect, test, dependency, workflow, milestone completion or deployment is delivered by this task. Product/scientific choices in the approval table remain open. Implementation is feasible in the existing architecture, conditional on accepting those boundaries and passing small-scale visual verification.
 
 Planning validation on 2026-10-21: all required `.agent/PLANS.md` sections are present; checkboxes are confined to Progress; referenced local files exist apart from the explicitly proposed new modules/tests; the approved branch ancestry and documentation-only starting diff were verified. Final whitespace/staging/commit checks are performed as part of this planning delivery and reported with its commit SHA. No application tests, browser QA, benchmark or CI were run for this documentation-only revision; prior baseline audit evidence is not relabeled as fresh validation.
+
+### Implementation execution record
+
+Start: branch M13 at `3f7488c1d41e9c91f072d2fe43aa43339a7719da`, tracking origin/M13, clean working tree. Phase 1 aligns current contracts without rewriting historical milestone records. The execution evidence below records the subsequent implementation and validation; CI is checked separately after the authorized push. Planning-only Outcomes above describe the prior planning delivery, not the active authorization.
+
+Implementation checkpoints 1–3: current contracts updated; R9 is the only new registration, zinc the only added reagent. Engine matching/reducer/thermal clocks remain unchanged. Initial RED run: 4 failed / 1 passed across two new suites (missing catalog/rule/substrate). Focused engine/render run then passed 107 tests with two failures in the old generic-mound expectation for new zinc; that expectation now explicitly verifies two zinc granules while retaining old mound/grain checks. Fixed fixture-only TSX suffix and dialog cleanup order errors without changing production behavior. Replay flow now passes all three cases, including two Auto cycles, locale and Escape cancellation. First full integration run exposed old 12-entry catalog assertions; these now expect the authorized 13 entries. A build caught an unsupported RTL `exact` option in a new helper; removed it (string role-name matching is already exact). These failures are retained here as evidence, not hidden or skipped. The final validation/browser results are recorded below.
+
+### Implementation outcome and actual evidence — 2026-10-21
+
+Delivered R9/zinc, two semantic effects, shared fixed substrate/coating geometry, retained residual-blue/gray material, finite 6000ms/static-stage rendering and EN/VI generic copy. Production engine algorithm, reducer/actions, mounts, thermometer relations/recording, thermal model/clock, Replay scheduler, package files and workflows are unchanged. R1–R8 remain registered as before. No calibrated displacement temperature or translation approval is claimed.
+
+Local validation on the final runtime/test tree: `npm run typecheck` passed independently during development; `npm run lint` passed with zero warnings; `npm test -- --maxWorkers=2` passed **654 tests / 57 files**, no skipped tests (22:51:57 run, 144.23s); `npm run build` passed including a fresh typecheck, 106 modules; `git diff --check` passed. The first full suite had 651 passing and two old catalog-count failures; only the authorized 12→13 expectations were updated. No timeout increase or assertion weakening. Later changes are current documentation/evidence only, so the unchanged runtime validation is reused.
+
+Browser: local Vite application in the in-app browser, viewport emulation at 1440×960, 390×844 and 844×390, EN/VI. Beaker/Test tube initial/developing/final compositions were observed; workspace, sample close-up and modal share the surface effect. Copper stays on visible gray granules, final liquid remains blue, and effects end. Manual Replay restores blue and coating opacity 0. Two actual Auto cycles each produced initial (opacity 0), developing (~0.05 at 1.5s), final (opacity 1), then reset. The live bench stayed complete. Browser computed final liquid fill was rgb(161,199,216), initial rgb(71,142,203); these are display colors, not concentration.
+
+Desktop/portrait `elementFromPoint` returned the intended Beaker label, lamp label and thermometer grip. Assembly keyboard movement retained coating and unavailable sensor reading (— °C). A valid pointer drop using refreshed DOM coordinates moved R9 from normalized ~0.322/0.475 to ~0.443/0.541 with the same SVG clip ID and finite occurrence. Earlier coordinate attempts cancelled without movement; a fresh geometry read and R1 control confirmed valid pointer movement without any interaction code changes. No horizontal overflow in inspected portrait/landscape bench and dialogs; chemistry fallback stayed English intentionally.
+
+Concurrency: six R9 started together (295 bench DOM nodes, 36 fixed coating paths); after 53.9s the counts were identical and active surface animations dropped 6→0. In a mixed scene R1 cloud, R5 gas, R9 coating and water boiling were simultaneously present; after 15s cloud/gas/new development ended while boiling continued, with seven stable coatings / 42 paths. This demonstrates bounded nodes/finite lifecycle, not measured FPS or low-end-device performance. Dense independent apparatus can still overlap and require keyboard selection, an existing free-bench limitation; no collision system was added.
+
+Existing-feature browser regression: R1 settling and R5 gas terminated correctly in the mixed scene. Fresh R7 was observed before qualification then during live green→black transformation with 3 low gas paths; fresh R8 during live blue→pale transformation without gas; final states remained. Water stopped boiling on lamp-off at 99.7°C and resumed after re-ignition. Prepared R6 with attached sensor showed live warming, no gas and sensor 26.9°C; Manual Replay used recorded reading (27.5°C) rather than fabricated displacement data.
+
+Evidence PNGs are outside the repository at `C:/Users/ASUS/.codex/visualizations/2026/10/17/01a14945-cf81-7a50-a3f6-a615962c49a6/`: `m13-beaker-initial.png`, `m13-beaker-developing.png`, `m13-beaker-final.png`, `m13-tube-developing.png`, `m13-tube-final.png`, `m13-tube-portrait-vi.png`, `m13-tube-landscape-en.png`, `m13-beaker-portrait-vi.png`, `m13-sample-closeup-developing.png`, `m13-six-concurrent.png`, `m13-mixed-scene-active.png`, `m13-regression-r7-transforming.png`, `m13-regression-r8-transforming.png`, `m13-regression-water-boiling.png`, `m13-regression-r6-live.png`. They are local QA artifacts, not tracked scientific measurements.
+
+**Remaining verification gap (P2):** this browser exposes viewport/visibility but no reduced-motion media emulation. Static initial/intermediate/final styles are implemented and regression-tested; actual reduced-motion browser behavior remains UNVERIFIED, not PASS. No physical touch device, screen-reader certification, frame-rate trace or scientific calibration was performed. Full browser acceptance remains partial until that reduced-motion check is completed during independent review. Normal-motion interactions/rendering and automated validation are green. `gh` has no login in this environment; attempt CI lookup through the connected GitHub API after push and report the exact result, not a presumed PASS. No PR/merge/deployment or milestone completion is delivered.

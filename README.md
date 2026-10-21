@@ -110,7 +110,7 @@ Focus equipment and use arrow keys (Shift moves farther). Escape cancels a drag;
 clears the bench without reloading the page.
 
 Select a beaker or test tube, then click/tap a chemical in the palette to add one
-simplified unit. The catalog includes the eleven reaction substances plus pure
+simplified unit. The catalog includes the original eleven reaction substances, zinc, and pure
 water (H₂O), with name, formula and solution/pure-liquid/solid labels. Containers display basic starting liquid/solid
 appearance and keep independent contents while moving. For a selected beaker or
 test tube, the right Experiment panel separates Sample (contents, heating,
@@ -122,7 +122,7 @@ Lamp/dropper details and no-selection help appear directly without tabs.
 Empty container clears only that container and returns to Sample. Reset
 lab removes equipment, contents and reaction results. Adding substances does not
 evaluate chemistry. Press Mix in the selected container's details to identify one
-of the six registered mix reactions (R1–R6); other combinations return
+of the seven registered mix reactions (R1–R6 and R9); other combinations return
 `No observable reaction.` Matching ignores order and requires the exact supported
 set of substances. Results belong to each container and are cleared when its
 contents change. Supported results now show precipitate, gas bubbles or subtle
@@ -283,7 +283,7 @@ lint, `npm test -- --maxWorkers=2` and build.
 - `src/features/lab/renderers/WaterBoilingVisual.tsx`: independent continuous physical SVG/CSS cues.
 - `src/store/mounting.ts`: shared mount eligibility, occupancy queries and mounted Heat source resolution.
 - `src/simulation/chemicals/`: the specified catalog and pure portion additions.
-- `src/simulation/reactions/`: typed R1–R8 rules, products and semantic effects.
+- `src/simulation/reactions/`: typed R1–R9 rules, products and semantic effects.
 - `src/simulation/engine/`: pure deterministic reaction evaluation and unit tests.
 - `src/styles/tokens.css`: shared colors, spacing, radii, and typography defaults.
 - `src/styles/global.css`: base styles and responsive laboratory layout.
@@ -384,7 +384,7 @@ fallback, interpolation and plurals; missing/blank Vietnamese uses English.
 Canonical English chemistry metadata is indexed
 by stable IDs in `src/localization/chemistry.ts`, and recorded result metadata
 remains the English fallback when rendered. Formulas/equations never pass through
-translation. Chemical/product names, R1–R8 names/explanations, phenomenon prose and
+translation. Chemical/product names, R1–R9 names/explanations, phenomenon prose and
 scientific captions remain English pending teacher/SGK review. See
 `docs/LOCALIZATION.md` for the boundary, `docs/TRANSLATION_GUIDE.md` for editing,
 `docs/VI_CHEMISTRY_TERMS.md` for pending review and `plans/m10-localization.md`
@@ -398,3 +398,16 @@ The auxiliary render-polish implementation/QA record is in
 `plans/m11-render-polish.md`. It supersedes the original geometry Heat interaction;
 `docs/M11_CLOSEOUT.md` and the original milestone plans remain historical records.
 This branch does not advance the official M11 milestone.
+
+### M13 displacement demonstration
+
+Add Zinc and Copper(II) sulfate solution to a Beaker or Test tube and press Mix.
+Over a finite six-second illustration the solution becomes less blue and dark/
+reddish-brown copper patches develop on visible gray zinc. Residual blue and
+coating are qualitative, not yield or remaining composition. Contact can initiate
+the real exothermic reaction without stirring; Mix starts the demonstration.
+There is no numerical displacement thermal model or fabricated sensor reading.
+The shared close-up/modal and finite Manual/Auto Replay show the same progression;
+reduced motion uses static stages. Starting portions, products-as-information and
+existing Dropper/removal/mounting semantics remain unchanged. New chemistry names
+and explanations use English fallback pending teacher/SGK terminology review.

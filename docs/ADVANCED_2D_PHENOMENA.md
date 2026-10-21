@@ -1,6 +1,6 @@
 # Advanced 2D Phenomena — Scope and feasibility specification
 
-**Status:** design/scoping authorized; implementation scope **not yet approved**.
+**Status:** M13 implementation explicitly approved on 2026-10-21 after independent review of ExecPlan baseline `3f7488c`. The original candidate analysis below is retained as design rationale; the approved scope in the following section supersedes its pending-approval wording.
 **Roadmap reference:** Advanced 2D Phenomena (called M13 in the original roadmap).
 **Working branch:** `M13` based on `main` at `aa7b8f8cc10d8c1247b1799ac6011207eaed1abc`.
 **Next owner:** Codex inspects the actual checkout and authors a living ExecPlan under `plans/` according to `.agent/PLANS.md`. This document is the product/design input, **not** an ExecPlan or implementation approval.
@@ -11,7 +11,7 @@ Extend the range of **scientifically meaningful 2D phenomena**, rather than repe
 
 Preserve the existing direct bench interaction, explicit `Mix` and mounted/lit `heat` triggers, reaction-result ownership, finite development/final hold, Teaching Replay, responsive layout, accessible controls and reduced-motion behavior. Prefer the existing SVG/CSS system; do not add a physics/particle engine or new dependencies without a separately demonstrated need and approval.
 
-The authoritative *implemented* chemistry remains R1–R8 in `docs/CHEMISTRY.md` and `src/simulation/reactions/`; pure-water boiling remains a **physical** phenomenon, not another registered reaction. The accepted baseline audit reported no confirmed blocker in R1–R8/Water Boiling V1, but live R7/R8 transients, direct reduced-motion browser behavior, physical-device performance and many concurrent effects were not exhaustively verified. Do not reinterpret these unverified checks as passed.
+The baseline implemented chemistry was R1–R8; the explicit authorization below adds only R9 to `docs/CHEMISTRY.md` and `src/simulation/reactions/`; pure-water boiling remains a **physical** phenomenon, not another registered reaction. The accepted baseline audit reported no confirmed blocker in R1–R8/Water Boiling V1, but live R7/R8 transients, direct reduced-motion browser behavior, physical-device performance and many concurrent effects were not exhaustively verified. Do not reinterpret these unverified checks as passed.
 
 ## Planning objective
 
@@ -78,3 +78,9 @@ If a new phenomenon is approved later, require at minimum:
 5. **Independent review and explicit merge approval:** do not automatically advance the recorded numbered milestone, merge, deploy or broaden the scope.
 
 Reference documents: `AGENTS.md`, `.agent/PLANS.md`, `docs/PRODUCT.md`, `docs/MILESTONES.md`, `docs/CHEMISTRY.md`, `docs/REACTION_DYNAMICS.md`, `docs/UI_UX.md`, `docs/ARCHITECTURE.md`, and `src/simulation/AGENTS.md`.
+
+## Approved implementation boundary — 2026-10-21
+
+The user approved R9 (Zn + CuSO4 → ZnSO4 + Cu), zinc as the only new selectable reagent, explicit Mix with a real-contact explanation, residual-blue fading, copper surface deposition on visible gray zinc, nominal finite 6000ms visualization and persistent final appearance. Reuse current state ownership/dynamics/Manual and Auto Replay. Acknowledge exothermy without a numerical thermal profile or fabricated sensor reading. Preserve starting inventory/repeated Mix; no stoichiometric consumption, chaining or product reuse. Keep Vietnamese chemistry under English fallback pending teacher/SGK review.
+
+Implementation, tests, browser QA and commit/push to M13 are authorized. No PR, merge, deployment or advancement beyond M13 is authorized. Execute the living `plans/m13-advanced-2d-phenomena.md`; original gate 3 is now satisfied. Teacher review and calibration must not be claimed without evidence.

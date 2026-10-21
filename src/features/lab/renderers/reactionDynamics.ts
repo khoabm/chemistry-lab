@@ -6,6 +6,8 @@ export const effectDurationMs = {
   gas: 8000,
   'temperature-rise': 3500,
   'solid-color-change': 6000,
+  'solution-color-change': 6000,
+  'surface-deposit': 6000,
 } as const satisfies Record<ReactionEffect['type'], number>
 
 export interface ReactionPresentation {

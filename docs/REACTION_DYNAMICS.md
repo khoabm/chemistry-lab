@@ -437,3 +437,9 @@ unavailable; no high-temperature solid measurement or temperature inferred from
 reaction warmth is added. Moving/attaching a sensor later does not rewrite the
 recording, and an already-playing session does not consume later observations.
 The live model continues independently; Replay never rewinds, freezes or heats it.
+
+## M13 — Solution color change and surface deposition
+
+R9 adds two finite semantic effects, each with a nominal 6000ms teaching duration: blue solution becomes less blue, while dark/reddish-brown copper develops on visible gray zinc. This duration is not kinetics; coverage and residual blue do not measure conversion. Copper remains anchored to immersed zinc granules, distinct from suspended precipitate and its sediment bed. Final appearance persists without looping motion.
+
+Use the same occurrence, common CSS animation age and shared renderer in bench, close-up and Enlarged View. Manual/Auto Replay restore blue/gray initial material, develop both effects and retain the final state/Auto hold without evaluating chemistry. Reduced motion preserves static intermediate/final live cues and initial/developing/final Replay stages. Existing sensor recording remains independent and honestly unavailable for unsupported displacement samples. No new clock, energy budget or Replay occurrence mechanism.

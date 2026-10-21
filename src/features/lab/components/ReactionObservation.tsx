@@ -30,6 +30,9 @@ export function ReactionObservation({ result }: { result: ReactionResult | null 
       {result.effects.some((effect) => effect.type === 'temperature-rise') && <div>
         <dt>{t('result.visualCue')}</dt><dd>{t('result.warmingLegend')}</dd>
       </div>}
+      {result.effects.some((effect) => effect.type === 'surface-deposit') && <div>
+        <dt>{t('result.visualCue')}</dt><dd>{t('result.displacementLegend')}</dd>
+      </div>}
       {result.effects.some((effect) => effect.type === 'solid-color-change') && <div>
         <dt>{t('result.heatingNote')}</dt><dd>{t('result.heatLegend')}</dd>
       </div>}

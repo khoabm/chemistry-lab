@@ -60,7 +60,9 @@ export function ReactionEffectsVisual({ effects, layout, presentation = complete
               })}
             </g>
           )
-          case 'solid-color-change': return null // The shared sample drawing applies this semantic color.
+          case 'solid-color-change':
+          case 'solution-color-change':
+          case 'surface-deposit': return null // Shared material composition owns these persistent effects.
           case 'temperature-rise': return active && (
             <g key={effect.id} data-reaction-effect="temperature-rise" className="reaction-warmth"
               transform={`translate(${x + width / 2}, ${surface + height / 2})`} style={duration}>

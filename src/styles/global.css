@@ -650,3 +650,19 @@ h3 { font-size: 14px; font-weight: 600; }
 .contents-list li.is-editable { grid-template-columns: 16px minmax(0, 1fr) auto; }
 .chemical-remove-button { min-height: 44px; padding: 5px 10px; border: 1px solid var(--color-line); border-radius: var(--radius-small); background: transparent; color: var(--color-muted); cursor: pointer; }
 .chemical-remove-button:hover { background: #fff7f4; color: #8b4438; border-color: #cfa99e; }
+
+/* M13: finite material development; shared occurrence age, never chemistry kinetics. */
+.displacement-liquid { fill: var(--solution-final); }
+.displacement-liquid.is-developing { animation: solution-fade var(--effect-duration) linear both; }
+.surface-deposit { opacity: 1; }
+.surface-deposit.is-developing { animation: surface-develop var(--effect-duration) ease-in-out both; }
+@keyframes solution-fade { 0%, 16.667% { fill: var(--solution-initial); } 100% { fill: var(--solution-final); } }
+@keyframes surface-develop { 0%, 16.667% { opacity: 0; } 100% { opacity: 1; } }
+.displacement-liquid[data-stage='initial'] { animation: none; fill: var(--solution-initial); }
+.surface-deposit[data-stage='initial'] { animation: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .displacement-liquid.is-developing { animation: none; fill: #73aac5; }
+  .surface-deposit.is-developing { animation: none; opacity: 0.55; }
+  .displacement-liquid[data-stage='initial'] { fill: var(--solution-initial); }
+  .surface-deposit[data-stage='initial'] { opacity: 0; }
+}

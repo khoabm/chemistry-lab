@@ -731,3 +731,13 @@ The sensor integrates warming up to the exact crossing, then relaxes toward 100�
 with the existing 30-s simulated liquid lag. It reads roughly 84.3/85.6°C at first
 boiling from ambient, not an instantaneous 100°C. No temperature is reset by the
 visual state, attachment or Replay. No boiling completion marker is stored.
+
+## M13 — Authorized zinc displacement (R9)
+
+Authorized on 2026-10-21 on branch `M13`; see `plans/m13-advanced-2d-phenomena.md`. R1–R8 remain unchanged. Zinc is the only new selectable reagent: `zinc`, Zn, solid, gray granules. Products `zinc-sulfate` (ZnSO4) and `copper-metal` (Cu) are semantic information, not reusable catalog samples.
+
+`mix`: Zn(s) + CuSO4(aq) → ZnSO4(aq) + Cu(s). Match exactly `zinc` and `copper-sulfate`, order-independently, with existing positive qualitative quantities. Extra substances and other zinc combinations remain unsupported demonstrations, not claims of real-world inertness. Physical contact can initiate real displacement without stirring; explicit Mix starts this application's compressed demonstration.
+
+Semantic effects: `solution-color-change` from blue toward paler blue, and `surface-deposit` of copper on zinc. Preserve residual blue and visible gray substrate, with dark/reddish-brown copper patches localized to the immersed surface. No generic precipitation, gas or complete-conversion claim. The final drawing does not replace the starting-substances inventory; existing repeated-Mix behavior remains.
+
+Real displacement is exothermic, but this scope has no displacement numerical thermal profile or temperature-rise effect. Mixed samples and zinc remain numerically unsupported; attached thermometer readings must be unavailable, not fabricated. Preserve the existing R6 budget, R7/R8 caps and pure-water thermal model. No new trigger or thermal scheduler. Teacher/SGK review of Vietnamese chemistry terminology remains pending; use English fallback.

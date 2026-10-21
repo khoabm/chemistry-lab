@@ -505,3 +505,9 @@ in the workbench, close-up and dialog; deterministic SVG/CSS loops remain separa
 from finite reaction effects and Replay. No persistent boiling boolean or particle
 state is stored. Thermometer attachment, R1–R8, Dropper and equipment/material
 removal retain their existing state contracts and stable identities.
+
+## M13 — Bounded displacement rendering
+
+R9 extends registered semantic data with solution color change and copper surface deposition. Existing useReducer actions/results and exact-set engine remain authoritative. No new persistent progress, material conversion, attachment, thermal profile or clock is introduced. A pure presentation geometry helper supplies the same zinc granule paths to the substrate and clipped coating renderer. The shared contents renderer retains the named substrate only when semantic deposition requests it, preserving existing reacted-material paths for R1–R8.
+
+Effect duration, SVG color/paths and CSS animation belong to presentation; semantic identity belongs to simulation data. New animation names participate in existing age synchronization and finite Manual/Auto Replay. Pure-water boiling remains separate physical animation. Product metadata never becomes transferable sample contents.

@@ -876,3 +876,9 @@ retains lag. The fixed-load, uncalibrated, 1-atm model and lack of evaporation
 calculation are disclosed. Search accepts Water/Nước/H₂O/H2O in either locale.
 Adding more water or another reagent invalidates numerical applicability;
 an unchanged pure-water Mix does not stop boiling.
+
+## M13 — Displacement presentation
+
+Show gray zinc granules and blue CuSO4 solution before explicit Mix. The six-second R9 demonstration reveals dark/reddish-brown copper patches on the immersed zinc and fades the solution to a still-blue final appearance. Keep the gray substrate visible; do not show copper as falling precipitate. Reuse vessel clips, shared close-up/modal composition, focus and hit targets. Effect overlays ignore pointer input.
+
+Provide concise EN/VI generic descriptions and a legend explaining surface deposition, qualitative extent and the real contact-versus-Mix abstraction. The reaction explanation acknowledges exothermy without invented temperature. Chemistry names/explanations retain English fallback pending teacher review. Reduced-motion stages, finite Replay and persistent final appearance must remain legible in Beaker/Test tube at desktop, portrait and short landscape sizes.
