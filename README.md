@@ -36,6 +36,12 @@ No backend is required.
 
 ## Documentation
 
+For a new ChatGPT conversation (planning, review or project orientation), start
+with [`docs/CHATGPT_PROJECT_BRIEF.md`](docs/CHATGPT_PROJECT_BRIEF.md).
+For Codex prompt preparation, then open
+[`docs/CODEX_PROMPT_PROTOCOL.md`](docs/CODEX_PROMPT_PROTOCOL.md).
+These are navigation/collaboration guides, not replacements for approved specs.
+
 Project specification:
 
 `docs/PRODUCT.md`
