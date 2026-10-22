@@ -1,8 +1,8 @@
 # Advanced 2D Phenomena — Extension scope and decision gates
 
-**Status:** broader M13 development direction approved on 2026-10-22; this document authorizes **feasibility and a Codex-authored ExecPlan**, not unconditional implementation of every candidate.
+**Status:** B1 feasibility/ExecPlan accepted and **B2 R10 implementation scope explicitly approved on 2026-10-22**. B3 implementation and its validation are authorized on this extension branch. C1/C2 remain separately deferred, not implemented or canceled; final M13 acceptance and merge remain separate gates.
 **Branch:** `M13-advanced-2d-extension`, forked from the reviewed R9 branch `M13` at `7648bf1b8afab812a11baaf1dee9fc46a42780bf`; `main` has not received R9.
-**Next deliverable:** `plans/m13-advanced-2d-extension.md` authored by Codex per `.agent/PLANS.md`, then independent ExecPlan review and explicit implementation-scope approval.
+**Next action:** Codex implements the approved **R10-only B3** scope under `plans/m13-advanced-2d-extension.md`, updates living contracts before source changes, runs full scoped tests/browser QA, commits/pushes to the extension branch, then stops for independent final review. No automatic merge/PR/deployment.
 **Relationship to prior work:** `docs/ADVANCED_2D_PHENOMENA.md` and `plans/m13-advanced-2d-phenomena.md` document the completed R9 implementation and its QA. Preserve those recorded decisions/evidence; do not reopen R9 without a confirmed regression.
 
 ## Product goal
@@ -23,9 +23,9 @@ Priority: scientific correctness → observable plausibility → visual clarity 
 
 Do not restart an already completed effect, perform general 2D polish, change material inventory into product/consumption accounting, or merge/release `M13` implicitly.
 
-## B — First priority: metal–acid phenomenon (R10 candidate)
+## B — Metal–acid phenomenon (approved R10 scope; original feasibility rationale below)
 
-**Candidate, not yet registered:**
+**Original candidate, approved for B3 implementation on 2026-10-22 (not yet registered at this documentation revision):**
 
 ```text
 Zn(s) + 2 HCl(aq) → ZnCl2(aq) + H2(g)
@@ -43,7 +43,22 @@ Zinc and hydrochloric acid already exist in the catalog; no new selectable mater
 
 **Mandatory design questions before coding:** whether the existing semantic `gas` effect can be extended with a new source/context without regressing R5/R7; whether the alteration needs its own effect type; what happens with repeated Mix, removal/invalidation, Dropper-prepared acid, attached thermometer, mounted lamp and concurrent R9/R10; which existing specifications require deliberate extension; and what exact browser observations prove a genuinely distinct effect. Compare at least one minimal alternative (e.g., localized gas alone without visually eroding zinc).
 
-**Gate B1 — feasibility/ExecPlan review:** Codex documents the smallest scientific/rendering model, reaction rule and testable acceptance; review identifies unresolved assumptions. **Gate B2 — user approval:** only after review explicitly approve R10 and any optional substrate alteration. **Gate B3 — implementation:** update approved source-of-truth contracts first, then implement/test/browser-QA on an authorized branch.
+**Gate B1 — feasibility/ExecPlan review: PASS** at `5c11f5a`. **Gate B2 — user scope approval: GRANTED** on 2026-10-22 for the constrained R10 contract below, excluding optional substrate alteration. **Gate B3 — implementation: AUTHORIZED**, but not yet completed at this documentation revision. Update current contracts first; implement, test and run browser QA, then stop for independent final review.
+
+## Authorized B2 decision — 2026-10-22
+
+User approved the independent review recommendations for B2. The binding implementation scope is:
+
+- Register **R10** exactly for `zinc` + `hydrochloric-acid` with **`mix`** (order-independent positive qualitative quantities), equation `Zn + 2HCl → ZnCl2 + H2↑`, informational products zinc chloride and hydrogen only. No new reagent/Heat rule, consumption, chain chemistry or inventory conversion.
+- Extend semantic `gas` with discriminated `context: 'immersed-solid'` and **required substrate `zinc`**, leaving the existing `liquid`/ `heated-solid` variants and their effects unchanged.
+- **Intensity `medium` and nominal 8000ms** are illustration choices, not measured rates/volumes. Fixed, restrained bubbles originate on immersed zinc contours, detach, ascend within liquid, and cease at the finite endpoint. R5 and R7 must remain visually/scientifically distinct.
+- **Omit zinc alteration/erosion**; retain gray zinc and colorless solution, with no copper coating, precipitation, steam, numerical thermal model or fabricated thermometer reading. No substrate consumption claim at the visually held endpoint.
+- Keep explicit Mix; explain that actual contact can start the chemistry without mandatory stirring. Include a **brief non-operational hydrogen flammability disclosure** and state that ignition/heating safety is not simulated. No flame test or automatic interaction policy change.
+- Preserve the current immutable result, common occurrence, Manual/Auto Replay, reset/empty/removal, Dropper, lamp/mount/thermometer and pure-water boiling contracts. Actual Chromium reduced-motion/browser verification and bench-scale readability are required.
+- **C1 dissolution: DEFER independently** pending a separate physical-process design/approval, not a chemical R11. **C2 R8 condensation: DEFER independently** pending apparatus/scientific review, preserving R8 without newly invented vapor/droplets.
+- **D final acceptance** must examine the expanded set of phenomena; completion of R10 alone does not automatically mark M13 complete or authorize merge into `M13`/`main`.
+
+This decision authorizes Codex to implement B3 and its tests/QA and push scoped changes **only to `M13-advanced-2d-extension`** without repeated permission for routine coding decisions. Unexpected scientific/architectural conflicts require review before changing approved scope.
 
 ## C — Secondary candidates: evaluate independently, do not auto-implement
 
@@ -59,7 +74,7 @@ Heating `CuSO4·5H2O` can release water. A limited condensation cue might be sci
 
 Evaluate whether droplets could plausibly appear on a cooler part of the existing Test tube and remain legible, without inventing a delivery tube, collecting vessel, visible smoke cloud, boiling liquid, measurable water yield or new heat-transfer mechanics. The RSC's example that collects condensed water uses a receiving tube and delivery tube; that apparatus must **not** be silently attributed to the application's existing single-tube setup. If the depiction is scientifically ambiguous, prefer to keep R8 unchanged.
 
-C1 and C2 must have independent conclusions: **implement / defer / reject**, with evidence, cost and effect on existing contracts. User approval of the broad M13 roadmap is **not** approval to change the physical engine or R8's baseline contract.
+C1 and C2 were assessed independently and **both deferred** at B2 on 2026-10-22. Revisiting either requires a separate scope approval, with evidence and lifecycle/apparatus implications; the physical engine and R8's baseline contract remain unchanged under B3.
 
 ## D — M13 final 2D acceptance
 
@@ -81,7 +96,7 @@ No lesson/course management, localization sign-off before teacher review, full s
 
 1. **Preparation (now):** preserve R9 base, create a dedicated branch and source-of-truth extension brief, link from the milestone index. No application implementation.
 2. **Codex feasibility/ExecPlan:** inspect local checkout and actual source; author `plans/m13-advanced-2d-extension.md` using every section in `.agent/PLANS.md`. Include a concrete B implementation proposal, an explicit optional zinc-alteration decision, independent C1/C2 trade-offs, schedule/checkpoints, tests, visualization evidence and stop conditions. Never silently mark candidate chemistry as approved.
-3. **Independent review / user scope gate:** review the ExecPlan first. Authorize concrete B implementation; decide C1 and C2 individually after feasibility. Record approvals in current documents before corresponding code.
+3. **Completed 2026-10-22 independent review / B2 gate:** ExecPlan `5c11f5a` accepted, R10 implementation approved within the Authorized B2 decision above, and C1/C2 explicitly deferred.
 4. **Scoped implementation/QA:** Codex follows approved plan, updates living Progress/Decision log, commits to authorized branch, runs focused then full integration/browser checks. Avoid resetting or rewriting accepted R9 history.
 5. **Final acceptance/merge:** independent review and explicit merge approval. Do not automatically merge into `M13` or `main`, declare numbered M13 complete, deploy or advance to M14/M15.
 
