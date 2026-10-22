@@ -1,9 +1,9 @@
 # Advanced 2D Phenomena — Scope and feasibility specification
 
-**Status:** M13 implementation explicitly approved on 2026-10-21 after independent review of ExecPlan baseline `3f7488c`. The original candidate analysis below is retained as design rationale; the approved scope in the following section supersedes its pending-approval wording.
+**Status:** R9 implementation is delivered on `M13` at `39fb363` following the 2026-10-21 approval of reviewed ExecPlan baseline `3f7488c`. Final QA gap closure and independent review are tracked in `plans/m13-advanced-2d-phenomena.md`; this is not a merge, release or milestone-completion declaration. The original planning sections below are historical design rationale, not current pending-approval instructions.
 **Roadmap reference:** Advanced 2D Phenomena (called M13 in the original roadmap).
 **Working branch:** `M13` based on `main` at `aa7b8f8cc10d8c1247b1799ac6011207eaed1abc`.
-**Next owner:** Codex inspects the actual checkout and authors a living ExecPlan under `plans/` according to `.agent/PLANS.md`. This document is the product/design input, **not** an ExecPlan or implementation approval.
+**Next action:** Review the final QA evidence recorded in the existing ExecPlan, then obtain independent acceptance and separate merge approval. Do not create a replacement plan or repeat the completed planning gate. This document remains the scope/design input; the explicit implementation authorization is recorded below.
 
 ## Purpose and constraints
 
@@ -13,13 +13,13 @@ Preserve the existing direct bench interaction, explicit `Mix` and mounted/lit `
 
 The baseline implemented chemistry was R1–R8; the explicit authorization below adds only R9 to `docs/CHEMISTRY.md` and `src/simulation/reactions/`; pure-water boiling remains a **physical** phenomenon, not another registered reaction. The accepted baseline audit reported no confirmed blocker in R1–R8/Water Boiling V1, but live R7/R8 transients, direct reduced-motion browser behavior, physical-device performance and many concurrent effects were not exhaustively verified. Do not reinterpret these unverified checks as passed.
 
-## Planning objective
+## Original planning objective (historical)
 
 Codex must inspect the current implementation and compare a **minimal new 2D phenomenon** against plausible alternatives. Deliver a design that adds clearly recognizable chemistry-visual behavior, is reusable where appropriate, and does not over-expand application-state or the rendering architecture. If the candidate has disproportionate complexity or scientific risk, document an alternative and ask for a scope decision rather than implementing it.
 
 ### First candidate for evaluation — metal displacement
 
-Qualitative reference example (a **proposal**, not an approved reaction registration):
+Qualitative reference example (a proposal at the original planning stage; subsequently approved below):
 
 ```text
 Zn(s) + CuSO4(aq) → ZnSO4(aq) + Cu(s)
@@ -40,7 +40,7 @@ Feasibility questions that **must be resolved in the ExecPlan**:
 
 No new chemical, reaction ID (`R9` included), product, effect type, threshold or trigger is **approved merely by appearing in this candidate section**. Approval of a specific chemistry rule and source-of-truth updates must precede implementation.
 
-## Scope of the current design task
+## Original planning-only task (historical)
 
 - Review the existing reaction definitions/engine, semantic effect types, contents renderer, shared reaction visualization, animation lifecycle and Replay.
 - Evaluate the above candidate and at least one alternative on scientific clarity, source/state compatibility, reusability, accessibility and implementation cost.
@@ -49,9 +49,9 @@ No new chemical, reaction ID (`R9` included), product, effect type, threshold or
 - Create a new living ExecPlan in `plans/m13-advanced-2d-phenomena.md` following every required section of `.agent/PLANS.md`, with `Progress` showing planning only. Codex may refine the recommended scope in that ExecPlan but must identify any conflicts with this document instead of silently changing the product contract.
 - Return the ExecPlan and trade-offs for independent review. **Stop before application/source implementation**.
 
-## Potential implementation acceptance checks (conditional, not yet authorization)
+## Implementation acceptance checks
 
-If a new phenomenon is approved later, require at minimum:
+The original conditional checks now apply to the approved R9 scope:
 
 - Registered rule matches **only** its supported chemicals and the appropriate existing trigger; order-independent, exact-set/no-reaction behavior and R1–R8 remain unchanged.
 - The new visual shows a discernible onset, meaningful progression, bounded transient activity and persistent final outcome; it does not imply unmodeled chemistry.
@@ -71,11 +71,11 @@ If a new phenomenon is approved later, require at minimum:
 
 ## Source-of-truth and authorization gates
 
-1. **Completed now:** create a dedicated planning branch and approved design brief without touching runtime code.
-2. **Codex planning:** inspect current checkout; write/update the ExecPlan in `plans/` and report feasibility, assumptions, risks, alternative and draft acceptance. No code edits in this gate.
-3. **User scope approval:** reviewer and user choose the actual reaction/phenomena and the implementation boundary. Only then update the relevant living chemistry, UI/UX and milestone specifications as needed; preserve historical records.
-4. **Implementation and QA:** Codex implements the authorized plan with tests/browser evidence, keeping the living ExecPlan synchronized.
-5. **Independent review and explicit merge approval:** do not automatically advance the recorded numbered milestone, merge, deploy or broaden the scope.
+1. **Completed planning setup:** dedicated branch and design brief, without runtime edits at that stage.
+2. **Completed Codex planning:** feasibility, alternatives and acceptance recorded in the reviewed ExecPlan (`3f7488c`). The no-code restriction applied to that planning gate.
+3. **Scope approved on 2026-10-21:** the user selected R9 and the implementation boundary below; current contracts were aligned while preserving historical records.
+4. **Implementation delivered (`39fb363`); final QA evidence recorded:** actual tests/browser checks and remaining limitations are in the living ExecPlan.
+5. **Independent review and explicit merge approval remain separate:** do not automatically advance the recorded numbered milestone, merge, deploy or broaden the scope.
 
 Reference documents: `AGENTS.md`, `.agent/PLANS.md`, `docs/PRODUCT.md`, `docs/MILESTONES.md`, `docs/CHEMISTRY.md`, `docs/REACTION_DYNAMICS.md`, `docs/UI_UX.md`, `docs/ARCHITECTURE.md`, and `src/simulation/AGENTS.md`.
 
