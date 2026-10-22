@@ -16,11 +16,12 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, e
   const surfaceColor = reactedLiquid ? '#d7e9ed' : liquids.at(-1)?.chemical.color
   const solution = effects.find((effect) => effect.type === 'solution-color-change')
   const deposit = effects.find((effect) => effect.type === 'surface-deposit')
+  const immersedGas = effects.find((effect) => effect.type === 'gas' && effect.context === 'immersed-solid')
   const liquidClass = solution ? `displacement-liquid ${effectIsActive(solution.type, presentation) ? 'is-developing' : 'is-complete'}` : ''
   const liquidStyle = solution ? { '--solution-initial': solutionColors[solution.from], '--solution-final': solutionColors[solution.to],
     '--effect-duration': `${effectDurationMs[solution.type]}ms` } as CSSProperties : undefined
   return (
-    <g stroke="none">
+    <g stroke="none" data-immersed-substrate={immersedGas?.substrate}>
       <defs>
         <linearGradient id={sheenId} x1="0" x2="1">
           <stop stopColor="#fffefa" stopOpacity="0.45" />
@@ -35,7 +36,7 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, e
       {/* Separate bands identify starting substances, not physical immiscible layers. */}
       {reactedLiquid ? <rect className={`reacted-liquid ${liquidClass}`} data-content-state="liquid" x={x} y={surface}
         data-reaction-effect={solution?.type} data-stage={replayStage} style={liquidStyle}
-        width={width} height={height} fill={solution ? solutionColors[solution.to] : '#d7e9ed'} fillOpacity={solution ? '0.65' : '0.55'} /> : liquids.map((sample, index) => {
+        width={width} height={height} fill={solution ? solutionColors[solution.to] : immersedGas ? liquids.at(-1)?.chemical.color : '#d7e9ed'} fillOpacity={solution || immersedGas ? '0.65' : '0.55'} /> : liquids.map((sample, index) => {
         const bandHeight = height * (sample.visualQuantity / total)
         const top = bottom - height * liquids.slice(0, index + 1).reduce((sum, portion) => sum + portion.visualQuantity, 0) / total
         return <rect key={sample.chemicalId} data-content-state="liquid" x={x} y={top} width={width} height={bandHeight}
@@ -51,7 +52,7 @@ export function ContainerContentsVisual({ layout, reacted = false, solidColor, e
         <path d={`M${x + 2} ${surface + 4}v${Math.max(0, height - 10)}`} stroke="#fffefa" strokeWidth="1.2" strokeOpacity="0.65" />
       </>}
       {solids.map((sample, index) => {
-        if (reacted && !solidColor && deposit?.substrate !== sample.chemicalId) return null
+        if (reacted && !solidColor && deposit?.substrate !== sample.chemicalId && immersedGas?.substrate !== sample.chemicalId) return null
         if (sample.chemicalId === 'zinc') return <g key={sample.chemicalId} data-substrate="zinc" data-content-state="solid" fill={sample.chemical.color} stroke="#5d6b71" strokeWidth="0.5">
           {zincGranules(layout, index).map((granule, i) => <path key={i} d={granule.body} />)}
         </g>

@@ -26,7 +26,7 @@ Communicate with the user in concise Vietnamese; preserve original code identifi
 - Do not invent redundant writable state, second clocks, global stores or UI-specific chemistry conditions.
 
 ## Chemistry and thermal contract
-- Only registered R1–R9 reactions and existing `mix`/`heat` chemistry triggers are supported. No reaction is a valid outcome. Preserve stable IDs, explicit Mix, finite results, Replay semantics and qualitative `ChemicalPortion.quantity` (never silently mL, g or mol).
+- Only registered R1–R10 reactions and existing `mix`/`heat` chemistry triggers are supported. No reaction is a valid outcome. Preserve stable IDs, explicit Mix, finite results, Replay semantics and qualitative `ChemicalPortion.quantity` (never silently mL, g or mol).
 - Heating requires approved mounted/lit lamp contact; geometric overlap alone is not heating. Respect valid mount, lift, cancel and thermometer attachment transitions.
 - The authorized Thermometer B+ model uses bounded **nominal educational** sample temperature, residual vessel history, sensor lag and one 6× thermal clock; it is not an experimentally calibrated simulator. Preserve R6 finite energy and R7/R8 teaching caps.
 - Water Boiling V1, now integrated, adds pure H₂O as a physical 100°C teaching plateau with separate continuous visual effects. It is **not** a chemical reaction, reaction gas, completion or Replay; mixtures and transfers must not gain unsupported numeric claims. See `docs/CHEMISTRY.md` for precise rules and limits.

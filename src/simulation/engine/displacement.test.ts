@@ -27,8 +27,8 @@ describe('R9 registered zinc displacement', () => {
     expect(contents).toEqual(portions(['zinc', 'copper-sulfate']))
   })
 
-  it('never infers acid reactions, spectator chemistry, heat, invalid amounts or product reuse', () => {
-    for (const ids of [['zinc'], ['zinc', 'hydrochloric-acid'], ['zinc', 'water'],
+  it('never infers spectator chemistry, heat, invalid amounts or product reuse', () => {
+    for (const ids of [['zinc'], ['zinc', 'water'],
       ['zinc', 'copper-sulfate', 'water'], ['copper-metal', 'zinc-sulfate']]) {
       expect(evaluateReaction({ contents: portions(ids), trigger: 'mix' }).status).toBe('no-reaction')
     }

@@ -122,7 +122,7 @@ Lamp/dropper details and no-selection help appear directly without tabs.
 Empty container clears only that container and returns to Sample. Reset
 lab removes equipment, contents and reaction results. Adding substances does not
 evaluate chemistry. Press Mix in the selected container's details to identify one
-of the seven registered mix reactions (R1–R6 and R9); other combinations return
+of the eight registered mix reactions (R1–R6 and R9–R10); other combinations return
 `No observable reaction.` Matching ignores order and requires the exact supported
 set of substances. Results belong to each container and are cleared when its
 contents change. Supported results now show precipitate, gas bubbles or subtle
@@ -283,7 +283,7 @@ lint, `npm test -- --maxWorkers=2` and build.
 - `src/features/lab/renderers/WaterBoilingVisual.tsx`: independent continuous physical SVG/CSS cues.
 - `src/store/mounting.ts`: shared mount eligibility, occupancy queries and mounted Heat source resolution.
 - `src/simulation/chemicals/`: the specified catalog and pure portion additions.
-- `src/simulation/reactions/`: typed R1–R9 rules, products and semantic effects.
+- `src/simulation/reactions/`: typed R1–R10 rules, products and semantic effects.
 - `src/simulation/engine/`: pure deterministic reaction evaluation and unit tests.
 - `src/styles/tokens.css`: shared colors, spacing, radii, and typography defaults.
 - `src/styles/global.css`: base styles and responsive laboratory layout.
@@ -384,7 +384,7 @@ fallback, interpolation and plurals; missing/blank Vietnamese uses English.
 Canonical English chemistry metadata is indexed
 by stable IDs in `src/localization/chemistry.ts`, and recorded result metadata
 remains the English fallback when rendered. Formulas/equations never pass through
-translation. Chemical/product names, R1–R9 names/explanations, phenomenon prose and
+translation. Chemical/product names, R1–R10 names/explanations, phenomenon prose and
 scientific captions remain English pending teacher/SGK review. See
 `docs/LOCALIZATION.md` for the boundary, `docs/TRANSLATION_GUIDE.md` for editing,
 `docs/VI_CHEMISTRY_TERMS.md` for pending review and `plans/m10-localization.md`
@@ -411,3 +411,7 @@ The shared close-up/modal and finite Manual/Auto Replay show the same progressio
 reduced motion uses static stages. Starting portions, products-as-information and
 existing Dropper/removal/mounting semantics remain unchanged. New chemistry names
 and explanations use English fallback pending teacher/SGK terminology review.
+
+### M13 extension: metal–acid gas
+
+Explicit Mix of zinc and hydrochloric acid demonstrates finite hydrogen bubbles from immersed zinc surfaces in Beaker/Test tube. The eight-second illustration retains gray starting material and colorless solution; it does not measure consumption or gas yield. Real contact can initiate reaction without stirring. Numerical thermometer measurement is unsupported for this mixture. Hydrogen is flammable; ignition/heating safety is not simulated. Manual/Auto Replay and reduced motion reuse the existing finite presentation; dissolution and R8 condensation remain deferred.

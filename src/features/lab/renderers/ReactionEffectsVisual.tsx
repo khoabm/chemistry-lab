@@ -3,6 +3,7 @@ import type { ReactionEffect } from '../../../simulation/reactions/types'
 import type { ContentsLayout } from './contentsPresentation'
 import { precipitateColors } from './reactionPresentation'
 import { completedPresentation, effectDurationMs, effectIsActive, type ReactionPresentation } from './reactionDynamics'
+import { ImmersedGasVisual } from './ImmersedGasVisual'
 
 // Fixed patterns keep renders deterministic without introducing particle state.
 const bubblePositions = [0.12, 0.33, 0.67, 0.86, 0.5, 0.22, 0.77, 0.4, 0.6] as const
@@ -40,7 +41,7 @@ export function ReactionEffectsVisual({ effects, layout, presentation = complete
                 style={{ '--fall-start': `${-height * (0.45 + index % 3 * 0.1)}px`, '--settle-delay': `${index % 4 * 0.22}s` } as CSSProperties} />)}
             </g>
           )
-          case 'gas': return active && (
+          case 'gas': return active && (effect.context === 'immersed-solid' ? <ImmersedGasVisual key={effect.id} effect={effect} layout={layout} /> : (
             <g key={effect.id} data-reaction-effect="gas" data-gas-context={effect.context} data-gas-intensity={effect.intensity}
               className={`reaction-gas${effect.context === 'heated-solid' ? ' is-solid-gas' : ''}`} style={duration}>
               {(effect.intensity === 'low' ? bubblePositions.slice(0, 3) : bubblePositions).map((offset, index) => {
@@ -59,7 +60,7 @@ export function ReactionEffectsVisual({ effects, layout, presentation = complete
                 </g>
               })}
             </g>
-          )
+          ))
           case 'solid-color-change':
           case 'solution-color-change':
           case 'surface-deposit': return null // Shared material composition owns these persistent effects.

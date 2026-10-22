@@ -270,5 +270,9 @@
   "water.assumptions": "Nominal {{mass}}g pure-water reference at 1 atm; 100°C plateau. Heating/cooling parameters are uncalibrated. Portion units are not mass or volume. The thermometer reading lags the simulated sample temperature. No evaporation quantity is calculated.",
   "effect.solutionFades": "The blue solution becomes less strongly blue.",
   "effect.surfaceDeposit": "Copper develops on the zinc surface.",
-  "result.displacementLegend": "Copper coats the immersed zinc; it is not settling precipitate. Residual blue and coating are qualitative, not a conversion measurement. Real contact can start the reaction without stirring; Mix starts this demonstration."
+  "result.displacementLegend": "Copper coats the immersed zinc; it is not settling precipitate. Residual blue and coating are qualitative, not a conversion measurement. Real contact can start the reaction without stirring; Mix starts this demonstration.",
+  "effect.gas.immersed": "Gas bubbles form on the immersed zinc surface.",
+  "result.immersedGasLegend": "Hydrogen bubbles rise from the immersed zinc, not from boiling. The remaining gray zinc and finite illustration do not measure consumption.",
+  "result.safety": "Demonstration limits",
+  "result.hydrogenSafety": "Hydrogen is flammable. Ignition and heating safety are not simulated; this is not a real-laboratory procedure."
 }

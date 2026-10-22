@@ -39,6 +39,10 @@ export function ReactionObservation({ result }: { result: ReactionResult | null 
       {result.effects.some((effect) => effect.type === 'gas' && effect.context === 'heated-solid') && <div>
         <dt>{t('result.visualCue')}</dt><dd>{t('result.solidGasLegend')}</dd>
       </div>}
+      {result.effects.some((effect) => effect.type === 'gas' && effect.context === 'immersed-solid') && <div>
+        <dt>{t('result.visualCue')}</dt><dd>{t('result.immersedGasLegend')}</dd>
+        <dt>{t('result.safety')}</dt><dd>{t('result.hydrogenSafety')}</dd>
+      </div>}
     </dl>}
   </div>
 }

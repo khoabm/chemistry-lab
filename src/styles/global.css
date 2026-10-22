@@ -470,6 +470,10 @@ h3 { font-size: 14px; font-weight: 600; }
 .reaction-precipitate.is-settled .precipitate-bed, .reaction-precipitate.is-settled .precipitate-particle { animation: none; }
 .reaction-gas { --gas-peak: 1; animation: gas-development var(--effect-duration) linear both; }
 .reaction-gas.is-solid-gas { --gas-peak: 0.6; }
+.equipment-visual[data-replay-stage='initial'] .is-immersed-gas { animation: none; opacity: 0; }
+@media (max-height: 500px) and (min-width: 601px) {
+  .sample-detail-content:has([data-immersed-substrate]) { align-items: start; }
+}
 .reaction-bubble { transform: translateY(calc(var(--bubble-rise) * 0.5)); animation: bubble-rise var(--bubble-duration) linear 5 both; animation-delay: var(--bubble-delay); }
 .bubble-surface-ring { opacity: 0.35; transform-box: fill-box; transform-origin: center; animation: bubble-release var(--bubble-duration) linear 5 both; animation-delay: var(--bubble-delay); }
 @keyframes precipitate-form { 0% { opacity: 0; } 18%, 40% { opacity: 1; } 100% { opacity: 0; } }
@@ -498,6 +502,8 @@ h3 { font-size: 14px; font-weight: 600; }
   .precipitate-cloud, .precipitate-bed, .precipitate-particle, .reaction-gas, .reaction-bubble, .bubble-surface-ring, .reaction-warmth, .warmth-indicator { animation: none; }
   .reaction-gas { opacity: 0.7; }
   .reaction-gas.is-solid-gas { opacity: 0.45; }
+  .equipment-visual[data-replay-stage='initial'] .is-immersed-gas { opacity: 0; }
+  .is-immersed-gas .reaction-bubble { transform: none; }
   /* Replay-only static stages; normal live reduced-motion output is unchanged. */
   .equipment-visual[data-replay-stage='initial'] .precipitate-cloud { opacity: 0.65; }
   .equipment-visual[data-replay-stage='initial'] .precipitate-bed { opacity: 0; }

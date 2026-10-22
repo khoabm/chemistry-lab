@@ -246,5 +246,9 @@
   "water.assumptions": "Mẫu nước tinh khiết tham chiếu danh định {{mass}}g tại 1 atm; giữ ở 100°C khi sôi. Thông số nóng lên/nguội chưa hiệu chuẩn. Đơn vị chất không phải khối lượng hay thể tích. Số đo nhiệt kế có độ trễ so với nhiệt độ mẫu mô phỏng. Không tính lượng nước bay hơi.",
   "effect.solutionFades": "Màu xanh của dung dịch nhạt dần.",
   "effect.surfaceDeposit": "Lớp kim loại hình thành trên bề mặt mẫu rắn.",
-  "result.displacementLegend": "Lớp kim loại bám trên mẫu rắn ngập trong dung dịch, không phải kết tủa lắng xuống. Màu và lớp bám chỉ minh họa, không đo mức chuyển hóa. Tiếp xúc có thể làm phản ứng thật bắt đầu mà không cần khuấy; nút Trộn khởi động minh họa."
+  "result.displacementLegend": "Lớp kim loại bám trên mẫu rắn ngập trong dung dịch, không phải kết tủa lắng xuống. Màu và lớp bám chỉ minh họa, không đo mức chuyển hóa. Tiếp xúc có thể làm phản ứng thật bắt đầu mà không cần khuấy; nút Trộn khởi động minh họa.",
+  "effect.gas.immersed": "Bọt khí hình thành trên bề mặt mẫu kim loại ngập trong dung dịch.",
+  "result.immersedGasLegend": "Bọt H₂ đi lên từ mẫu kim loại ngập trong dung dịch, không phải sự sôi. Mẫu kim loại xám còn lại và thời gian minh họa không đo lượng chất đã phản ứng.",
+  "result.safety": "Giới hạn minh họa",
+  "result.hydrogenSafety": "Khí H₂ dễ cháy. Ứng dụng không mô phỏng an toàn khi đốt hoặc đun nóng; đây không phải hướng dẫn thực hành thí nghiệm."
 }

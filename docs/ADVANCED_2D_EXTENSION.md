@@ -1,8 +1,8 @@
 # Advanced 2D Phenomena — Extension scope and decision gates
 
-**Status:** B1 feasibility/ExecPlan accepted and **B2 R10 implementation scope explicitly approved on 2026-10-22**. B3 implementation and its validation are authorized on this extension branch. C1/C2 remain separately deferred, not implemented or canceled; final M13 acceptance and merge remain separate gates.
+**Status:** B1 feasibility/ExecPlan accepted and **B2 R10 implementation scope explicitly approved on 2026-10-22**. B3 implementation and local validation are delivered on this extension branch; actual evidence is in the living ExecPlan. C1/C2 remain separately deferred, not implemented or canceled; final M13 acceptance and merge remain separate gates.
 **Branch:** `M13-advanced-2d-extension`, forked from the reviewed R9 branch `M13` at `7648bf1b8afab812a11baaf1dee9fc46a42780bf`; `main` has not received R9.
-**Next action:** Codex implements the approved **R10-only B3** scope under `plans/m13-advanced-2d-extension.md`, updates living contracts before source changes, runs full scoped tests/browser QA, commits/pushes to the extension branch, then stops for independent final review. No automatic merge/PR/deployment.
+**Next action:** Independently review the implemented **R10-only B3** scope and recorded validation in `plans/m13-advanced-2d-extension.md`. Commit/push is authorized; merge/PR/deployment and M13 completion are not.
 **Relationship to prior work:** `docs/ADVANCED_2D_PHENOMENA.md` and `plans/m13-advanced-2d-phenomena.md` document the completed R9 implementation and its QA. Preserve those recorded decisions/evidence; do not reopen R9 without a confirmed regression.
 
 ## Product goal
@@ -25,7 +25,7 @@ Do not restart an already completed effect, perform general 2D polish, change ma
 
 ## B — Metal–acid phenomenon (approved R10 scope; original feasibility rationale below)
 
-**Original candidate, approved for B3 implementation on 2026-10-22 (not yet registered at this documentation revision):**
+**Approved on 2026-10-22 and registered by B3; the original feasibility rationale is retained below:**
 
 ```text
 Zn(s) + 2 HCl(aq) → ZnCl2(aq) + H2(g)

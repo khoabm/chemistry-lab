@@ -882,3 +882,9 @@ an unchanged pure-water Mix does not stop boiling.
 Show gray zinc granules and blue CuSO4 solution before explicit Mix. The six-second R9 demonstration reveals dark/reddish-brown copper patches on the immersed zinc and fades the solution to a still-blue final appearance. Keep the gray substrate visible; do not show copper as falling precipitate. Reuse vessel clips, shared close-up/modal composition, focus and hit targets. Effect overlays ignore pointer input.
 
 Provide concise EN/VI generic descriptions and a legend explaining surface deposition, qualitative extent and the real contact-versus-Mix abstraction. The reaction explanation acknowledges exothermy without invented temperature. Chemistry names/explanations retain English fallback pending teacher review. Reduced-motion stages, finite Replay and persistent final appearance must remain legible in Beaker/Test tube at desktop, portrait and short landscape sizes.
+
+## M13 extension — Metal–acid observation
+
+R10 displays hydrogen forming at immersed gray zinc in colorless hydrochloric acid after explicit Mix. Preserve substrate/liquid appearance, independent apparatus hit targets and the common close-up/Enlarged View. Effect overlays ignore pointer input. Bubbles detach upward and stop after the finite illustration; no copper, boiling, vapor, erosion or ignition. Explain contact versus Mix and that finite ending is not proof of complete consumption.
+
+Provide localized EN/VI origin/legend and concise non-operational hydrogen flammability disclosure: ignition and heating safety are not simulated. Keep chemistry English fallback pending teacher review. Mounted/lit lamps do not drive or ignite this demonstration, and unsupported thermometer readings remain unavailable. Preserve keyboard, focus, cancellation and reduced-motion initial/developing/final Replay without changing R9 or the existing modal layout.

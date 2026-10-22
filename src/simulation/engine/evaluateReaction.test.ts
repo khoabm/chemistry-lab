@@ -20,8 +20,8 @@ function portions(ids: readonly ChemicalId[]): ChemicalPortion[] {
 const noReaction = { status: 'no-reaction', trigger: 'mix', observation: 'No observable reaction.' }
 
 describe('registered mix reactions', () => {
-  it('registers only R1–R6 and R9 with unique reaction/effect IDs and consistent product identities', () => {
-    expect(mixReactions.map(({ id }) => id)).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R9'])
+  it('registers only R1–R6 and R9–R10 with unique reaction/effect IDs and consistent product identities', () => {
+    expect(mixReactions.map(({ id }) => id)).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R9', 'R10'])
     const effectIds = mixReactions.flatMap(({ effects }) => effects.map(({ id }) => id))
     expect(new Set(effectIds).size).toBe(effectIds.length)
     const products = new Map<string, { name: string; formula: string }>()

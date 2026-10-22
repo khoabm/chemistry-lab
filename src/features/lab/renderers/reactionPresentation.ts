@@ -16,7 +16,7 @@ export function describeReactionEffects(effects: readonly ReactionEffect[], t: T
   return effects.map((effect) => {
     switch (effect.type) {
       case 'precipitate': return t(`effect.precipitate.${effect.color}`)
-      case 'gas': return t(effect.context === 'heated-solid' ? 'effect.gas.solid' : 'effect.gas.liquid')
+      case 'gas': return t(effect.context === 'immersed-solid' ? 'effect.gas.immersed' : effect.context === 'heated-solid' ? 'effect.gas.solid' : 'effect.gas.liquid')
       case 'solid-color-change': return t(`effect.solid.${effect.color}`)
       case 'temperature-rise': return t('effect.warming')
       case 'solution-color-change': return t('effect.solutionFades')

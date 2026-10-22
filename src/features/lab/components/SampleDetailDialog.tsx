@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useStatusLive } from '../../../localization/useStatusLive'
 import { LanguageSelect } from '../../../localization/LanguageSelect'
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { ContainerState } from '../../../types/container'
 import type { EquipmentType } from '../../../types/equipment'
 import { EquipmentVisual } from './EquipmentVisual'
@@ -24,6 +24,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
 }) {
   const { t } = useTranslation()
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const [visible, setVisible] = useState(false)
   const titleId = useId()
   const replay = useReactionReplay(container, presentation)
   const visibleThermometer = replay.stage ? replay.thermometer : thermometer
@@ -41,6 +42,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
   }, [])
 
   return <dialog ref={dialogRef} className="sample-detail-dialog" aria-labelledby={titleId}
+    onToggle={(event) => setVisible(event.currentTarget.open)}
     onCancel={(event) => { event.preventDefault(); onDismiss() }}
     onClick={(event) => { if (event.target === event.currentTarget) onDismiss() }}>
     <div className="sample-detail-body">
@@ -56,6 +58,7 @@ export function SampleDetailDialog({ container, equipmentType, onDismiss, presen
         <div className="sample-detail-demonstration">
           <div className="sample-detail-visual">
             <EquipmentVisual equipmentType={equipmentType} contents={container.contents} reactionResult={container.reactionResult}
+              visible={visible}
               presentation={replay.presentation} replayStage={replay.stage} thermometer={visibleThermometer} boiling={water === 'boiling'}
               heating={container.heatingState.status === 'heating'} />
           </div>

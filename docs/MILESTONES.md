@@ -23,13 +23,13 @@ beyond M13. M11 remains the latest completed numbered milestone recorded above.
 **M13 extension — comprehensive 2D phenomena** was directionally approved on
 2026-10-22 as a continuation of the already QA-reviewed R9 work. A dedicated
 branch `M13-advanced-2d-extension` preserves that baseline and scopes staged
-feasibility: first metal–acid localized gas (provisional R10), then independent
+development: metal–acid localized gas (R10), with independent
 physical dissolution and R8 condensation assessments, followed by final 2D
 acceptance. See `docs/ADVANCED_2D_EXTENSION.md`. The extension ExecPlan was reviewed and **B2 R10-only implementation was approved**
 on 2026-10-22; see `docs/ADVANCED_2D_EXTENSION.md` and
 `plans/m13-advanced-2d-extension.md`. C1 dissolution and C2 R8 condensation
-were each explicitly deferred. R10 implementation/QA is authorized only on
-the extension branch; R8's visual contract and the physical-process engine
+were each explicitly deferred. R10 implementation and local QA are delivered on
+the extension branch, pending independent final review; R8's visual contract and the physical-process engine
 remain unchanged. This does not approve M13 completion or merge. Neither
 M13 nor its extension is merged or declared complete by this roadmap entry.
 

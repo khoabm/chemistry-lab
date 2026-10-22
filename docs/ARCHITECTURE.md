@@ -511,3 +511,9 @@ removal retain their existing state contracts and stable identities.
 R9 extends registered semantic data with solution color change and copper surface deposition. Existing useReducer actions/results and exact-set engine remain authoritative. No new persistent progress, material conversion, attachment, thermal profile or clock is introduced. A pure presentation geometry helper supplies the same zinc granule paths to the substrate and clipped coating renderer. The shared contents renderer retains the named substrate only when semantic deposition requests it, preserving existing reacted-material paths for R1–R8.
 
 Effect duration, SVG color/paths and CSS animation belong to presentation; semantic identity belongs to simulation data. New animation names participate in existing age synchronization and finite Manual/Auto Replay. Pure-water boiling remains separate physical animation. Product metadata never becomes transferable sample contents.
+
+## M13 extension — Named immersed gas source
+
+R10 extends the existing semantic gas union with an `immersed-solid` context requiring a stable substrate chemical ID. Existing gas contexts remain unchanged. The engine/reducer return ordinary immutable results; no extra workspace field/action, consumption model, thermal profile or clock is added. A focused shared zinc geometry helper supplies wetted contour sites to presentation; it must not put SVG coordinates into simulation data.
+
+The contents renderer retains a substrate explicitly named by deposition or immersed gas and preserves R10 liquid appearance. A scoped renderer uses existing glass/liquid clips, finite dynamics and age synchronization. Rendering follows semantic context rather than inferring chemistry from labels/reaction IDs. Existing Replay and bounded sensor recording remain authoritative. Dissolution and R8 condensation are not implemented by this extension.

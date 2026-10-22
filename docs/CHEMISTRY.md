@@ -736,8 +736,16 @@ visual state, attachment or Replay. No boiling completion marker is stored.
 
 Authorized on 2026-10-21 on branch `M13`; see `plans/m13-advanced-2d-phenomena.md`. R1–R8 remain unchanged. Zinc is the only new selectable reagent: `zinc`, Zn, solid, gray granules. Products `zinc-sulfate` (ZnSO4) and `copper-metal` (Cu) are semantic information, not reusable catalog samples.
 
-`mix`: Zn(s) + CuSO4(aq) → ZnSO4(aq) + Cu(s). Match exactly `zinc` and `copper-sulfate`, order-independently, with existing positive qualitative quantities. Extra substances and other zinc combinations remain unsupported demonstrations, not claims of real-world inertness. Physical contact can initiate real displacement without stirring; explicit Mix starts this application's compressed demonstration.
+`mix`: Zn(s) + CuSO4(aq) → ZnSO4(aq) + Cu(s). Match exactly `zinc` and `copper-sulfate`, order-independently, with existing positive qualitative quantities. Extra substances and zinc combinations beyond the registered R9/R10 rules remain unsupported demonstrations, not claims of real-world inertness. Physical contact can initiate real displacement without stirring; explicit Mix starts this application's compressed demonstration.
 
 Semantic effects: `solution-color-change` from blue toward paler blue, and `surface-deposit` of copper on zinc. Preserve residual blue and visible gray substrate, with dark/reddish-brown copper patches localized to the immersed surface. No generic precipitation, gas or complete-conversion claim. The final drawing does not replace the starting-substances inventory; existing repeated-Mix behavior remains.
 
 Real displacement is exothermic, but this scope has no displacement numerical thermal profile or temperature-rise effect. Mixed samples and zinc remain numerically unsupported; attached thermometer readings must be unavailable, not fabricated. Preserve the existing R6 budget, R7/R8 caps and pure-water thermal model. No new trigger or thermal scheduler. Teacher/SGK review of Vietnamese chemistry terminology remains pending; use English fallback.
+
+## M13 extension — Authorized metal–acid demonstration (R10)
+
+B2 approved on 2026-10-22; see `ADVANCED_2D_EXTENSION.md` and `../plans/m13-advanced-2d-extension.md`. Register only `zinc` + `hydrochloric-acid`, explicit `mix`: Zn(s) + 2HCl(aq) → ZnCl2(aq) + H2(g). Exact positive qualitative reactant sets, either order; no amount-ratio test, extra-reagent inference or Heat rule. Both reagents already exist; zinc chloride and hydrogen are informational products only.
+
+One medium `gas` effect has `context: 'immersed-solid'` and required substrate `zinc`. Bubbles arise at immersed zinc contours, not across arbitrary liquid, from a heated dry solid, or as boiling. Keep visible gray zinc and colorless schematic solution after the finite illustration; no erosion, copper, precipitate, complete-consumption claim or inventory conversion. Real contact can initiate reaction without stirring; Mix starts the compressed demonstration.
+
+The nominal 8000ms illustration is not measured kinetics or gas yield. R10 has no numerical thermal profile/energy budget; attached thermometers remain unavailable for this unsupported mixture. Hydrogen is flammable; ignition and heating safety are not simulated. Existing lamps do not start, extend or ignite R10. C1 dissolution and C2 R8 condensation remain deferred; R1–R9 and physical water boiling keep their approved contracts.

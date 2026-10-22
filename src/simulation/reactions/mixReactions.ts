@@ -1,6 +1,6 @@
 import type { ReactionDefinition } from './types'
 
-// Only the mix reactions registered in docs/CHEMISTRY.md (R1–R6, R9).
+// Only the mix reactions registered in docs/CHEMISTRY.md (R1–R6, R9–R10).
 export const mixReactions: readonly ReactionDefinition[] = [
   {
     id: 'R1', name: 'Silver chloride precipitation', trigger: 'mix',
@@ -81,5 +81,15 @@ export const mixReactions: readonly ReactionDefinition[] = [
       { id: 'r9-surface-copper', type: 'surface-deposit', substrate: 'zinc', product: 'copper-metal', appearance: 'copper' },
     ],
     observation: 'Zinc displaces copper from copper(II) sulfate. Copper develops on the zinc surface as the blue solution becomes less strongly blue. Real contact can initiate this exothermic reaction without stirring; Mix starts this illustrative demonstration. No numerical temperature or extent is modeled.',
+  },
+  {
+    id: 'R10', name: 'Zinc reacts with hydrochloric acid', trigger: 'mix',
+    reactants: ['zinc', 'hydrochloric-acid'], equation: 'Zn + 2HCl → ZnCl2 + H2↑',
+    products: [
+      { id: 'zinc-chloride', name: 'Zinc chloride', formula: 'ZnCl2' },
+      { id: 'hydrogen', name: 'Hydrogen', formula: 'H2' },
+    ],
+    effects: [{ id: 'r10-hydrogen', type: 'gas', intensity: 'medium', context: 'immersed-solid', substrate: 'zinc' }],
+    observation: 'Hydrogen bubbles form at immersed zinc as it reacts with hydrochloric acid, producing zinc chloride solution. Real contact can initiate this exothermic reaction without stirring; Mix starts the compressed illustration. Its finite ending does not prove complete consumption. No numerical temperature, gas yield or zinc loss is modeled.',
   },
 ]
