@@ -42,6 +42,8 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
         {equipmentType === 'thermometer' && <ThermometerVisual reading={reading} />}
         {equipmentType === 'beaker' && <>
           <path fill="#fffefa90" d="M24 20h47l6 7-5 4v48a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6Z" />
+          {/* Vessel details sit behind solid contents; keep the outer rim in front. */}
+          <path data-vessel-interior-detail="beaker" d="M31 39h9M31 50h6M31 61h9M31 72h6M63 37v37" />
           <defs><clipPath id={clipId}><path d="M26 32h44v47a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4Z" /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
             <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} effects={resultEffects} presentation={presentation} replayStage={replayStage} />
@@ -49,10 +51,11 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
             {boiling && <WaterBoilingVisual layout={layout} narrow={false} />}
           </g>
           {boiling && <WaterBoilingVapor narrow={false} />}
-          <path d="M24 26h42M31 39h9M31 50h6M31 61h9M31 72h6M63 37v37" />
+          <path data-vessel-rim="beaker" d="M24 26h42" />
         </>}
         {equipmentType === 'test-tube' && <>
           <path fill="#fffefa90" d="M36 15h28v60a14 14 0 0 1-28 0Z" />
+          <path data-vessel-interior-detail="test-tube" d="M43 30v41M55 78h1" />
           <defs><clipPath id={clipId}><path d="M38 23h24v52a12 12 0 0 1-24 0Z" /></clipPath></defs>
           <g clipPath={`url(#${clipId})`}>
             <ContainerContentsVisual layout={layout} reacted={reactionResult?.status === 'reaction'} solidColor={solidColor} effects={resultEffects} presentation={presentation} replayStage={replayStage} />
@@ -60,7 +63,7 @@ export const EquipmentVisual = memo(function EquipmentVisual({ equipmentType, co
             {boiling && <WaterBoilingVisual layout={layout} narrow />}
           </g>
           {boiling && <WaterBoilingVapor narrow />}
-          <path d="M32 15h36M32 20h36M43 30v41M55 78h1" />
+          <path data-vessel-rim="test-tube" d="M32 15h36M32 20h36" />
         </>}
         {equipmentType === 'dropper' && <>
           <path fill="#397963" d="M39 18a11 11 0 0 1 22 0v20H39Z" />
