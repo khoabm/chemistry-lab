@@ -6,15 +6,15 @@ This ExecPlan is a living document and must remain synchronized with implementat
 
 If independently reviewed and explicitly approved, a learner can combine the existing gray zinc and colorless hydrochloric acid in either vessel, press Mix, and observe hydrogen bubbles forming on immersed zinc, rising and ending. This adds a distinct **origin of gas**, rather than duplicating R5's mixture-wide gas or R7's heated-solid release. Workspace, sample close-up and Enlarged View share the same finite occurrence; Replay explains it without changing the live experiment.
 
-**Current authorization, 2026-10-22:** feasibility, this plan, commit and push on `M13-advanced-2d-extension` only. `docs/ADVANCED_2D_EXTENSION.md` approves direction, not R10 registration, optional material alteration, dissolution or R8 condensation. Stop after planning delivery for independent review and explicit scope approval. Implementation steps below are conditional; no application feature is delivered by this document.
+**Current authorization, 2026-10-22:** independent ExecPlan review PASS and user-approved B2 scope are recorded in `docs/ADVANCED_2D_EXTENSION.md` §Authorized B2 decision. **B3 R10-only implementation, tests, browser QA and commit/push on this branch are authorized.** Optional zinc alteration is omitted; C1/C2 are deferred. This authorization does not imply work has already been implemented or tested, and never grants merge/release/PR approval.
 
 Labels: **Fact** means inspected source at preparation HEAD `a007c548`; **Recommendation** is the proposed engineering/product choice; **Scientific basis** is a supported qualitative observation; **Teaching assumption** is an uncalibrated illustration choice; **Approval required** is not authorized by this plan.
 
 ## Scope
 
 - **B1, this delivery:** inspect source/contracts; design the smallest viable metal–acid demonstration, compare semantic/rendering alternatives, assess C1 and C2 independently and define final acceptance D.
-- **B2, pending:** approve or revise the exact R10 rule, gas context, intensity/timing, retained material appearance, safety explanation and C1/C2 dispositions in the decision table below.
-- **B3, proposed implementation:** R10 only, no new selectable reagent; localized finite gas, visible original zinc, shared renderer, existing dynamics/Replay, concise explanations and scoped regression/browser evidence.
+- **B2, approved 2026-10-22:** exact R10 rule, immersed-solid context with substrate, medium/8000ms illustrative gas, retained gray zinc, no erosion, non-operational hydrogen flammability note; separately defer C1/C2.
+- **B3, authorized but not yet implemented:** R10 only, no new selectable reagent; localized finite gas, visible original zinc, shared renderer, existing dynamics/Replay, concise explanations and scoped regression/browser evidence.
 - **C1 recommendation: DEFER** physical dissolution. **C2 recommendation: DEFER** R8 condensation. These are separate product decisions, not hidden implementation tasks in B.
 - **D:** bounded cross-feature integration acceptance of approved work, retaining R9 and the existing thermal/interaction contracts. Accepted deferral of C1/C2 does not prevent D; neither feature is a prerequisite masquerading as mandatory scope.
 
@@ -127,7 +127,7 @@ Proposed only after B2: extend `ReactionId` with R10 and the existing gas union 
 
 ## Implementation steps
 
-These steps start only after independent plan review and explicit B2 approval; ordinary engineering within that approval does not need repeated permission.
+Independent plan review and explicit B2 approval were received on 2026-10-22. These implementation steps are now authorized; ordinary engineering within that scope does not need repeated permission.
 
 1. **Align approved scope (0.5 day).** Record approved/deferred decisions here and intentionally extend affected current specifications/instructions. Preserve historical plans and R9 QA. Recheck actual branch/status/base; keep unrelated work intact. Start failing engine tests for current no-reaction Zn/HCl and renderer tests for missing retained/localized zinc, before introducing R10.
 2. **Register semantic B contract (0.5–1 day).** Add discriminated gas context/R10 definition and metadata; no engine algorithm/catalog changes. Unit-test exact matching and wrong/extra inputs; update exhaustive presentation descriptions. Focused existing R1–R9 checks must pass before moving on.
@@ -208,7 +208,7 @@ Use actual Chromium/Playwright/local app, not injected synthetic React state. In
 - [x] Assess B semantics/origin/material retention and optional alteration; compare alternatives; verify qualitative scientific references with access limitations recorded.
 - [x] Assess C1 and C2 separately; recommend independent deferrals with concrete reasons and future approval needs.
 - [x] Author implementation-ready B proposal, decisions, checkpoints, D acceptance matrix and stop conditions.
-- [ ] Independent ExecPlan review and explicit B2 user approval; record C1/C2 dispositions.
+- [x] 2026-10-22: Independent ExecPlan review PASS; user approved B2 R10, medium/8000ms gas and retained zinc, omitted alteration, and deferred C1/C2 separately.
 - [ ] After approval: align contracts, add failing regressions, implement B in verified checkpoints.
 - [ ] Run full integration/actual browser acceptance D and preserve R9 evidence; final independent implementation review.
 - [ ] Obtain separate merge/release authorization; do not advance M13 automatically.
@@ -225,7 +225,8 @@ Use actual Chromium/Playwright/local app, not injected synthetic React state. In
 
 | Date / status | Decision | Reason |
 | --- | --- | --- |
-| 2026-10-22 / authorized now | Planning document and scoped commit/push only. | Extension direction requires independent review and explicit implementation gates; no R10/C1/C2 code authorization. |
+| 2026-10-22 / B2 implementation approved | User authorized R10-only B3 and validation on the extension branch, with approved gas semantics and visual limits; C1/C2 explicitly deferred. | Independent review of planning SHA `5c11f5a`; scope recorded in `docs/ADVANCED_2D_EXTENSION.md`. No merge/release authorization. |
+| 2026-10-22 / original planning gate (historical) | Planning document and scoped commit/push only. | Earlier authorization applied before independent review/B2; superseded for B3 by explicit user approval. |
 | 2026-10-22 / recommended B2 | Extend gas context with required immersed substrate, retain original zinc, reuse finite age/Replay. | Distinct scientific origin with minimal existing architecture changes; no second effect lifecycle. |
 | 2026-10-22 / recommended B2 | Omit optional zinc alteration; medium 8000ms localized gas and retained qualitative final material. | Avoid fake conversion and unclear gray texture; no reason to add persistent semantics before evidence. |
 | 2026-10-22 / recommended separate C1 decision | Defer dissolution, no reaction ID/workaround. | Valuable physical teaching process but no approved physical occurrence/Replay or quantitative endpoint. |
@@ -234,6 +235,8 @@ Use actual Chromium/Playwright/local app, not injected synthetic React state. In
 
 ## Outcomes and retrospective
 
-Planning delivery only: a source-grounded B implementation proposal plus independent C1/C2 deferral recommendations, explicit user decisions, estimated sequence and bounded acceptance. No R10 registration, source/test/dependency/configuration change or new scientific calibration. R9 code and accepted evidence remain intact. Engineering appears feasible in the existing stack; final scientific-visual plausibility still requires the specified browser/teacher review, and implementation cannot begin from this plan's existence alone.
+Historical planning delivery only: a source-grounded B implementation proposal plus independent C1/C2 deferral recommendations, explicit user decisions, estimated sequence and bounded acceptance. No R10 registration, source/test/dependency/configuration change or new scientific calibration. R9 code and accepted evidence remain intact. Engineering appears feasible in the existing stack; final scientific-visual plausibility still requires the specified browser/teacher review, and implementation cannot begin from this plan's existence alone.
 
 Planning validation on 2026-10-22: a read-only Python check passed all 13 required sections, the technology-stack subsection, Progress-only checkboxes, 18 existing local anchors, whitespace and fence balance; proposed new files are explicitly labeled. `git merge-base --is-ancestor 7648bf1 HEAD` and a quiet diff against that revision for source/package/workflow paths passed. Documentation-only preparation differences were confirmed. Final whitespace/staging/commit checks are recorded in planning delivery. No application tests, R10 browser workflow or new scientific experiment was executed for this document-only task. Stop for independent ExecPlan review and explicit scope approval after committing/pushing this plan.
+
+Post-review status note (2026-10-22): B2 approval has been recorded; runtime remains unchanged at this documentation checkpoint. Subsequent B3 implementation, tests and browser acceptance must be recorded as completed only after execution.
