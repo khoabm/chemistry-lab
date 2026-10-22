@@ -25,10 +25,12 @@ beyond M13. M11 remains the latest completed numbered milestone recorded above.
 branch `M13-advanced-2d-extension` preserves that baseline and scopes staged
 feasibility: first metal–acid localized gas (provisional R10), then independent
 physical dissolution and R8 condensation assessments, followed by final 2D
-acceptance. See `docs/ADVANCED_2D_EXTENSION.md`. The extension currently
-authorizes a Codex-authored ExecPlan and independent review; it **does not**
-authorize registering R10, changing R8's existing visual contract or adding a
-new physical-process engine before the corresponding scope decisions. Neither
+acceptance. See `docs/ADVANCED_2D_EXTENSION.md`. The extension ExecPlan was reviewed and **B2 R10-only implementation was approved**
+on 2026-10-22; see `docs/ADVANCED_2D_EXTENSION.md` and
+`plans/m13-advanced-2d-extension.md`. C1 dissolution and C2 R8 condensation
+were each explicitly deferred. R10 implementation/QA is authorized only on
+the extension branch; R8's visual contract and the physical-process engine
+remain unchanged. This does not approve M13 completion or merge. Neither
 M13 nor its extension is merged or declared complete by this roadmap entry.
 
 Historical milestone branches (`M0`, `M1`, …, `M11`) preserve the earlier
