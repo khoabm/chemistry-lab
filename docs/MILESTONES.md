@@ -20,6 +20,17 @@ finite shared rendering/Replay and regression/browser validation. See
 This records active authorization, not completion, merge, release or advancement
 beyond M13. M11 remains the latest completed numbered milestone recorded above.
 
+**M13 extension — comprehensive 2D phenomena** was directionally approved on
+2026-10-22 as a continuation of the already QA-reviewed R9 work. A dedicated
+branch `M13-advanced-2d-extension` preserves that baseline and scopes staged
+feasibility: first metal–acid localized gas (provisional R10), then independent
+physical dissolution and R8 condensation assessments, followed by final 2D
+acceptance. See `docs/ADVANCED_2D_EXTENSION.md`. The extension currently
+authorizes a Codex-authored ExecPlan and independent review; it **does not**
+authorize registering R10, changing R8's existing visual contract or adding a
+new physical-process engine before the corresponding scope decisions. Neither
+M13 nor its extension is merged or declared complete by this roadmap entry.
+
 Historical milestone branches (`M0`, `M1`, …, `M11`) preserve the earlier
 sequence. Newly approved feature branches need not follow that naming scheme.
 Codex must not advance the numbered milestone, assume feature approval from a
