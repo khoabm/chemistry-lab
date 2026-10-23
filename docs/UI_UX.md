@@ -459,8 +459,10 @@ that the SVG proves physical calibration or that this device measures heated sol
 Enter picks up/drops a focused thermometer; Arrows and Shift move the draft, Escape
 or Tab cancels. The native pickup action also supports clicking/tapping a target
 container and an explicit Remove action, without a primary combobox. Focus-driven
-scroll re-anchors keyboard drafts; pointer scroll/resize/blur/hidden/capture loss
-cancels without changing committed attachment. Invalid/occupied targets retain it.
+scroll re-anchors keyboard drafts; page/bench-ancestor scroll, resize, blur,
+hidden document or capture loss cancels pointer drafts without changing committed
+attachment. Independent palette/Experiment scrolling does not cancel a pointer
+draft. Invalid/occupied targets retain the committed attachment.
 Reading changes are not an aria-live stream. EN/VI disclose nominal assumptions and
 experimental milestones. Sensor lag is preserved at reaction trigger time.
 Thermometers expose a 44×44px upper grip and narrow stem target; transparent wrapper

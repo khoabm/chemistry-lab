@@ -103,7 +103,7 @@ export function useEquipmentInteraction(
     }
     window.addEventListener('blur', cancelDrag)
     document.addEventListener('visibilitychange', cancelWhenHidden)
-    const scroll = () => {
+    const scroll = (event: Event) => {
       const session = sessionRef.current
       const bench = benchRef.current
       // Focusing the native pickup target can scroll it into view. Keep a keyboard
@@ -117,7 +117,11 @@ export function useEquipmentInteraction(
           return { ...previous, point: center }
         })
         measureBench()
-      } else cancelDrag()
+      } else if (!bench || !(event.target instanceof Node) || event.target.contains(bench)) {
+        // Scrolling the page/bench ancestry invalidates pointer coordinates.
+        // Independent palette/Experiment scroll regions do not move the bench.
+        cancelDrag()
+      }
     }
     window.addEventListener('scroll', scroll, true)
     return () => {

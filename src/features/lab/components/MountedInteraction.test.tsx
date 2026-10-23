@@ -192,7 +192,35 @@ describe('internal Pass 3 reducer-backed apparatus integration', () => {
     expect(view.button()).toHaveAttribute('style', style)
   })
 
-  it.each(['Escape', 'pointercancel', 'lostpointercapture', 'blur', 'hidden', 'outside', 'resize'] as const)('preserves mounted container and assembly after %s, including stale pointerup', (reason) => {
+  it.each(['equipment-1', 'equipment-4'])('keeps %s dragging through unrelated panel scroll and commits once at release', (id) => {
+    const initial = fixture()
+    const view = setup(initial)
+    const button = view.button(id)
+    button.focus()
+    view.start(id)
+    // Neither scroll container contains the bench or changes its coordinates.
+    for (const className of ['lab-observations', 'palette-content']) {
+      const panel = document.createElement('div')
+      panel.className = className
+      view.container.append(panel)
+      fireEvent.scroll(panel)
+      pointer(button, 'move', 720, 420)
+      fireEvent.scroll(panel)
+      expect(button).toHaveClass('is-moving')
+      expect(button).toHaveFocus()
+      expect(view.button(id)).toBe(button)
+      expect(observed.mounts).toBe(initial.mounts)
+      expect(observed.equipment).toBe(initial.equipment)
+      expect(view.changes()).toEqual([])
+    }
+    pointer(button, 'up', 720, 420)
+    expect(view.changes().map((action) => action.type)).toEqual([
+      id === 'equipment-1' ? 'remove-from-support' : 'move-lamp-assembly',
+    ])
+    expect(observed.mounts).toEqual(id === 'equipment-1' ? [] : initial.mounts)
+  })
+
+  it.each(['Escape', 'pointercancel', 'lostpointercapture', 'blur', 'hidden', 'outside', 'resize', 'scroll-window', 'scroll-document', 'scroll-ancestor', 'scroll-bench'] as const)('preserves mounted container and assembly after %s, including stale pointerup', (reason) => {
     for (const id of ['equipment-1', 'equipment-4']) {
       const initial = fixture()
       const view = setup(initial)
@@ -211,6 +239,10 @@ describe('internal Pass 3 reducer-backed apparatus integration', () => {
         fireEvent(document, new Event('visibilitychange'))
       }
       if (reason === 'resize') fireEvent(window, new Event('resize'))
+      if (reason === 'scroll-window') fireEvent.scroll(window)
+      if (reason === 'scroll-document') fireEvent.scroll(document)
+      if (reason === 'scroll-ancestor') fireEvent.scroll(view.container)
+      if (reason === 'scroll-bench') fireEvent.scroll(screen.getByRole('group', { name: 'Laboratory bench' }))
       pointer(button, 'up', reason === 'outside' ? 299 : 650, 420)
       pointer(button, 'up', 650, 420)
       expect(view.changes()).toEqual([])
