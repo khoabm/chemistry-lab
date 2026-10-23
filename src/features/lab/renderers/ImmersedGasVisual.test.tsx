@@ -7,6 +7,23 @@ import { immersedZincSites, zincGranules } from './solidSampleGeometry'
 import { ReactionEffectsVisual } from './ReactionEffectsVisual'
 
 describe('immersed zinc gas composition', () => {
+  it.each(['beaker', 'test-tube'] as const)('keeps %s interior markings behind solid material and rim in front', (equipmentType) => {
+    const contents = [{ chemicalId: 'zinc', quantity: 1 }, { chemicalId: 'hydrochloric-acid', quantity: 1 }] as const
+    const result = evaluateReaction({ contents, trigger: 'mix' })
+    const { container } = render(<EquipmentVisual equipmentType={equipmentType} contents={contents}
+      reactionResult={result} presentation={{ startedAt: 0, elapsedMs: 2000 }} />)
+    const detail = container.querySelector('[data-vessel-interior-detail]')
+    const zinc = container.querySelector('[data-substrate="zinc"]')
+    const rim = container.querySelector('[data-vessel-rim]')
+    expect(detail).toBeInTheDocument()
+    expect(zinc).toBeInTheDocument()
+    expect(rim).toBeInTheDocument()
+    const relation = detail!.compareDocumentPosition(zinc!)
+    expect(relation & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const rimRelation = zinc!.compareDocumentPosition(rim!)
+    expect(rimRelation & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it.each(['beaker', 'test-tube'] as const)('retains %s zinc/liquid and anchors finite bubbles to its actual contour', (equipmentType) => {
     const contents = [{ chemicalId: 'zinc', quantity: 1 }, { chemicalId: 'hydrochloric-acid', quantity: 1 }] as const
     const result = evaluateReaction({ contents, trigger: 'mix' })
